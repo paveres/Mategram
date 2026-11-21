@@ -1,0 +1,98 @@
+{
+  "hooks": [
+    {
+      "id": "mate.presence.import",
+      "file": "submodules/TelegramStringFormatting/Sources/PresenceStrings.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import TextFormat", "before": ["import TelegramPresentationData"], "after": [""] },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.presence.build",
+      "file": "submodules/TelegramStringFormatting/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/AppBundle:AppBundle\",", "before": ["\"//submodules/TelegramPresentationData:TelegramPresentationData\","] },
+      "text": ["\"//Mategram/Core:MategramCore\","],
+      "required": true
+    },
+    {
+      "id": "mate.presence.exact",
+      "file": "submodules/TelegramStringFormatting/Sources/PresenceStrings.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func stringAndActivityForUserPresence(strings: PresentationStrings, dateTimeFormat: PresentationDateTimeFormat, presence: EnginePeer.Presence, relativeTo timestamp: Int32, expanded: Bool = false) -> (String, Bool) {"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.preciseLastSeen), case let .present(mategramStatusTimestamp) = presence.status, let mategramText = MategramLastSeen.text(statusTimestamp: mategramStatusTimestamp, now: timestamp, languageCode: strings.baseLanguageCode, twentyFourHour: dateTimeFormat.timeFormat == .military) {",
+        "    return (mategramText, false)",
+        "}"
+      ],
+      "required": true,
+      "note": "single entry point of every last-seen string"
+    },
+    {
+      "id": "mate.info.section",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_after",
+      "anchor": { "line": "case peerInfo", "before": ["case personalChannel"], "after": ["case agentProviders"] },
+      "text": ["case mategram"],
+      "required": true
+    },
+    {
+      "id": "mate.info.items",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_before",
+      "anchor": { "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []", "occurrence": 1 },
+      "text": ["items[.mategram]!.append(contentsOf: mategramPeerInfoItems(data: data, context: context, presentationData: presentationData, interaction: interaction))"],
+      "required": true
+    },
+    {
+      "id": "mate.settings.case",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_after",
+      "anchor": { "line": "case chatFolders", "before": ["case devices"], "after": ["case notificationsAndSounds"] },
+      "text": ["case mategram"],
+      "required": true
+    },
+    {
+      "id": "mate.settings.row",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
+      "action": "insert_before",
+      "anchor": { "line": "let notificationsWarning: Bool" },
+      "text": [
+        "items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 90, text: \"Mategram\", icon: PresentationResourcesSettings.chatFolders, action: {",
+        "    interaction.openSettings(.mategram)",
+        "}))"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.settings.open",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenSettingsActions.swift",
+      "action": "insert_before",
+      "anchor": { "line": "case .chatFolders:" },
+      "text": [
+        "case .mategram:",
+        "    push(mategramSettingsController(context: self.context))"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.settings.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenSettingsActions.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import SettingsUI" },
+      "text": ["import MategramUI"],
+      "required": true
+    },
+    {
+      "id": "mate.peerinfo.build",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/ItemListUI\"," },
+      "text": ["\"//Mategram/Core:MategramCore\",", "\"//Mategram/UI:MategramUI\","],
+      "required": true
+    }
+  ]
+}
