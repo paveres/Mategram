@@ -628,6 +628,10 @@ def cmd_codesigning(ctx, args):
         for f in sorted((src / "profiles").glob("*.mobileprovision")):
             d = read_profile(f)
             d2 = replace_ids(d, OLD_BUNDLE, args.bundle, OLD_TEAM, args.team)
+            import datetime
+            moment = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None, microsecond=0)
+            d2["CreationDate"] = moment
+            d2["ExpirationDate"] = moment + datetime.timedelta(days=3650)
             write_profile(d2, out / "profiles" / f.name, key, cert)
             count += 1
         for f in sorted((out / "profiles").glob("*.mobileprovision")):
