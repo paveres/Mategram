@@ -1,0 +1,119 @@
+{
+  "hooks": [
+    {
+      "id": "ghost.typing",
+      "file": "submodules/TelegramCore/Sources/State/ManagedLocalInputActivities.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "return network.request(Api.functions.messages.setTyping(flags: flags, peer: inputPeer, topMsgId: topMessageId, action: actionFromActivity(activity)))",
+        "before": [
+          "if topMessageId != nil {",
+          "flags |= 1 << 0",
+          "}"
+        ],
+        "after": [
+          "|> `catch` { _ -> Signal<Api.Bool, NoError> in",
+          "return .single(.boolFalse)",
+          "}"
+        ]
+      },
+      "text": [
+        "if MategramGhost.holdsTyping(peerId: peerId, activity: activity) { return .complete() }"
+      ],
+      "required": true,
+      "note": "typing status request (messages.setTyping)"
+    },
+    {
+      "id": "ghost.online",
+      "file": "submodules/TelegramCore/Sources/State/ManagedAccountPresence.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func updatePresence(_ isOnline: Bool) {",
+        "before": [
+          "self.onlineTimer?.invalidate()",
+          "}",
+          ""
+        ],
+        "after": [
+          "let request: Signal<Api.Bool, MTRpcError>",
+          "if isOnline {",
+          "let timer = SignalKitTimer(timeout: 30.0, repeat: false, completion: { [weak self] in"
+        ]
+      },
+      "text": [
+        "if MategramGhost.holdsOnline(isOnline) { return }"
+      ],
+      "required": true,
+      "note": "online presence (account.updateStatus)"
+    },
+    {
+      "id": "ghost.read-history",
+      "file": "submodules/TelegramCore/Sources/State/SynchronizePeerReadState.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "var pushSignal: Signal<Void, NoError> = network.request(Api.functions.messages.readHistory(peer: inputPeer, maxId: maxIncomingReadId))",
+        "before": [
+          "default:",
+          "switch readState {",
+          "case let .idBased(maxIncomingReadId, _, _, _, markedUnread):"
+        ],
+        "after": [
+          "|> map(Optional.init)",
+          "|> `catch` { _ -> Signal<Api.messages.AffectedMessages?, NoError> in",
+          "return .single(nil)"
+        ]
+      },
+      "text": [
+        "if MategramGhost.holdsReadReceipt(peerId: peerId, maxId: maxIncomingReadId) { return .single(readState) }"
+      ],
+      "required": true,
+      "note": "history read receipt (messages.readHistory); verify variable names at build"
+    },
+    {
+      "id": "ghost.story-views",
+      "file": "submodules/TelegramCore/Sources/TelegramEngine/Messages/Stories.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func _internal_markStoryAsSeen(account: Account, peerId: PeerId, id: Int32, asPinned: Bool) -> Signal<Never, NoError> {",
+        "before": [
+          "}",
+          "}",
+          ""
+        ],
+        "after": [
+          "if asPinned {",
+          "return account.postbox.transaction { transaction -> Api.InputPeer? in",
+          "return transaction.getPeer(peerId).flatMap(apiInputPeer)"
+        ]
+      },
+      "text": [
+        "if MategramGhost.holdsStoryViews(peerId: peerId) { return .complete() }"
+      ],
+      "required": true,
+      "note": "story seen mark (stories.incrementStoryViews)"
+    },
+    {
+      "id": "ghost.consume-contents",
+      "file": "submodules/TelegramCore/Sources/State/ManagedSynchronizeConsumeMessageContentsOperations.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "return network.request(Api.functions.messages.readMessageContents(id: operation.messageIds.map { $0.id }))",
+        "before": [
+          "",
+          "private func synchronizeConsumeMessageContents(transaction: Transaction, network: Network, stateManager: AccountStateManager, peerId: PeerId, operation: SynchronizeConsumeMessageContentsOperation) -> Signal<Void, NoError> {",
+          "if peerId.namespace == Namespaces.Peer.CloudUser || peerId.namespace == Namespaces.Peer.CloudGroup {"
+        ],
+        "after": [
+          "|> map(Optional.init)",
+          "|> `catch` { _ -> Signal<Api.messages.AffectedMessages?, NoError> in",
+          "return .single(nil)"
+        ]
+      },
+      "text": [
+        "if MategramGhost.holdsContentRead(peerId: peerId) { return .complete() }"
+      ],
+      "required": true,
+      "note": "voice/video/view-once consumed (messages.readMessageContents); verify return type at build"
+    }
+  ]
+}

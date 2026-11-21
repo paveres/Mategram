@@ -1,0 +1,11 @@
+upstream/
+build-report/
+.mategram/
+__pycache__/
+*.pyc
+secrets.local.json
+*.local.json
+docs/clients/
+docs/reference/
+build/
+brand/icons/
