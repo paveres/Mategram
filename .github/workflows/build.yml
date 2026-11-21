@@ -69,6 +69,12 @@ jobs:
           python3 scripts/mategram.py sync
           cat build-report/sync-report.md
 
+      - name: Mategram icons
+        run: |
+          python3 -m venv "$RUNNER_TEMP/iv"
+          "$RUNNER_TEMP/iv/bin/pip" install --quiet pillow
+          "$RUNNER_TEMP/iv/bin/python" scripts/gen_icons.py upstream/Telegram/Telegram-iOS
+
       - name: Select Xcode
         run: |
           ls -d /Applications/Xcode*.app

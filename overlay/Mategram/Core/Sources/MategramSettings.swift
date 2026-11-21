@@ -20,10 +20,12 @@ public enum MategramKey: String, CaseIterable {
     case hideGiftRow
     case hideAppsRow
     case hideTipsRow
+    case cameraInGallery
+    case roundProfileButtons
 
     public var defaultValue: Bool {
         switch self {
-        case .showProfileId, .showDataCenter, .showRegistrationDate, .preciseLastSeen:
+        case .showProfileId, .showDataCenter, .showRegistrationDate, .preciseLastSeen, .roundProfileButtons:
             return true
         default:
             return false

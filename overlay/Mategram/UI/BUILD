@@ -13,6 +13,7 @@ swift_library(
         "//Mategram/Core:MategramCore",
         "//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit",
         "//submodules/Display:Display",
+        "//submodules/AsyncDisplayKit:AsyncDisplayKit",
         "//submodules/TelegramPresentationData:TelegramPresentationData",
         "//submodules/AccountContext:AccountContext",
         "//submodules/ItemListUI:ItemListUI",

@@ -105,7 +105,7 @@
         "line": "let notificationsWarning: Bool"
       },
       "text": [
-        "items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 90, text: \"Mategram\", icon: PresentationResourcesSettings.chatFolders, action: {",
+        "items[.myProfile]!.append(PeerInfoScreenDisclosureItem(id: 90, text: \"Mategram\", icon: MategramLogo.image(size: CGSize(width: 29.0, height: 29.0), color: .white, background: .black, cornerRadius: 7.0, scale: 3.0), action: {",
         "    interaction.openSettings(.mategram)",
         "}))"
       ],
@@ -503,6 +503,112 @@
       ],
       "required": true,
       "note": "sideloaded builds without app groups: use app storage instead of failing with a black screen"
+    },
+    {
+      "id": "mate.btn.size",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let buttonSize = CGSize(width: buttonWidth, height: 58.0)"
+      },
+      "text": [
+        "let mategramRound = MategramSettings.shared.bool(.roundProfileButtons)",
+        "let mategramSide = min(buttonWidth, 76.0)",
+        "let buttonSize = mategramRound ? CGSize(width: mategramSide, height: mategramSide) : CGSize(width: buttonWidth, height: 58.0)",
+        "let mategramSpacing: CGFloat = (mategramRound && buttonKeys.count > 1) ? (width - stripLeft - stripRight - buttonSideInset * 2.0 - CGFloat(buttonKeys.count) * mategramSide) / CGFloat(buttonKeys.count - 1) : buttonSpacing"
+      ],
+      "required": true,
+      "note": "round profile buttons: size"
+    },
+    {
+      "id": "mate.btn.step",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "buttonRightOrigin.x -= buttonSize.width + buttonSpacing"
+      },
+      "text": [
+        "buttonRightOrigin.x -= buttonSize.width + mategramSpacing"
+      ],
+      "required": true,
+      "note": "round profile buttons: spacing"
+    },
+    {
+      "id": "mate.btn.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import UIKit",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.btn.radius",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: min(16.0, backgroundFrame.height * 0.5))"
+      },
+      "text": [
+        "transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: MategramSettings.shared.bool(.roundProfileButtons) ? backgroundFrame.height * 0.5 : min(16.0, backgroundFrame.height * 0.5))"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.btn.source",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.referenceNode.contextMenuSourcePath = UIBezierPath(roundedRect: backgroundFrame, cornerRadius: min(16.0, backgroundFrame.height * 0.5))"
+      },
+      "text": [
+        "self.referenceNode.contextMenuSourcePath = UIBezierPath(roundedRect: backgroundFrame, cornerRadius: MategramSettings.shared.bool(.roundProfileButtons) ? backgroundFrame.height * 0.5 : min(16.0, backgroundFrame.height * 0.5))"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.cam.import",
+      "file": "submodules/MediaPickerUI/Sources/MediaPickerScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.cam.build",
+      "file": "submodules/MediaPickerUI/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TelegramPresentationData:TelegramPresentationData\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.cam.cell",
+      "file": "submodules/MediaPickerUI/Sources/MediaPickerScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let cameraCellSubject = controller.subject.cameraCellSubject",
+        "occurrence": 1
+      },
+      "text": [
+        "let cameraCellSubject: MediaPickerCameraCellSubject = (controller.subject.cameraCellSubject == .chatAssets && !MategramSettings.shared.bool(.cameraInGallery)) ? .noCamera : controller.subject.cameraCellSubject"
+      ],
+      "required": true,
+      "note": "gallery: live camera cell is optional"
     }
   ]
 }
