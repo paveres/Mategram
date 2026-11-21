@@ -187,3 +187,7 @@ public enum MategramCallGate {
 public enum MategramChatRelay {
     public static var edit: ((Any) -> Void)?
 }
+
+public enum MategramAttach {
+    public static var forced: String?
+}

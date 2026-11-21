@@ -1165,6 +1165,79 @@
         "var itemSize: CGFloat = 40.0"
       ],
       "required": true
+    },
+    {
+      "id": "m5.att.import",
+      "file": "submodules/TelegramUI/Sources/ChatControllerOpenAttachmentMenu.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.att.var",
+      "file": "submodules/TelegramUI/Sources/ChatControllerOpenAttachmentMenu.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let buttons: Signal<([AttachmentButtonType], [AttachmentButtonType], AttachmentButtonType?), NoError>"
+      },
+      "text": [
+        "var buttons: Signal<([AttachmentButtonType], [AttachmentButtonType], AttachmentButtonType?), NoError>"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.att.menu",
+      "file": "submodules/TelegramUI/Sources/ChatControllerOpenAttachmentMenu.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "let dataSettings = self.context.sharedContext.accountManager.transaction { transaction -> GeneratedMediaStoreSettings in"
+      },
+      "text": [
+        "if case .default = subject, MategramAttach.forced == nil, let mategramSource = self.chatDisplayNode.textInputPanelNode?.attachmentButton {",
+        "    let _ = (buttons |> take(1) |> deliverOnMainQueue).startStandalone(next: { [weak self] value in",
+        "        self?.mategramPresentAttachMenu(sourceView: mategramSource, buttons: value.1)",
+        "    })",
+        "    return",
+        "}",
+        "if let mategramForced = MategramAttach.forced {",
+        "    MategramAttach.forced = nil",
+        "    buttons = buttons |> map { value -> ([AttachmentButtonType], [AttachmentButtonType], AttachmentButtonType?) in",
+        "        if let match = value.1.first(where: { mategramAttachKey($0) == mategramForced }) {",
+        "            return ([match], value.1, match)",
+        "        }",
+        "        return value",
+        "    }",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.att.plus",
+      "file": "submodules/TelegramPresentationData/Sources/Resources/PresentationResourcesChat.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "return generateTintedImage(image: UIImage(bundleImageName: \"Chat/Input/Text/IconAttachment\"), color: .white)?.withRenderingMode(.alwaysTemplate)"
+      },
+      "text": [
+        "return generateImage(CGSize(width: 24.0, height: 24.0), rotatedContext: { size, context in",
+        "    context.clear(CGRect(origin: CGPoint(), size: size))",
+        "    context.setStrokeColor(UIColor.white.cgColor)",
+        "    context.setLineWidth(2.2)",
+        "    context.setLineCap(.round)",
+        "    context.move(to: CGPoint(x: 12.0, y: 4.5))",
+        "    context.addLine(to: CGPoint(x: 12.0, y: 19.5))",
+        "    context.move(to: CGPoint(x: 4.5, y: 12.0))",
+        "    context.addLine(to: CGPoint(x: 19.5, y: 12.0))",
+        "    context.strokePath()",
+        "})?.withRenderingMode(.alwaysTemplate)"
+      ],
+      "required": true
     }
   ]
 }
