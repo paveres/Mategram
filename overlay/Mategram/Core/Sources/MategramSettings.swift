@@ -60,6 +60,8 @@ public enum MategramKey: String, CaseIterable {
     case alwaysTranslate
     case longAllChats
     case doubleTapEdit
+    case serviceMessageTime
+    case builtInMic
     case hideMyProfileRow
     case hideWalletRow
     case hideProxyRow

@@ -69,3 +69,22 @@ public enum MategramLook {
         return UIColor(hue: hue, saturation: saturation * 0.5, brightness: brightness, alpha: alpha)
     }
 }
+
+public enum MategramServiceTime {
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
+
+    public static func append(_ string: NSAttributedString?, timestamp: Int32) -> NSAttributedString? {
+        guard MategramSettings.shared.bool(.serviceMessageTime), let string, string.length > 0 else {
+            return string
+        }
+        let attributes = string.attributes(at: string.length - 1, effectiveRange: nil).filter { $0.key == .font || $0.key == .foregroundColor }
+        let result = NSMutableAttributedString(attributedString: string)
+        let time = formatter.string(from: Date(timeIntervalSince1970: Double(timestamp)))
+        result.append(NSAttributedString(string: " · \(time)", attributes: attributes))
+        return result
+    }
+}

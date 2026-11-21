@@ -1345,6 +1345,82 @@
         "mategramGlassView.update(size: mategramGlassFrame.size, cornerRadius: min(26.0, mategramGlassFrame.height * 0.5), isDark: presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .clear), transition: ComponentTransition(transition))"
       ],
       "required": true
+    },
+    {
+      "id": "m6.svc.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionBubbleContentNode/Sources/ChatMessageActionBubbleContentNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.svc.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionBubbleContentNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "deps = [",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.svc.time",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionBubbleContentNode/Sources/ChatMessageActionBubbleContentNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let attributedString = attributedServiceMessageString(theme: item.presentationData.theme, strings: item.presentationData.strings, nameDisplayOrder: item.presentationData.nameDisplayOrder, dateTimeFormat: item.presentationData.dateTimeFormat, message: item.message, messageCount: messageCount, accountPeerId: item.context.account.peerId, forForumOverview: forForumOverview)"
+      },
+      "text": [
+        "let attributedString = MategramServiceTime.append(attributedServiceMessageString(theme: item.presentationData.theme, strings: item.presentationData.strings, nameDisplayOrder: item.presentationData.nameDisplayOrder, dateTimeFormat: item.presentationData.dateTimeFormat, message: item.message, messageCount: messageCount, accountPeerId: item.context.account.peerId, forForumOverview: forForumOverview), timestamp: item.message.timestamp)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.mic.import",
+      "file": "submodules/TelegramAudio/Sources/ManagedAudioSession.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.mic.build",
+      "file": "submodules/TelegramAudio/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.mic.builtin",
+      "file": "submodules/TelegramAudio/Sources/ManagedAudioSession.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "try self.setupOutputMode(outputMode, type: type)"
+      },
+      "text": [
+        "if case .record = type, MategramSettings.shared.bool(.builtInMic), let mategramMic = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) { _ = try? AVAudioSession.sharedInstance().setPreferredInput(mategramMic) }"
+      ],
+      "required": true
     }
   ]
 }
