@@ -93,6 +93,88 @@
       "anchor": { "line": "\"//submodules/ItemListUI\"," },
       "text": ["\"//Mategram/Core:MategramCore\",", "\"//Mategram/UI:MategramUI\","],
       "required": true
+    },
+    {
+      "id": "mate.badge.import",
+      "file": "submodules/TelegramCore/Sources/Utils/PeerUtils.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import Postbox", "before": ["import Foundation"] },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.badge.build",
+      "file": "submodules/TelegramCore/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/MediaPreuploadRegistry:MediaPreuploadRegistry\"," },
+      "text": ["\"//Mategram/Core:MategramCore\","],
+      "required": true
+    },
+    {
+      "id": "mate.badge.status",
+      "file": "submodules/TelegramCore/Sources/Utils/PeerUtils.swift",
+      "action": "replace",
+      "anchor": { "line": "return user.emojiStatus", "before": ["case let user as TelegramUser:"], "after": ["case let channel as TelegramChannel:"] },
+      "text": ["return MategramBadges.emojiFileId(userId: user.id.id._internalGetInt64Value()).map { PeerEmojiStatus(content: .emoji(fileId: $0), expirationDate: nil) } ?? user.emojiStatus"],
+      "required": true,
+      "note": "client-only Mategram badge shown as emoji status"
+    },
+    {
+      "id": "mate.views.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageDateAndStatusNode/Sources/ChatMessageDateAndStatusNode.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import StaticGlassBackground" },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.views.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageDateAndStatusNode/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/TelegramStringFormatting\"," },
+      "text": ["\"//Mategram/Core:MategramCore\","],
+      "required": true
+    },
+    {
+      "id": "mate.views.full",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageDateAndStatusNode/Sources/ChatMessageDateAndStatusNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "updatedDateText = compactNumericCountString(impressionCount, decimalSeparator: arguments.presentationData.dateTimeFormat.decimalSeparator) + \" \" + updatedDateText"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.fullViewCount) {",
+        "    updatedDateText = MategramNumbers.fullCount(impressionCount) + \" \" + String(updatedDateText.dropFirst(compactNumericCountString(impressionCount, decimalSeparator: arguments.presentationData.dateTimeFormat.decimalSeparator).count + 1))",
+        "}"
+      ],
+      "strip": false,
+      "required": true,
+      "note": "full view count under channel posts"
+    },
+    {
+      "id": "mate.stories.import",
+      "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import Foundation" },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.stories.build",
+      "file": "submodules/ChatListUI/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/TelegramPresentationData:TelegramPresentationData\",", "occurrence": 1 },
+      "text": ["\"//Mategram/Core:MategramCore\","],
+      "required": true
+    },
+    {
+      "id": "mate.stories.hide",
+      "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
+      "action": "insert_after",
+      "anchor": { "line": "func shouldDisplayStoriesInChatListHeader(storySubscriptions: EngineStorySubscriptions, isHidden: Bool) -> Bool {" },
+      "text": ["if MategramSettings.shared.bool(.hideStoriesBar) { return false }"],
+      "required": true,
+      "note": "hide stories bar"
     }
   ]
 }

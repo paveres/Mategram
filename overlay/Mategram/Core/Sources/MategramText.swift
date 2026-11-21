@@ -29,6 +29,12 @@ public enum MategramText {
     case preciseLastSeen
     case preciseLastSeenFooter
 
+    case sectionChats
+    case fullViewCount
+    case fullViewCountFooter
+    case hideStoriesBar
+    case hideStoriesBarFooter
+
     case rowId
     case rowDataCenter
     case rowDataCenterUnknown
@@ -65,6 +71,11 @@ public enum MategramText {
         case .sectionStatus: return "Статус в сети"
         case .preciseLastSeen: return "Точное время визита"
         case .preciseLastSeenFooter: return "К статусу «был(а)» добавляются секунды: в шапке чата, профиле, списке контактов и участников. Если человек скрыл время, оно не покажется."
+        case .sectionChats: return "Чаты и каналы"
+        case .fullViewCount: return "Точное число просмотров"
+        case .fullViewCountFooter: return "Под постами канала число просмотров показывается полностью: 1 234 567 вместо 1,2M."
+        case .hideStoriesBar: return "Скрыть ленту историй"
+        case .hideStoriesBarFooter: return "Лента историй над списком чатов не показывается. Сами истории доступны из профиля."
         case .rowId: return "ID"
         case .rowDataCenter: return "Датацентр"
         case .rowDataCenterUnknown: return "неизвестно"
@@ -94,6 +105,11 @@ public enum MategramText {
         case .sectionStatus: return "Last seen"
         case .preciseLastSeen: return "Exact visit time"
         case .preciseLastSeenFooter: return "Seconds are added to «last seen» in the chat header, profile, contacts and member lists. If a person hides the time, it stays hidden."
+        case .sectionChats: return "Chats and channels"
+        case .fullViewCount: return "Exact view count"
+        case .fullViewCountFooter: return "Views under channel posts are shown in full: 1,234,567 instead of 1.2M."
+        case .hideStoriesBar: return "Hide stories bar"
+        case .hideStoriesBarFooter: return "The stories bar above the chat list is not shown. Stories stay available from profiles."
         case .rowId: return "ID"
         case .rowDataCenter: return "Data center"
         case .rowDataCenterUnknown: return "unknown"

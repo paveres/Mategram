@@ -6,12 +6,14 @@ public enum MategramKey: String, CaseIterable {
     case showMutualContact
     case showRegistrationDate
     case preciseLastSeen
+    case fullViewCount
+    case hideStoriesBar
 
     public var defaultValue: Bool {
         switch self {
         case .showProfileId, .showDataCenter, .showRegistrationDate, .preciseLastSeen:
             return true
-        case .showMutualContact:
+        case .showMutualContact, .fullViewCount, .hideStoriesBar:
             return false
         }
     }

@@ -83,6 +83,12 @@ private func mategramSettingsEntries(language: MategramLanguage) -> [MategramSet
     entries.append(.toggle(index: nextIndex(), section: 2, key: .preciseLastSeen, title: MategramText.preciseLastSeen.string(language), value: settings.bool(.preciseLastSeen)))
     entries.append(.footer(index: nextIndex(), section: 2, text: MategramText.preciseLastSeenFooter.string(language)))
 
+    entries.append(.header(index: nextIndex(), section: 3, text: MategramText.sectionChats.string(language).uppercased()))
+    entries.append(.toggle(index: nextIndex(), section: 3, key: .fullViewCount, title: MategramText.fullViewCount.string(language), value: settings.bool(.fullViewCount)))
+    entries.append(.footer(index: nextIndex(), section: 3, text: MategramText.fullViewCountFooter.string(language)))
+    entries.append(.toggle(index: nextIndex(), section: 3, key: .hideStoriesBar, title: MategramText.hideStoriesBar.string(language), value: settings.bool(.hideStoriesBar)))
+    entries.append(.footer(index: nextIndex(), section: 3, text: MategramText.hideStoriesBarFooter.string(language)))
+
     return entries
 }
 
