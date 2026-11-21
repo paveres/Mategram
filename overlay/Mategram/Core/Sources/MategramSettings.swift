@@ -83,6 +83,9 @@ public enum MategramKey: String, CaseIterable {
     case hideWatchRow
     case hideSupportRow
     case hideFaqRow
+    case hideAllChatsTab
+    case rememberFolder
+    case callsTcp
 
     public var defaultValue: Bool {
         switch self {

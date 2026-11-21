@@ -1504,6 +1504,84 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m7.folders.hide",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var resolvedItems = filterItems",
+        "occurrence": 1
+      },
+      "text": [
+        "var resolvedItems = mategramVisibleFolders(filterItems)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.folders.initial",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var selectedEntryId = !strongSelf.initializedFilters ? firstItemEntryId : strongSelf.chatListDisplayNode.mainContainerNode.currentItemFilter",
+        "occurrence": 1
+      },
+      "text": [
+        "var selectedEntryId = !strongSelf.initializedFilters ? mategramInitialFolder(firstItemEntryId, resolvedItems) : strongSelf.chatListDisplayNode.mainContainerNode.currentItemFilter"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.folders.store",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.chatListDisplayNode.mainContainerNode.currentItemFilterUpdated = { [weak self] filter, fraction, transition, force in",
+        "occurrence": 1
+      },
+      "text": [
+        "    mategramStoreFolder(filter)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.tcp.import",
+      "file": "submodules/TelegramCallsUI/Sources/PresentationCall.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.tcp.build",
+      "file": "submodules/TelegramCallsUI/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TelegramPresentationData:TelegramPresentationData\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.tcp.use",
+      "file": "submodules/TelegramCallsUI/Sources/PresentationCall.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let ongoingContext = OngoingCallContext(account: self.context.account, callSessionManager: self.callSessionManager, callId: id, internalId: self.internalId, proxyServer: proxyServer, initialNetworkType: self.currentNetworkType, updatedNetworkType: self.updatedNetworkType, serializedData: self.serializedData, dataSaving: dataSaving, key: key, isOutgoing: sessionState.isOutgoing, video: self.videoCapturer, connections: updatedConnections, maxLayer: maxLayer, version: version, customParameters: customParameters, allowP2P: allowsP2P, enableTCP: self.enableTCP, enableStunMarking: self.enableStunMarking, audioSessionActive: contextAudioSessionActive, logName: logName, preferredVideoCodec: self.preferredVideoCodec, audioDevice: self.sharedAudioContext?.audioDevice)",
+        "occurrence": 1
+      },
+      "text": [
+        "let ongoingContext = OngoingCallContext(account: self.context.account, callSessionManager: self.callSessionManager, callId: id, internalId: self.internalId, proxyServer: proxyServer, initialNetworkType: self.currentNetworkType, updatedNetworkType: self.updatedNetworkType, serializedData: self.serializedData, dataSaving: dataSaving, key: key, isOutgoing: sessionState.isOutgoing, video: self.videoCapturer, connections: updatedConnections, maxLayer: maxLayer, version: version, customParameters: customParameters, allowP2P: allowsP2P, enableTCP: self.enableTCP || MategramSettings.shared.bool(.callsTcp), enableStunMarking: self.enableStunMarking, audioSessionActive: contextAudioSessionActive, logName: logName, preferredVideoCodec: self.preferredVideoCodec, audioDevice: self.sharedAudioContext?.audioDevice)"
+      ],
+      "required": true
     }
   ]
 }
