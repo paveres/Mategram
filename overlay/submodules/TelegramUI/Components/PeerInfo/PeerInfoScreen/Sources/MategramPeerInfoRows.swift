@@ -112,6 +112,40 @@ func mategramPeerInfoItems(
         }
     }
 
+    if settings.bool(.showCreationDate) {
+        var creationDate: Int32?
+        if case let .legacyGroup(group) = peer {
+            creationDate = group.creationDate
+        } else if case let .channel(channel) = peer, channel.flags.contains(.isCreator) {
+            creationDate = channel.creationDate
+        }
+        if let creationDate, creationDate > 0 {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: language == .russian ? "ru_RU" : "en_US")
+            formatter.dateStyle = .long
+            formatter.timeStyle = .none
+            let value = formatter.string(from: Date(timeIntervalSince1970: Double(creationDate)))
+            let label = language == .russian ? "создано" : "created"
+            result.append(PeerInfoScreenLabeledValueItem(id: 9006, label: label, text: value, textColor: .primary, action: nil, longTapAction: nil, requestLayout: { _ in
+            }))
+        }
+    }
+
+    if MategramGhost.showsServerReadAction, peer.id != context.account.peerId, MategramGhost.holdsReadReceipt(peer: peer.id.toInt64()) {
+        let readTitle = language == .russian ? "Прочитать на сервере" : "Mark as read on server"
+        let readDone = language == .russian ? "Чат отмечен прочитанным у собеседника" : "The chat is marked as read for the other side"
+        let peerId = peer.id
+        result.append(PeerInfoScreenActionItem(id: 9007, text: readTitle, action: {
+            let _ = mategramPushReadStateNow(account: context.account, peerId: peerId).start(completed: {
+                Queue.mainQueue().async {
+                    context.sharedContext.mainWindow?.present(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: readDone, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: false, action: { _ in
+                        return false
+                    }), on: .root)
+                }
+            })
+        }))
+    }
+
     if settings.bool(.ghostMode), peer.id != context.account.peerId {
         let peerKey = peer.id.toInt64()
         let ghostTitle = language == .russian ? "Режим призрака в этом чате" : "Ghost mode in this chat"

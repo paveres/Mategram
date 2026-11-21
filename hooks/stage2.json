@@ -134,11 +134,24 @@
         "line": "public func enqueueMessages(account: Account, peerId: PeerId, messages: [EnqueueMessage]) -> Signal<[MessageId?], NoError> {"
       },
       "text": [
+        "let mategramDelay: Int32? = peerId.namespace == Namespaces.Peer.SecretChat ? nil : MategramGhost.sendDelay",
         "let messages: [EnqueueMessage] = messages.map { mategramMessage -> EnqueueMessage in",
+        "    var mategramResult = mategramMessage",
         "    if MategramSettings.shared.bool(.zalgoFilter), case let .message(text, attributes, inlineStickers, mediaReference, threadId, replyToMessageId, replyToStoryId, localGroupingKey, correlationId, bubbleUpEmojiOrStickersets) = mategramMessage, !attributes.contains(where: { $0 is TextEntitiesMessageAttribute }) {",
-        "        return .message(text: MategramZalgo.clean(text), attributes: attributes, inlineStickers: inlineStickers, mediaReference: mediaReference, threadId: threadId, replyToMessageId: replyToMessageId, replyToStoryId: replyToStoryId, localGroupingKey: localGroupingKey, correlationId: correlationId, bubbleUpEmojiOrStickersets: bubbleUpEmojiOrStickersets)",
+        "        mategramResult = .message(text: MategramZalgo.clean(text), attributes: attributes, inlineStickers: inlineStickers, mediaReference: mediaReference, threadId: threadId, replyToMessageId: replyToMessageId, replyToStoryId: replyToStoryId, localGroupingKey: localGroupingKey, correlationId: correlationId, bubbleUpEmojiOrStickersets: bubbleUpEmojiOrStickersets)",
         "    }",
-        "    return mategramMessage",
+        "    if let mategramDelay {",
+        "        mategramResult = mategramResult.withUpdatedAttributes { attributes in",
+        "            if attributes.contains(where: { $0 is OutgoingScheduleInfoMessageAttribute }) {",
+        "                return attributes",
+        "            }",
+        "            return attributes + [OutgoingScheduleInfoMessageAttribute(scheduleTime: Int32(Date().timeIntervalSince1970) + mategramDelay, repeatPeriod: nil)]",
+        "        }",
+        "    }",
+        "    return mategramResult",
+        "}",
+        "if MategramGhost.readsOnReply(peer: peerId.toInt64()) {",
+        "    let _ = mategramPushReadStateNow(account: account, peerId: peerId).start()",
         "}"
       ],
       "required": true
@@ -666,6 +679,188 @@
       },
       "text": [
         "self.masterPendingParts = (self.fastDownloads || MategramSettings.shared.bool(.fastDownload)) ? fastDownloadMasterPendingParts : 6"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.read.server",
+      "file": "submodules/TelegramCore/Sources/State/SynchronizePeerReadState.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "private func pushPeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId, willValidate: Bool) -> Signal<Never, PeerReadStateValidationError> {"
+      },
+      "text": [
+        "public func mategramPushReadStateNow(account: Account, peerId: PeerId) -> Signal<Never, NoError> {",
+        "    let mategramPeer = peerId.toInt64()",
+        "    MategramGhost.allowRead(peer: mategramPeer)",
+        "    return pushPeerReadState(network: account.network, postbox: account.postbox, stateManager: account.stateManager, peerId: peerId, willValidate: false)",
+        "    |> `catch` { _ -> Signal<Never, NoError> in",
+        "        return .complete()",
+        "    }",
+        "    |> afterDisposed {",
+        "        MategramGhost.endAllowRead(peer: mategramPeer)",
+        "    }",
+        "}",
+        ""
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.ghost.kinds",
+      "file": "submodules/TelegramCore/Sources/State/ManagedLocalInputActivities.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func requestActivity(postbox: Postbox, network: Network, accountPeerId: PeerId, peerId: PeerId, threadId: Int64?, activity: PeerInputActivity?) -> Signal<Void, NoError> {"
+      },
+      "text": [
+        "if let activity {",
+        "    let mategramKind: Int",
+        "    switch activity {",
+        "    case .typingText:",
+        "        mategramKind = 1",
+        "    case .recordingVoice, .recordingInstantVideo:",
+        "        mategramKind = 2",
+        "    case .uploadingFile, .uploadingPhoto, .uploadingVideo, .uploadingInstantVideo:",
+        "        mategramKind = 3",
+        "    case .choosingSticker:",
+        "        mategramKind = 4",
+        "    default:",
+        "        mategramKind = 0",
+        "    }",
+        "    if MategramGhost.holdsActivity(kind: mategramKind, peer: peerId.toInt64()) {",
+        "        return .complete()",
+        "    }",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.once.init",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "public var viewOnce = false"
+      },
+      "text": [
+        "public var viewOnce = MategramSettings.shared.bool(.viewOnceDefault)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.once.reset1",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.viewOnce = false",
+        "occurrence": 1
+      },
+      "text": [
+        "self.viewOnce = MategramSettings.shared.bool(.viewOnceDefault)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.once.reset2",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.viewOnce = false",
+        "occurrence": 2
+      },
+      "text": [
+        "self.viewOnce = MategramSettings.shared.bool(.viewOnceDefault)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.once.reset3",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.viewOnce = false",
+        "occurrence": 3
+      },
+      "text": [
+        "self.viewOnce = MategramSettings.shared.bool(.viewOnceDefault)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.calls.import",
+      "file": "submodules/TelegramUI/Sources/TelegramRootController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.calls.hide1",
+      "file": "submodules/TelegramUI/Sources/TelegramRootController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if showCallsTab {",
+        "occurrence": 1
+      },
+      "text": [
+        "if showCallsTab && !MategramSettings.shared.bool(.hideCallsTab) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.calls.hide2",
+      "file": "submodules/TelegramUI/Sources/TelegramRootController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if showCallsTab {",
+        "occurrence": 2
+      },
+      "text": [
+        "if showCallsTab && !MategramSettings.shared.bool(.hideCallsTab) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.lines.one",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListItem.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "maximumNumberOfLines: (authorAttributedString == nil && itemTags.isEmpty && forumThread == nil && topForumTopicItems.isEmpty) ? 2 : 1,"
+      },
+      "text": [
+        "maximumNumberOfLines: (authorAttributedString == nil && itemTags.isEmpty && forumThread == nil && topForumTopicItems.isEmpty && !MategramSettings.shared.bool(.singleLinePreview)) ? 2 : 1,"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.tr.always",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if canTranslate {",
+        "before": [
+          "canTranslate = false",
+          "}"
+        ]
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.alwaysTranslate), !messageText.isEmpty, chatPresentationInterfaceState.chatLocation.peerId?.namespace != Namespaces.Peer.SecretChat { canTranslate = true }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.allchats",
+      "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "title = HorizontalTabsComponent.Tab.Title(text: self.presentationData.strings.ChatList_Tabs_All, entities: [], enableAnimations: false)"
+      },
+      "text": [
+        "title = HorizontalTabsComponent.Tab.Title(text: MategramSettings.shared.bool(.longAllChats) ? self.presentationData.strings.ChatList_Tabs_AllChats : self.presentationData.strings.ChatList_Tabs_All, entities: [], enableAnimations: false)"
       ],
       "required": true
     }

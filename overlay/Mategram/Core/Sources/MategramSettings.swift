@@ -47,6 +47,18 @@ public enum MategramKey: String, CaseIterable {
     case mutedNameColors
     case smallStickers
     case fastDownload
+    case ghostHideText
+    case ghostHideRecording
+    case ghostHideUploads
+    case ghostHideStickers
+    case ghostReadOnReply
+    case ghostDelaySend
+    case hideCallsTab
+    case viewOnceDefault
+    case singleLinePreview
+    case showCreationDate
+    case alwaysTranslate
+    case longAllChats
 
     public var defaultValue: Bool {
         switch self {
