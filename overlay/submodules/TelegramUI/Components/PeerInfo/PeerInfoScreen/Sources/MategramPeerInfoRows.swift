@@ -112,5 +112,13 @@ func mategramPeerInfoItems(
         }
     }
 
+    if settings.bool(.ghostMode), peer.id != context.account.peerId {
+        let peerKey = peer.id.toInt64()
+        let ghostTitle = language == .russian ? "Режим призрака в этом чате" : "Ghost mode in this chat"
+        result.append(PeerInfoScreenSwitchItem(id: 9005, text: ghostTitle, value: !MategramGhost.isException(peer: peerKey), toggled: { value in
+            MategramGhost.setException(peer: peerKey, !value)
+        }))
+    }
+
     return result
 }

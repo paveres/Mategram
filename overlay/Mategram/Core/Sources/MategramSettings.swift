@@ -28,6 +28,21 @@ public enum MategramKey: String, CaseIterable {
     case ghostOnline
     case ghostStories
     case ghostContents
+    case ghostAlwaysOnline
+    case hideReactions
+    case sendOnReturn
+    case hideSendAs
+    case zalgoFilter
+    case menuSaveToSaved
+    case hideBusinessBotPanel
+    case hideProxySponsor
+    case disableChatSwipes
+    case hidePhone
+    case showSessionApiId
+    case wordFilter
+    case hideTabTitles
+    case noAutoplayNextVoice
+    case googleTranslate
 
     public var defaultValue: Bool {
         switch self {
@@ -65,6 +80,59 @@ public final class MategramSettings {
     public func set(_ value: Bool, for key: MategramKey) {
         self.defaults.set(value, forKey: MategramSettings.storageKey(key))
         NotificationCenter.default.post(name: MategramSettings.didChangeNotification, object: nil)
+    }
+}
+
+public enum MategramTextKey: String, CaseIterable {
+    case filterWords
+}
+
+extension MategramSettings {
+    private static func textStorageKey(_ key: MategramTextKey) -> String {
+        return "mategram.text.\(key.rawValue)"
+    }
+
+    public func text(_ key: MategramTextKey) -> String {
+        return UserDefaults.standard.string(forKey: MategramSettings.textStorageKey(key)) ?? ""
+    }
+
+    public func setText(_ value: String, for key: MategramTextKey) {
+        UserDefaults.standard.set(value, forKey: MategramSettings.textStorageKey(key))
+        if key == .filterWords {
+            MategramWordFilter.reset()
+        }
+        NotificationCenter.default.post(name: MategramSettings.didChangeNotification, object: nil)
+    }
+}
+
+public enum MategramWordFilter {
+    private static var cached: [String]?
+
+    static func reset() {
+        cached = nil
+    }
+
+    private static func words() -> [String] {
+        if let cached {
+            return cached
+        }
+        let raw = MategramSettings.shared.text(.filterWords)
+        let parts = raw.components(separatedBy: CharacterSet(charactersIn: ",
+")).map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }.filter { !$0.isEmpty }
+        cached = parts
+        return parts
+    }
+
+    public static func matches(_ text: String) -> Bool {
+        if !MategramSettings.shared.bool(.wordFilter) || text.isEmpty {
+            return false
+        }
+        let list = words()
+        if list.isEmpty {
+            return false
+        }
+        let lowered = text.lowercased()
+        return list.contains(where: { lowered.contains($0) })
     }
 }
 

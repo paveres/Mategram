@@ -132,10 +132,12 @@ private final class MategramHeaderNode: ListViewItemNode, ItemListItemNode {
 private final class MategramSettingsArguments {
     let toggle: (MategramKey, Bool) -> Void
     let openSection: (MategramSection) -> Void
+    let updateText: (MategramTextKey, String) -> Void
 
-    init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void) {
+    init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }) {
         self.toggle = toggle
         self.openSection = openSection
+        self.updateText = updateText
     }
 }
 
@@ -144,6 +146,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case sectionRow(index: Int32, section: Int32, kind: MategramSection, title: String, subtitle: String)
     case toggle(index: Int32, section: Int32, key: MategramKey, title: String, value: Bool)
     case footer(index: Int32, section: Int32, text: String)
+    case textHeader(index: Int32, section: Int32, text: String)
+    case textInput(index: Int32, section: Int32, key: MategramTextKey, placeholder: String, value: String)
 
     var section: ItemListSectionId {
         switch self {
@@ -154,6 +158,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .toggle(_, section, _, _, _):
             return section
         case let .footer(_, section, _):
+            return section
+        case let .textHeader(_, section, _):
+            return section
+        case let .textInput(_, section, _, _, _):
             return section
         }
     }
@@ -167,6 +175,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .toggle(index, _, _, _, _):
             return index
         case let .footer(index, _, _):
+            return index
+        case let .textHeader(index, _, _):
+            return index
+        case let .textInput(index, _, _, _, _):
             return index
         }
     }
@@ -191,6 +203,12 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             })
         case let .footer(_, section, text):
             return ItemListTextItem(presentationData: presentationData, text: .plain(text), sectionId: section)
+        case let .textHeader(_, section, text):
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: text, sectionId: section)
+        case let .textInput(_, section, key, placeholder, value):
+            return ItemListMultilineInputItem(presentationData: presentationData, systemStyle: .glass, text: value, placeholder: placeholder, maxLength: nil, sectionId: section, style: .blocks, capitalization: false, autocorrection: false, textUpdated: { text in
+                arguments.updateText(key, text)
+            })
         }
     }
 }
@@ -224,6 +242,13 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
         index += 1
         entries.append(.footer(index: index, section: sectionId, text: option.footer(language)))
     }
+    for option in MategramCatalog.textOptions(in: section) {
+        sectionId += 1
+        index += 1
+        entries.append(.textHeader(index: index, section: sectionId, text: option.title(language)))
+        index += 1
+        entries.append(.textInput(index: index, section: sectionId, key: option.key, placeholder: option.placeholder(language), value: settings.text(option.key)))
+    }
     return entries
 }
 
@@ -256,6 +281,8 @@ private func mategramSectionController(context: AccountContext, section: Mategra
         counter += 1
         refresh.set(counter)
     }, openSection: { _ in
+    }, updateText: { key, text in
+        MategramSettings.shared.setText(text, for: key)
     })
     return ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: section))
 }

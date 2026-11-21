@@ -1,0 +1,491 @@
+{
+  "hooks": [
+    {
+      "id": "m2.react.import",
+      "file": "submodules/TelegramCore/Sources/ApiUtils/ReactionsMessageAttribute.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.react.hide",
+      "file": "submodules/TelegramCore/Sources/ApiUtils/ReactionsMessageAttribute.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func mergedMessageReactions(attributes: [MessageAttribute], isTags: Bool) -> ReactionsMessageAttribute? {"
+      },
+      "text": [
+        "if !isTags, MategramSettings.shared.bool(.hideReactions) { return nil }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TouchDownGesture\","
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.return1",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func chatInputTextNode(shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {"
+      },
+      "text": [
+        "if text == \"\n\", MategramSettings.shared.bool(.sendOnReturn) { self.sendButtonPressed(); return false }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.return2",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "@objc public func editableTextNode(_ editableTextNode: ASEditableTextNode, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {"
+      },
+      "text": [
+        "if text == \"\n\", MategramSettings.shared.bool(.sendOnReturn) { self.sendButtonPressed(); return false }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.sendas1",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if let sendAsPeers = interfaceState.sendAsPeers, !sendAsPeers.isEmpty && interfaceState.editMessageState == nil {",
+        "occurrence": 1
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideSendAs), let sendAsPeers = interfaceState.sendAsPeers, !sendAsPeers.isEmpty && interfaceState.editMessageState == nil {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.sendas2",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if let sendAsPeers = interfaceState.sendAsPeers, !sendAsPeers.isEmpty && interfaceState.editMessageState == nil {",
+        "occurrence": 2
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideSendAs), let sendAsPeers = interfaceState.sendAsPeers, !sendAsPeers.isEmpty && interfaceState.editMessageState == nil {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.input.sendas3",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if let sendAsPeers = interfaceState.sendAsPeers, !sendAsPeers.isEmpty && interfaceState.editMessageState == nil {",
+        "occurrence": 3
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideSendAs), let sendAsPeers = interfaceState.sendAsPeers, !sendAsPeers.isEmpty && interfaceState.editMessageState == nil {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.zalgo.import",
+      "file": "submodules/TelegramCore/Sources/PendingMessages/EnqueueMessage.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.zalgo.apply",
+      "file": "submodules/TelegramCore/Sources/PendingMessages/EnqueueMessage.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func enqueueMessages(account: Account, peerId: PeerId, messages: [EnqueueMessage]) -> Signal<[MessageId?], NoError> {"
+      },
+      "text": [
+        "let messages: [EnqueueMessage] = messages.map { mategramMessage -> EnqueueMessage in",
+        "    if MategramSettings.shared.bool(.zalgoFilter), case let .message(text, attributes, inlineStickers, mediaReference, threadId, replyToMessageId, replyToStoryId, localGroupingKey, correlationId, bubbleUpEmojiOrStickersets) = mategramMessage, !attributes.contains(where: { $0 is TextEntitiesMessageAttribute }) {",
+        "        return .message(text: MategramZalgo.clean(text), attributes: attributes, inlineStickers: inlineStickers, mediaReference: mediaReference, threadId: threadId, replyToMessageId: replyToMessageId, replyToStoryId: replyToStoryId, localGroupingKey: localGroupingKey, correlationId: correlationId, bubbleUpEmojiOrStickersets: bubbleUpEmojiOrStickersets)",
+        "    }",
+        "    return mategramMessage",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.bizbot.import",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceTitlePanelNodes.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.bizbot.hide",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceTitlePanelNodes.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func managingBotTitlePanelForChatPresentationInterfaceState(_ chatPresentationInterfaceState: ChatPresentationInterfaceState, context: AccountContext, displayedTitlePanel: ChatTitleAccessoryPanelNode?, currentPanel: ChatManagingBotTitlePanelNode?, interfaceInteraction: ChatPanelInterfaceInteraction?) -> ChatManagingBotTitlePanelNode? {"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.hideBusinessBotPanel) { return nil }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.promo.import",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListNodeEntries.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.promo.hide",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListNodeEntries.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "return item.item.renderedPeer.peerId != state.hiddenPsaPeerId"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.hideProxySponsor), case .proxy = item.promoInfo.content { return false }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.swipe.import",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListItem.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.swipe.off",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListItem.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "strongSelf.setRevealOptions((left: peerLeftRevealOptions, right: peerRevealOptions), enableAnimations: item.context.sharedContext.energyUsageSettings.fullTranslucency)"
+      },
+      "text": [
+        "strongSelf.setRevealOptions((left: MategramSettings.shared.bool(.disableChatSwipes) ? [] : peerLeftRevealOptions, right: MategramSettings.shared.bool(.disableChatSwipes) ? [] : peerRevealOptions), enableAnimations: item.context.sharedContext.energyUsageSettings.fullTranslucency)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.session.import",
+      "file": "submodules/SettingsUI/Sources/Privacy and Security/Recent Sessions/ItemListRecentSessionItem.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.session.build",
+      "file": "submodules/SettingsUI/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/AlertUI:AlertUI\",",
+        "before": [
+          "\"//submodules/ActivityIndicator:ActivityIndicator\","
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.session.apiid",
+      "file": "submodules/SettingsUI/Sources/Privacy and Security/Recent Sessions/ItemListRecentSessionItem.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let appString = \"\\(item.session.appName) \\(appVersion)\""
+      },
+      "text": [
+        "let appString = MategramSettings.shared.bool(.showSessionApiId) ? \"\\(item.session.appName) \\(appVersion) · API \\(item.session.apiId)\" : \"\\(item.session.appName) \\(appVersion)\""
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.phone.header",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var subtitle = formatPhoneNumber(context: self.context, number: user.phone ?? \"\")"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.hidePhone) { subtitle = MategramPhone.mask(subtitle) }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.phone.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.phone.row",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let formattedPhone = formatPhoneNumber(context: context, number: phone)"
+      },
+      "text": [
+        "let formattedPhone = (MategramSettings.shared.bool(.hidePhone) && user.id == context.account.peerId) ? MategramPhone.mask(formatPhoneNumber(context: context, number: phone)) : formatPhoneNumber(context: context, number: phone)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.menu.import",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.menu.saved",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if data.messageActions.options.contains(.report) {"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.menuSaveToSaved), data.messageActions.options.contains(.forward), !isCopyProtected, message.id.peerId != context.account.peerId {",
+        "    actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.DialogList_SavedMessages, icon: { theme in",
+        "        return generateTintedImage(image: UIImage(bundleImageName: \"Chat/Context Menu/Fave\"), color: theme.actionSheet.primaryTextColor)",
+        "    }, action: { _, f in",
+        "        let mategramIds = (selectAll || isImage ? messages : [message]).map { $0.id }",
+        "        let _ = enqueueMessages(account: context.account, peerId: context.account.peerId, messages: mategramIds.map { EnqueueMessage.forward(source: $0, threadId: nil, grouping: .auto, attributes: [], correlationId: nil) }).startStandalone()",
+        "        f(.default)",
+        "    })))",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.ghost.always",
+      "file": "submodules/TelegramCore/Sources/State/ManagedAccountPresence.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func updatePresence(_ isOnline: Bool) {"
+      },
+      "text": [
+        "let isOnline = MategramGhost.keepsOnline() ? true : isOnline"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.words.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageItemView/Sources/ChatMessageItemView.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.words.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageItemView/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/AsyncDisplayKit\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.words.dim",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageItemView/Sources/ChatMessageItemView.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "open func setupItem(_ item: ChatMessageItem, synchronousLoad: Bool) {"
+      },
+      "text": [
+        "self.alpha = (item.message.flags.contains(.Incoming) && MategramWordFilter.matches(item.message.text)) ? 0.3 : 1.0"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.tabs.import",
+      "file": "submodules/TelegramUI/Components/TabBarComponent/Sources/TabBarComponent.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.tabs.build",
+      "file": "submodules/TelegramUI/Components/TabBarComponent/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/Display\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.tabs.titles",
+      "file": "submodules/TelegramUI/Components/TabBarComponent/Sources/TabBarComponent.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "alphaTransition.setAlpha(view: titleView, alpha: (component.isSearchActive || !component.showsTitle) ? 0.0 : 1.0)"
+      },
+      "text": [
+        "alphaTransition.setAlpha(view: titleView, alpha: (component.isSearchActive || !component.showsTitle || MategramSettings.shared.bool(.hideTabTitles)) ? 0.0 : 1.0)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.voice.import",
+      "file": "submodules/TelegramUI/Sources/SharedMediaPlayer.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.voice.next",
+      "file": "submodules/TelegramUI/Sources/SharedMediaPlayer.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "strongSelf.scheduledPlaybackAction = .play",
+        "after": [
+          "strongSelf.control(.next)"
+        ]
+      },
+      "text": [
+        "if strongSelf.type == .voice, MategramSettings.shared.bool(.noAutoplayNextVoice) { strongSelf.playedToEnd?(); return }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.tr.import",
+      "file": "submodules/TelegramCore/Sources/TelegramEngine/Messages/Translate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m2.tr.google",
+      "file": "submodules/TelegramCore/Sources/TelegramEngine/Messages/Translate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func _internal_translate(network: Network, text: String, toLang: String, entities: [MessageTextEntity] = [], tone: TranslationTone = .neutral, peer: Api.InputPeer? = nil, messageId: Int32? = nil) -> Signal<(String, [MessageTextEntity])?, TranslationError> {"
+      },
+      "text": [
+        "if MategramGoogleTranslate.isEnabled, entities.isEmpty {",
+        "    return Signal { subscriber in",
+        "        let task = MategramGoogleTranslate.translate(text: text, toLang: toLang, completion: { result in",
+        "            if let result {",
+        "                subscriber.putNext((result, []))",
+        "                subscriber.putCompletion()",
+        "            } else {",
+        "                subscriber.putError(.generic)",
+        "            }",
+        "        })",
+        "        return ActionDisposable {",
+        "            task?.cancel()",
+        "        }",
+        "    }",
+        "}"
+      ],
+      "required": true
+    }
+  ]
+}

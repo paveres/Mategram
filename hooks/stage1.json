@@ -683,7 +683,7 @@
         "line": "private func requestActivity(postbox: Postbox, network: Network, accountPeerId: PeerId, peerId: PeerId, threadId: Int64?, activity: PeerInputActivity?) -> Signal<Void, NoError> {"
       },
       "text": [
-        "if MategramGhost.holdsTyping() { return .complete() }"
+        "if MategramGhost.holdsTyping(peer: peerId.toInt64()) { return .complete() }"
       ],
       "required": true,
       "strip": true
@@ -708,7 +708,7 @@
         "line": "var pushSignal: Signal<Void, NoError> = network.request(Api.functions.messages.readHistory(peer: inputPeer, maxId: maxIncomingReadId))"
       },
       "text": [
-        "if MategramGhost.holdsReadReceipt() { return .single(readState) }"
+        "if MategramGhost.holdsReadReceipt(peer: peerId.toInt64()) { return .single(readState) }"
       ],
       "required": true
     },
@@ -720,7 +720,7 @@
         "line": "var pushSignal: Signal<Void, NoError> = network.request(Api.functions.channels.readHistory(channel: Api.InputChannel.inputChannel(.init(channelId: channelId, accessHash: accessHash)), maxId: maxIncomingReadId))"
       },
       "text": [
-        "if MategramGhost.holdsReadReceipt() { return .single(readState) }"
+        "if MategramGhost.holdsReadReceipt(peer: peerId.toInt64()) { return .single(readState) }"
       ],
       "required": true
     },
