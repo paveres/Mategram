@@ -35,6 +35,7 @@ public enum MategramGhost {
     }
 
     private static var allowedReads = Set<Int64>()
+    public static var storyWarningPassed = false
 
     public static func allowRead(peer: Int64) {
         allowedReads.insert(peer)

@@ -1484,6 +1484,26 @@
         "if !MategramSettings.shared.bool(.hideProfileGifts) { availablePanes?.insert(.gifts, at: hasStories ? 1 : 0) }"
       ],
       "required": true
+    },
+    {
+      "id": "m6.story.ask",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func openStories(peerId: EnginePeer.Id, completion: @escaping (StoryContainerScreen) -> Void = { _ in }) {"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.warnStories), !MategramGhost.holdsStoryViews(), !MategramGhost.storyWarningPassed {",
+        "    let mategramRu = self.presentationData.strings.baseLanguageCode.hasPrefix(\"ru\")",
+        "    self.present(textAlertController(context: self.context, title: nil, text: mategramRu ? \"Автор увидит, что вы смотрели историю. Открыть?\" : \"The author will see that you viewed the story. Open?\", actions: [TextAlertAction(type: .genericAction, title: self.presentationData.strings.Common_Cancel, action: {}), TextAlertAction(type: .defaultAction, title: mategramRu ? \"Открыть\" : \"Open\", action: { [weak self] in",
+        "        MategramGhost.storyWarningPassed = true",
+        "        self?.openStories(peerId: peerId, completion: completion)",
+        "        MategramGhost.storyWarningPassed = false",
+        "    })]), in: .window(.root))",
+        "    return",
+        "}"
+      ],
+      "required": true
     }
   ]
 }
