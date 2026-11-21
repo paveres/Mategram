@@ -1582,6 +1582,84 @@
         "let ongoingContext = OngoingCallContext(account: self.context.account, callSessionManager: self.callSessionManager, callId: id, internalId: self.internalId, proxyServer: proxyServer, initialNetworkType: self.currentNetworkType, updatedNetworkType: self.updatedNetworkType, serializedData: self.serializedData, dataSaving: dataSaving, key: key, isOutgoing: sessionState.isOutgoing, video: self.videoCapturer, connections: updatedConnections, maxLayer: maxLayer, version: version, customParameters: customParameters, allowP2P: allowsP2P, enableTCP: self.enableTCP || MategramSettings.shared.bool(.callsTcp), enableStunMarking: self.enableStunMarking, audioSessionActive: contextAudioSessionActive, logName: logName, preferredVideoCodec: self.preferredVideoCodec, audioDevice: self.sharedAudioContext?.audioDevice)"
       ],
       "required": true
+    },
+    {
+      "id": "m7.status.hide",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "} else if let emojiStatus = peer.emojiStatus {",
+        "occurrence": 1
+      },
+      "text": [
+        "} else if let emojiStatus = peer.emojiStatus, !MategramSettings.shared.bool(.hideEmojiStatus) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.color.hide1",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "} else if let profileColor = peer?.effectiveProfileColor {",
+        "occurrence": 1
+      },
+      "text": [
+        "} else if let profileColor = peer?.effectiveProfileColor, !MategramSettings.shared.bool(.hideProfileColor) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.color.hide2",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "} else if let profileColor = peer?.effectiveProfileColor {",
+        "occurrence": 2
+      },
+      "text": [
+        "} else if let profileColor = peer?.effectiveProfileColor, !MategramSettings.shared.bool(.hideProfileColor) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.round.import",
+      "file": "submodules/TelegramUI/Components/VideoMessageCameraScreen/Sources/VideoMessageCameraScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.round.build",
+      "file": "submodules/TelegramUI/Components/VideoMessageCameraScreen/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/Display\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.round.back",
+      "file": "submodules/TelegramUI/Components/VideoMessageCameraScreen/Sources/VideoMessageCameraScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let isFrontPosition = \"\".isEmpty",
+        "occurrence": 1
+      },
+      "text": [
+        "let isFrontPosition = !MategramSettings.shared.bool(.backCameraRound)"
+      ],
+      "required": true
     }
   ]
 }

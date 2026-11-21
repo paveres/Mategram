@@ -86,6 +86,9 @@ public enum MategramKey: String, CaseIterable {
     case hideAllChatsTab
     case rememberFolder
     case callsTcp
+    case hideEmojiStatus
+    case hideProfileColor
+    case backCameraRound
 
     public var defaultValue: Bool {
         switch self {
