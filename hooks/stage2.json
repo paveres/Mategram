@@ -1421,6 +1421,18 @@
         "if case .record = type, MategramSettings.shared.bool(.builtInMic), let mategramMic = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) { _ = try? AVAudioSession.sharedInstance().setPreferredInput(mategramMic) }"
       ],
       "required": true
+    },
+    {
+      "id": "m6.counter",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let counterText = remainingCount >= 5 ? \"\" : \"\\(remainingCount)\""
+      },
+      "text": [
+        "let counterText = (MategramSettings.shared.bool(.charCounter) && textCount > 0 && remainingCount >= 5) ? \"\\(textCount)\" : (remainingCount >= 5 ? \"\" : \"\\(remainingCount)\")"
+      ],
+      "required": true
     }
   ]
 }
