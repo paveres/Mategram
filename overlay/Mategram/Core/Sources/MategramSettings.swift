@@ -59,6 +59,7 @@ public enum MategramKey: String, CaseIterable {
     case showCreationDate
     case alwaysTranslate
     case longAllChats
+    case doubleTapEdit
 
     public var defaultValue: Bool {
         switch self {
@@ -164,4 +165,8 @@ public enum MategramCallGate {
         allowed = false
         return value
     }
+}
+
+public enum MategramChatRelay {
+    public static var edit: ((Any) -> Void)?
 }

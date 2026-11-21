@@ -863,6 +863,88 @@
         "title = HorizontalTabsComponent.Tab.Title(text: MategramSettings.shared.bool(.longAllChats) ? self.presentationData.strings.ChatList_Tabs_AllChats : self.presentationData.strings.ChatList_Tabs_All, entities: [], enableAnimations: false)"
       ],
       "required": true
+    },
+    {
+      "id": "m4.dtap.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.dtap.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/AsyncDisplayKit\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.dtap.edit",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "if let (gesture, location) = recognizer.lastRecognizedGestureAndLocation, let item = self.item {",
+        "before": [
+          "@objc private func tapLongTapOrDoubleTapGesture(_ recognizer: TapLongTapOrDoubleTapGestureRecognizer) {",
+          "switch recognizer.state {",
+          "case .ended:"
+        ]
+      },
+      "text": [
+        "if case .doubleTap = gesture, MategramSettings.shared.bool(.doubleTapEdit), !item.message.flags.contains(.Incoming), let mategramEdit = MategramChatRelay.edit {",
+        "    self.mainContainerNode.cancelGesture()",
+        "    mategramEdit(item.message.id)",
+        "    return",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.dtap.ccimport",
+      "file": "submodules/TelegramUI/Sources/ChatController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m4.dtap.relay",
+      "file": "submodules/TelegramUI/Sources/ChatController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "super.viewDidAppear(animated)",
+        "after": [
+          "self.forwardSideListAppearance(.didAppear, animated: animated)"
+        ]
+      },
+      "text": [
+        "MategramChatRelay.edit = { [weak self] value in",
+        "    guard let self, let messageId = value as? EngineMessage.Id else {",
+        "        return",
+        "    }",
+        "    self.interfaceInteraction?.setupEditMessage(messageId, { _ in })",
+        "}"
+      ],
+      "required": true
     }
   ]
 }
