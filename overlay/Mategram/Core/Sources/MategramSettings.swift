@@ -5,15 +5,20 @@ public enum MategramKey: String, CaseIterable {
     case showDataCenter
     case showMutualContact
     case showRegistrationDate
+    case hideStarRating
     case preciseLastSeen
+    case timeSeconds
     case fullViewCount
     case hideStoriesBar
+    case hideChatsTitle
+    case confirmCalls
+    case openLinksExternal
 
     public var defaultValue: Bool {
         switch self {
         case .showProfileId, .showDataCenter, .showRegistrationDate, .preciseLastSeen:
             return true
-        case .showMutualContact, .fullViewCount, .hideStoriesBar:
+        default:
             return false
         }
     }
@@ -45,5 +50,19 @@ public final class MategramSettings {
     public func set(_ value: Bool, for key: MategramKey) {
         self.defaults.set(value, forKey: MategramSettings.storageKey(key))
         NotificationCenter.default.post(name: MategramSettings.didChangeNotification, object: nil)
+    }
+}
+
+public enum MategramCallGate {
+    private static var allowed = false
+
+    public static func allowNext() {
+        allowed = true
+    }
+
+    public static func consume() -> Bool {
+        let value = allowed
+        allowed = false
+        return value
     }
 }

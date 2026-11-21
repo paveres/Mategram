@@ -72,22 +72,19 @@ private func mategramSettingsEntries(language: MategramLanguage) -> [MategramSet
         return index
     }
 
-    entries.append(.header(index: nextIndex(), section: 1, text: MategramText.sectionProfile.string(language).uppercased()))
-    entries.append(.toggle(index: nextIndex(), section: 1, key: .showProfileId, title: MategramText.profileId.string(language), value: settings.bool(.showProfileId)))
-    entries.append(.toggle(index: nextIndex(), section: 1, key: .showDataCenter, title: MategramText.dataCenter.string(language), value: settings.bool(.showDataCenter)))
-    entries.append(.toggle(index: nextIndex(), section: 1, key: .showMutualContact, title: MategramText.mutualContact.string(language), value: settings.bool(.showMutualContact)))
-    entries.append(.toggle(index: nextIndex(), section: 1, key: .showRegistrationDate, title: MategramText.registrationDate.string(language), value: settings.bool(.showRegistrationDate)))
-    entries.append(.footer(index: nextIndex(), section: 1, text: MategramText.sectionProfileFooter.string(language)))
-
-    entries.append(.header(index: nextIndex(), section: 2, text: MategramText.sectionStatus.string(language).uppercased()))
-    entries.append(.toggle(index: nextIndex(), section: 2, key: .preciseLastSeen, title: MategramText.preciseLastSeen.string(language), value: settings.bool(.preciseLastSeen)))
-    entries.append(.footer(index: nextIndex(), section: 2, text: MategramText.preciseLastSeenFooter.string(language)))
-
-    entries.append(.header(index: nextIndex(), section: 3, text: MategramText.sectionChats.string(language).uppercased()))
-    entries.append(.toggle(index: nextIndex(), section: 3, key: .fullViewCount, title: MategramText.fullViewCount.string(language), value: settings.bool(.fullViewCount)))
-    entries.append(.footer(index: nextIndex(), section: 3, text: MategramText.fullViewCountFooter.string(language)))
-    entries.append(.toggle(index: nextIndex(), section: 3, key: .hideStoriesBar, title: MategramText.hideStoriesBar.string(language), value: settings.bool(.hideStoriesBar)))
-    entries.append(.footer(index: nextIndex(), section: 3, text: MategramText.hideStoriesBarFooter.string(language)))
+    var sectionId: Int32 = 0
+    for section in MategramSection.allCases {
+        var first = true
+        for option in MategramCatalog.options where option.section == section {
+            sectionId += 1
+            if first {
+                entries.append(.header(index: nextIndex(), section: sectionId, text: section.title(language).uppercased()))
+                first = false
+            }
+            entries.append(.toggle(index: nextIndex(), section: sectionId, key: option.key, title: option.title(language), value: settings.bool(option.key)))
+            entries.append(.footer(index: nextIndex(), section: sectionId, text: option.footer(language)))
+        }
+    }
 
     return entries
 }

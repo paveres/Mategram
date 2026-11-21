@@ -175,6 +175,125 @@
       "text": ["if MategramSettings.shared.bool(.hideStoriesBar) { return false }"],
       "required": true,
       "note": "hide stories bar"
+    },
+    {
+      "id": "mate.seconds.import",
+      "file": "submodules/TextFormat/Sources/DateFormat.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import TelegramUIPreferences" },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.seconds.build",
+      "file": "submodules/TextFormat/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/Display:Display\",", "occurrence": 1 },
+      "text": ["\"//Mategram/Core:MategramCore\","],
+      "required": true
+    },
+    {
+      "id": "mate.seconds.apply",
+      "file": "submodules/TextFormat/Sources/DateFormat.swift",
+      "action": "insert_after",
+      "anchor": { "line": "public func stringForMessageTimestamp(timestamp: Int32, dateTimeFormat: PresentationDateTimeFormat, withSeconds: Bool = false, local: Bool = true) -> String {" },
+      "text": ["let withSeconds = withSeconds || MategramSettings.shared.bool(.timeSeconds)"],
+      "required": true,
+      "note": "seconds in message time"
+    },
+    {
+      "id": "mate.ctx.import",
+      "file": "submodules/TelegramUI/Sources/AccountContext.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import MessageWidget" },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.ctx.build",
+      "file": "submodules/TelegramUI/BUILD",
+      "action": "insert_after",
+      "anchor": { "line": "\"//submodules/AlertUI:AlertUI\"," },
+      "text": ["\"//Mategram/Core:MategramCore\","],
+      "required": true
+    },
+    {
+      "id": "mate.call.confirm",
+      "file": "submodules/TelegramUI/Sources/AccountContext.swift",
+      "action": "insert_after",
+      "anchor": { "line": "public func requestCall(peerId: EnginePeer.Id, isVideo: Bool, completion: @escaping () -> Void) {" },
+      "strip": false,
+      "text": [
+        "if MategramSettings.shared.bool(.confirmCalls) && !MategramCallGate.consume() {",
+        "    let mategramPresentationData = self.sharedContext.currentPresentationData.with { $0 }",
+        "    let mategramLanguage = MategramLanguage(code: mategramPresentationData.strings.baseLanguageCode)",
+        "    let mategramQuestion = isVideo ? (mategramLanguage == .russian ? \"Начать видеозвонок?\" : \"Start a video call?\") : (mategramLanguage == .russian ? \"Позвонить?\" : \"Call?\")",
+        "    self.sharedContext.mainWindow?.present(textAlertController(context: self, title: nil, text: mategramQuestion, actions: [TextAlertAction(type: .genericAction, title: mategramPresentationData.strings.Common_Cancel, action: {}), TextAlertAction(type: .defaultAction, title: mategramLanguage == .russian ? \"Позвонить\" : \"Call\", action: { [weak self] in",
+        "        MategramCallGate.allowNext()",
+        "        self?.requestCall(peerId: peerId, isVideo: isVideo, completion: completion)",
+        "    })]), on: .root)",
+        "    return",
+        "}"
+      ],
+      "required": true,
+      "note": "confirm before calling"
+    },
+    {
+      "id": "mate.url.import",
+      "file": "submodules/TelegramUI/Sources/OpenUrl.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import Foundation", "occurrence": 1 },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.url.external",
+      "file": "submodules/TelegramUI/Sources/OpenUrl.swift",
+      "action": "insert_after",
+      "anchor": { "line": "func openExternalUrlImpl(context: AccountContext, urlContext: OpenURLContext, url: String, forceExternal: Bool, presentationData: PresentationData, navigationController: NavigationController?, dismissInput: @escaping () -> Void) {" },
+      "text": [
+        "if MategramSettings.shared.bool(.openLinksExternal), let mategramUrl = URL(string: url), mategramUrl.scheme == \"http\" || mategramUrl.scheme == \"https\" {",
+        "    context.sharedContext.applicationBindings.openUrl(url)",
+        "    return",
+        "}"
+      ],
+      "strip": false,
+      "required": true,
+      "note": "open web links in the system browser"
+    },
+    {
+      "id": "mate.rating.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import AsyncDisplayKit", "occurrence": 1 },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.rating.hide",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": { "line": "if let cachedData = cachedData as? CachedUserData, let starRating = cachedData.starRating {" },
+      "text": ["if !MategramSettings.shared.bool(.hideStarRating), let cachedData = cachedData as? CachedUserData, let starRating = cachedData.starRating {"],
+      "required": true,
+      "note": "hide star rating"
+    },
+    {
+      "id": "mate.title.import",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import Foundation", "occurrence": 1 },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.title.hide",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "replace",
+      "anchor": { "line": "title = self.presentationData.strings.DialogList_Title", "occurrence": 1 },
+      "text": ["title = MategramSettings.shared.bool(.hideChatsTitle) ? \"\" : self.presentationData.strings.DialogList_Title"],
+      "required": true,
+      "note": "hide the Chats title"
     }
   ]
 }
