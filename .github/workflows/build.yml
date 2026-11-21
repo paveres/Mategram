@@ -120,6 +120,16 @@ jobs:
             --configuration=${{ inputs.configuration || 'release_arm64' }} \
             --buildNumber=${{ github.run_number }}
 
+      - name: Cache size
+        if: always()
+        run: |
+          du -sh "$HOME/telegram-bazel-cache" /private/var/tmp/_bazel_runner/cache/repos 2>/dev/null || true
+          SIZE_MB=$(du -sm "$HOME/telegram-bazel-cache" /private/var/tmp/_bazel_runner/cache/repos 2>/dev/null | awk '{s+=$1} END {print s+0}')
+          echo "Bazel cache to save: ${SIZE_MB} MB (GitHub keeps at most 10240 MB per repository)"
+          if [ "$SIZE_MB" -gt 9000 ]; then
+            echo "::warning::Bazel cache is ${SIZE_MB} MB, close to the 10 GB repository limit; saving may fail"
+          fi
+
       - name: Save Bazel cache
         if: always()
         uses: actions/cache/save@v4
