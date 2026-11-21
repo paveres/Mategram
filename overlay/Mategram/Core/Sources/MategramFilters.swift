@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 public enum MategramZalgo {
     private static func isCombining(_ scalar: Unicode.Scalar) -> Bool {
@@ -46,5 +47,25 @@ public enum MategramPhone {
             }
         }
         return result
+    }
+}
+
+public enum MategramLook {
+    public static var stickerScale: CGFloat {
+        return MategramSettings.shared.bool(.smallStickers) ? 0.7 : 1.0
+    }
+
+    public static func muted(_ color: UIColor) -> UIColor {
+        if !MategramSettings.shared.bool(.mutedNameColors) {
+            return color
+        }
+        var hue: CGFloat = 0.0
+        var saturation: CGFloat = 0.0
+        var brightness: CGFloat = 0.0
+        var alpha: CGFloat = 0.0
+        guard color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) else {
+            return color
+        }
+        return UIColor(hue: hue, saturation: saturation * 0.5, brightness: brightness, alpha: alpha)
     }
 }

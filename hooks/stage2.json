@@ -486,6 +486,148 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m3.hd.always",
+      "file": "submodules/MediaPickerUI/Sources/MediaPickerScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let highQualityPhoto = UserDefaults.standard.bool(forKey: \"TG_photoHighQuality_v0\")"
+      },
+      "text": [
+        "let highQualityPhoto = UserDefaults.standard.bool(forKey: \"TG_photoHighQuality_v0\") || MategramSettings.shared.bool(.alwaysHD)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.color.import",
+      "file": "submodules/AccountContext/Sources/PeerNameColors.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.color.build",
+      "file": "submodules/AccountContext/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TelegramAudio:TelegramAudio\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.color.muted",
+      "file": "submodules/AccountContext/Sources/PeerNameColors.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func get(_ color: PeerNameColor, dark: Bool = false) -> Colors {"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.mutedNameColors) {",
+        "    let mategramBase: Colors",
+        "    if dark, let colors = self.darkColors[color.rawValue] {",
+        "        mategramBase = colors",
+        "    } else if let colors = self.colors[color.rawValue] {",
+        "        mategramBase = colors",
+        "    } else {",
+        "        mategramBase = PeerNameColors.defaultSingleColors[5]!",
+        "    }",
+        "    return Colors(main: MategramLook.muted(mategramBase.main), secondary: mategramBase.secondary.map(MategramLook.muted), tertiary: mategramBase.tertiary.map(MategramLook.muted))",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.st.import.ChatMessageAnimatedStickerItemNode",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageAnimatedStickerItemNode/Sources/ChatMessageAnimatedStickerItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.st.build.ChatMessageAnimatedStickerItemNode",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageAnimatedStickerItemNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TelegramUI/Components/StaticGlassBackground\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.st.size.ChatMessageAnimatedStickerItemNode",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageAnimatedStickerItemNode/Sources/ChatMessageAnimatedStickerItemNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var displaySize = CGSize(width: 180.0, height: 180.0)"
+      },
+      "text": [
+        "var displaySize = CGSize(width: 180.0 * MategramLook.stickerScale, height: 180.0 * MategramLook.stickerScale)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.st.import.ChatMessageStickerItemNode",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageStickerItemNode/Sources/ChatMessageStickerItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.st.build.ChatMessageStickerItemNode",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageStickerItemNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TelegramUI/Components/StaticGlassBackground\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.st.size.ChatMessageStickerItemNode",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageStickerItemNode/Sources/ChatMessageStickerItemNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let displaySize = CGSize(width: 184.0, height: 184.0)"
+      },
+      "text": [
+        "let displaySize = CGSize(width: 184.0 * MategramLook.stickerScale, height: 184.0 * MategramLook.stickerScale)"
+      ],
+      "required": true
     }
   ]
 }

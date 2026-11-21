@@ -52,8 +52,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.calls, .english): return "Confirmation, browser"
         case (.settings, .russian): return "Скрытие стандартных пунктов"
         case (.settings, .english): return "Hide standard rows"
-        case (.media, .russian): return "Камера в галерее"
-        case (.media, .english): return "Camera in gallery"
+        case (.media, .russian): return "Камера в галерее, HD"
+        case (.media, .english): return "Camera in gallery, HD"
         }
     }
 
@@ -153,6 +153,12 @@ public enum MategramCatalog {
         MategramOption(key: .googleTranslate, section: .chat, titleRu: "Перевод через Google", titleEn: "Google translation",
             footerRu: "Кнопка «Перевести» переводит текст через Google, а не через Telegram. Текст без форматирования уходит в Google.",
             footerEn: "The Translate button uses Google instead of Telegram. Plain text is sent to Google."),
+        MategramOption(key: .smallStickers, section: .chat, titleRu: "Уменьшенные стикеры", titleEn: "Smaller stickers",
+            footerRu: "Стикеры в чате на треть меньше обычного.",
+            footerEn: "Stickers in chats are a third smaller."),
+        MategramOption(key: .mutedNameColors, section: .chat, titleRu: "Приглушённые цвета имён", titleEn: "Muted name colors",
+            footerRu: "Цвета имён и цитат вдвое менее насыщенные.",
+            footerEn: "Name and quote colors are half as saturated."),
         MategramOption(key: .hideBusinessBotPanel, section: .chat, titleRu: "Скрыть панель бизнес-бота", titleEn: "Hide business bot panel",
             footerRu: "Убирает плашку бота, который управляет чатом.",
             footerEn: "Removes the bar of the bot that manages the chat."),
@@ -231,6 +237,9 @@ public enum MategramCatalog {
         MategramOption(key: .hideTipsRow, section: .settings, titleRu: "Скрыть справку", titleEn: "Hide help rows",
             footerRu: "Убирает «Вопросы о Telegram» и «Возможности Telegram».",
             footerEn: "Removes Telegram FAQ and Telegram Features."),
+        MategramOption(key: .alwaysHD, section: .media, titleRu: "Всегда HD", titleEn: "Always HD",
+            footerRu: "Фото в галерее сразу отправляются в высоком качестве.",
+            footerEn: "Photos from the gallery are always sent in high quality."),
         MategramOption(key: .cameraInGallery, section: .media, titleRu: "Камера в галерее", titleEn: "Camera in gallery",
             footerRu: "Живая камера первой ячейкой в галерее. Выключена, галерея открывается легче.",
             footerEn: "Live camera as the first gallery cell. Off keeps the gallery lighter.")
