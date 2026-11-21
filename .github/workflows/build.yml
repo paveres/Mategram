@@ -1,0 +1,162 @@
+name: Mategram iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: 'macOS runner'
+        type: choice
+        default: xcode-27
+        options:
+          - xcode-27
+          - macos-26
+          - macos-15
+      tag:
+        description: 'Telegram-iOS release tag (empty: the one pinned in upstream.lock.json)'
+        type: string
+        default: ''
+      configuration:
+        description: 'Build configuration'
+        type: choice
+        default: release_arm64
+        options:
+          - release_arm64
+          - debug_arm64
+      release:
+        description: 'Publish the IPA as a release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runner || 'xcode-27' }}
+    timeout-minutes: 360
+
+    steps:
+      - name: Free disk space
+        run: |
+          df -h /
+          for x in /Applications/Xcode_*.app; do
+            case "$x" in
+              *Xcode_26*|*Xcode_27*) ;;
+              *) sudo rm -rf "$x" ;;
+            esac
+          done
+          sudo rm -rf /Users/runner/Library/Android /usr/local/share/dotnet /usr/local/lib/node_modules /Users/runner/.ghcup || true
+          xcrun simctl delete all || true
+          df -h /
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch Telegram-iOS
+        run: |
+          TAG="${{ inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG=$(python3 -c 'import json; print(json.load(open("upstream.lock.json"))["tag"])')
+          fi
+          echo "Telegram-iOS tag: $TAG"
+          echo "UPSTREAM_TAG=$TAG" >> $GITHUB_ENV
+          git clone --depth 1 --branch "$TAG" --recurse-submodules --shallow-submodules https://github.com/TelegramMessenger/Telegram-iOS.git upstream
+          git -C upstream log -1 --format='%H %cd'
+
+      - name: Apply Mategram
+        run: |
+          python3 scripts/mategram.py sync
+          cat build-report/sync-report.md
+
+      - name: Select Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          WANTED=$(python3 -c 'import json; print(json.load(open("upstream/versions.json"))["xcode"])')
+          if [ -d "/Applications/Xcode_$WANTED.app" ]; then
+            XCODE="/Applications/Xcode_$WANTED.app"
+          else
+            XCODE=$(ls -d /Applications/Xcode_2[67]*.app | sort -V | tail -1)
+          fi
+          echo "upstream wants Xcode $WANTED, using $XCODE"
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
+      - name: Write build configuration and signing profiles
+        env:
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+        run: |
+          if [ -z "$TELEGRAM_API_ID" ] || [ -z "$TELEGRAM_API_HASH" ]; then
+            echo "Add TELEGRAM_API_ID and TELEGRAM_API_HASH in Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          python3 scripts/mategram.py config
+          python3 scripts/mategram.py codesigning
+
+      - name: Restore Bazel cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/telegram-bazel-cache
+            /private/var/tmp/_bazel_runner/cache/repos
+          key: bazel-${{ inputs.runner || 'xcode-27' }}-${{ env.UPSTREAM_TAG }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            bazel-${{ inputs.runner || 'xcode-27' }}-${{ env.UPSTREAM_TAG }}-
+            bazel-${{ inputs.runner || 'xcode-27' }}-
+
+      - name: Build
+        timeout-minutes: 290
+        working-directory: upstream
+        run: |
+          python3 build-system/Make/ImportCertificates.py --path "$GITHUB_WORKSPACE/build/fake-codesigning/certs"
+          python3 -u build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --cacheDir="$HOME/telegram-bazel-cache" \
+            build \
+            --continueOnError \
+            --configurationPath=build-system/mategram-configuration.json \
+            --codesigningInformationPath="$GITHUB_WORKSPACE/build/fake-codesigning" \
+            --configuration=${{ inputs.configuration || 'release_arm64' }} \
+            --buildNumber=${{ github.run_number }}
+
+      - name: Save Bazel cache
+        if: always()
+        uses: actions/cache/save@v4
+        continue-on-error: true
+        with:
+          path: |
+            ~/telegram-bazel-cache
+            /private/var/tmp/_bazel_runner/cache/repos
+          key: bazel-${{ inputs.runner || 'xcode-27' }}-${{ env.UPSTREAM_TAG }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Collect IPA
+        run: |
+          IPA="$GITHUB_WORKSPACE/upstream/bazel-bin/Telegram/Telegram.ipa"
+          if [ ! -f "$IPA" ]; then
+            IPA=$(find -L "$GITHUB_WORKSPACE/upstream/bazel-out" -path '*applebin_ios-ios_arm64*' -name Telegram.ipa -print0 2>/dev/null | xargs -0 ls -t | head -1)
+          fi
+          if [ -z "$IPA" ] || [ ! -f "$IPA" ]; then
+            echo "Telegram.ipa not found"
+            exit 1
+          fi
+          mkdir -p "$GITHUB_WORKSPACE/build/artifacts"
+          cp "$IPA" "$GITHUB_WORKSPACE/build/artifacts/Mategram.ipa"
+          echo "IPA_PATH=$GITHUB_WORKSPACE/build/artifacts/Mategram.ipa" >> $GITHUB_ENV
+          ls -la "$GITHUB_WORKSPACE/build/artifacts"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Mategram-${{ github.run_number }}
+          path: ${{ env.IPA_PATH }}
+          if-no-files-found: error
+
+      - name: Publish release
+        if: ${{ inputs.release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "build-${{ github.run_number }}" "$IPA_PATH" \
+            -R "$GITHUB_REPOSITORY" \
+            --title "Mategram ${UPSTREAM_TAG#release-} (${{ github.run_number }})" \
+            --notes "Unsigned build. Install with Sideloadly or AltStore using your Apple ID."
