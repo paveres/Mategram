@@ -155,12 +155,6 @@ jobs:
           echo "IPA_PATH=$GITHUB_WORKSPACE/build/artifacts/Mategram.ipa" >> $GITHUB_ENV
           ls -la "$GITHUB_WORKSPACE/build/artifacts"
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Mategram-${{ github.run_number }}
-          path: ${{ env.IPA_PATH }}
-          if-no-files-found: error
-
       - name: Publish release
         if: ${{ inputs.release }}
         env:

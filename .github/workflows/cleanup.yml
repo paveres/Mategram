@@ -1,0 +1,26 @@
+name: Cleanup
+
+on:
+  workflow_run:
+    workflows: ["Mategram iOS"]
+    types: [completed]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete finished successful build and old cleanup runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            gh api -X DELETE "repos/$REPO/actions/runs/${{ github.event.workflow_run.id }}" || true
+          fi
+          gh api "repos/$REPO/actions/workflows/cleanup.yml/runs?per_page=100" --jq '.workflow_runs[] | select(.status=="completed") | .id' | while read id; do
+            gh api -X DELETE "repos/$REPO/actions/runs/$id" || true
+          done
