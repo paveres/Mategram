@@ -134,8 +134,7 @@ public enum MategramWordFilter {
             return cached
         }
         let raw = MategramSettings.shared.text(.filterWords)
-        let parts = raw.components(separatedBy: CharacterSet(charactersIn: ",
-")).map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }.filter { !$0.isEmpty }
+        let parts = raw.components(separatedBy: CharacterSet(charactersIn: ",\n")).map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }.filter { !$0.isEmpty }
         cached = parts
         return parts
     }
