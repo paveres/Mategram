@@ -1,6 +1,7 @@
 import Foundation
 
 public enum MategramSection: Int, CaseIterable {
+    case ghost
     case profile
     case time
     case chatList
@@ -10,6 +11,8 @@ public enum MategramSection: Int, CaseIterable {
 
     public func title(_ language: MategramLanguage) -> String {
         switch (self, language) {
+        case (.ghost, .russian): return "Режим призрака"
+        case (.ghost, .english): return "Ghost mode"
         case (.profile, .russian): return "Профили"
         case (.profile, .english): return "Profiles"
         case (.time, .russian): return "Время и статус"
@@ -27,6 +30,8 @@ public enum MategramSection: Int, CaseIterable {
 
     public func subtitle(_ language: MategramLanguage) -> String {
         switch (self, language) {
+        case (.ghost, .russian): return "Прочтение, печать, онлайн, истории"
+        case (.ghost, .english): return "Read, typing, online, stories"
         case (.profile, .russian): return "ID, датацентр, регистрация"
         case (.profile, .english): return "ID, data center, registration"
         case (.time, .russian): return "Секунды, точный визит, просмотры"
@@ -44,6 +49,7 @@ public enum MategramSection: Int, CaseIterable {
 
     public var symbol: String {
         switch self {
+        case .ghost: return "moon"
         case .profile: return "person.crop.circle"
         case .time: return "clock"
         case .chatList: return "list.bullet"
@@ -73,6 +79,24 @@ public struct MategramOption {
 
 public enum MategramCatalog {
     public static let options: [MategramOption] = [
+        MategramOption(key: .ghostMode, section: .ghost, titleRu: "Режим призрака", titleEn: "Ghost mode",
+            footerRu: "Главный выключатель. Включает все пункты ниже, которые вы оставили включёнными.",
+            footerEn: "Master switch. Turns on every option below that you left on."),
+        MategramOption(key: .ghostRead, section: .ghost, titleRu: "Не отмечать прочитанным", titleEn: "Do not mark as read",
+            footerRu: "Собеседник не увидит, что вы прочитали сообщения. У вас чат выглядит прочитанным.",
+            footerEn: "The other side will not see that you read messages. On your side the chat looks read."),
+        MategramOption(key: .ghostTyping, section: .ghost, titleRu: "Скрыть «печатает»", titleEn: "Hide «typing»",
+            footerRu: "Не отправляется статус «печатает», запись голоса и другие действия.",
+            footerEn: "Typing, voice recording and other activity are not sent."),
+        MategramOption(key: .ghostOnline, section: .ghost, titleRu: "Не показывать «онлайн»", titleEn: "Do not show «online»",
+            footerRu: "Ваш статус в сети не обновляется, пока приложение открыто.",
+            footerEn: "Your online status is not updated while the app is open."),
+        MategramOption(key: .ghostStories, section: .ghost, titleRu: "Невидимые истории", titleEn: "Invisible stories",
+            footerRu: "Просмотр историй не отмечается у автора.",
+            footerEn: "Story views are not shown to the author."),
+        MategramOption(key: .ghostContents, section: .ghost, titleRu: "Не отмечать прослушанным", titleEn: "Do not mark as listened",
+            footerRu: "Голосовые и кружки остаются непрослушанными у отправителя.",
+            footerEn: "Voice and video messages stay unlistened for the sender."),
         MategramOption(key: .showProfileId, section: .profile, titleRu: "ID в профиле", titleEn: "ID in profile",
             footerRu: "Числовой ID пользователя, группы или канала. Нажмите на строку, чтобы скопировать.",
             footerEn: "Numeric ID of a user, group or channel. Tap the row to copy."),

@@ -609,6 +609,144 @@
       ],
       "required": true,
       "note": "gallery: live camera cell is optional"
+    },
+    {
+      "id": "mate.ghost.imp1",
+      "file": "submodules/TelegramCore/Sources/State/ManagedLocalInputActivities.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.imp2",
+      "file": "submodules/TelegramCore/Sources/State/ManagedAccountPresence.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.imp3",
+      "file": "submodules/TelegramCore/Sources/State/SynchronizePeerReadState.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.imp4",
+      "file": "submodules/TelegramCore/Sources/TelegramEngine/Messages/Stories.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.imp5",
+      "file": "submodules/TelegramCore/Sources/State/ManagedSynchronizeConsumeMessageContentsOperations.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.typing",
+      "file": "submodules/TelegramCore/Sources/State/ManagedLocalInputActivities.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func requestActivity(postbox: Postbox, network: Network, accountPeerId: PeerId, peerId: PeerId, threadId: Int64?, activity: PeerInputActivity?) -> Signal<Void, NoError> {"
+      },
+      "text": [
+        "if MategramGhost.holdsTyping() { return .complete() }"
+      ],
+      "required": true,
+      "strip": true
+    },
+    {
+      "id": "mate.ghost.online",
+      "file": "submodules/TelegramCore/Sources/State/ManagedAccountPresence.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func updatePresence(_ isOnline: Bool) {"
+      },
+      "text": [
+        "if MategramGhost.holdsOnline() { return }"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.read",
+      "file": "submodules/TelegramCore/Sources/State/SynchronizePeerReadState.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "var pushSignal: Signal<Void, NoError> = network.request(Api.functions.messages.readHistory(peer: inputPeer, maxId: maxIncomingReadId))"
+      },
+      "text": [
+        "if MategramGhost.holdsReadReceipt() { return .single(readState) }"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.read-channel",
+      "file": "submodules/TelegramCore/Sources/State/SynchronizePeerReadState.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "var pushSignal: Signal<Void, NoError> = network.request(Api.functions.channels.readHistory(channel: Api.InputChannel.inputChannel(.init(channelId: channelId, accessHash: accessHash)), maxId: maxIncomingReadId))"
+      },
+      "text": [
+        "if MategramGhost.holdsReadReceipt() { return .single(readState) }"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.stories",
+      "file": "submodules/TelegramCore/Sources/TelegramEngine/Messages/Stories.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func _internal_markStoryAsSeen(account: Account, peerId: PeerId, id: Int32, asPinned: Bool) -> Signal<Never, NoError> {"
+      },
+      "text": [
+        "if MategramGhost.holdsStoryViews() { return .complete() }"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.ghost.contents",
+      "file": "submodules/TelegramCore/Sources/State/ManagedSynchronizeConsumeMessageContentsOperations.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func synchronizeConsumeMessageContents(transaction: Transaction, network: Network, stateManager: AccountStateManager, peerId: PeerId, operation: SynchronizeConsumeMessageContentsOperation) -> Signal<Void, NoError> {"
+      },
+      "text": [
+        "if MategramGhost.holdsContentRead() { return .complete() }"
+      ],
+      "required": true
     }
   ]
 }
