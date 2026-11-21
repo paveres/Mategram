@@ -58,7 +58,7 @@
         "line": "public func chatInputTextNode(shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {"
       },
       "text": [
-        "if text == \"\n\", MategramSettings.shared.bool(.sendOnReturn) { self.sendButtonPressed(); return false }"
+        "if text == \"\\n\", MategramSettings.shared.bool(.sendOnReturn) { self.sendButtonPressed(); return false }"
       ],
       "required": true
     },
@@ -70,7 +70,7 @@
         "line": "@objc public func editableTextNode(_ editableTextNode: ASEditableTextNode, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {"
       },
       "text": [
-        "if text == \"\n\", MategramSettings.shared.bool(.sendOnReturn) { self.sendButtonPressed(); return false }"
+        "if text == \"\\n\", MategramSettings.shared.bool(.sendOnReturn) { self.sendButtonPressed(); return false }"
       ],
       "required": true
     },
