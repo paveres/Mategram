@@ -60,6 +60,24 @@ public enum MategramKey: String, CaseIterable {
     case alwaysTranslate
     case longAllChats
     case doubleTapEdit
+    case hideMyProfileRow
+    case hideWalletRow
+    case hideProxyRow
+    case hideSavedRow
+    case hideRecentCallsRow
+    case hideContactsRow
+    case hideDevicesRow
+    case hideFoldersRow
+    case hideNotificationsRow
+    case hidePrivacyRow
+    case hideDataRow
+    case hideAppearanceRow
+    case hidePowerSavingRow
+    case hideLanguageRow
+    case hidePassportRow
+    case hideWatchRow
+    case hideSupportRow
+    case hideFaqRow
 
     public var defaultValue: Bool {
         switch self {

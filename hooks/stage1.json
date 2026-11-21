@@ -105,7 +105,7 @@
         "line": "let notificationsWarning: Bool"
       },
       "text": [
-        "items[.myProfile]!.append(PeerInfoScreenDisclosureItem(id: 90, text: \"Mategram\", icon: MategramLogo.image(size: CGSize(width: 29.0, height: 29.0), color: .white, background: .black, cornerRadius: 7.0, scale: 3.0), action: {",
+        "items[.mategramSection]!.append(PeerInfoScreenDisclosureItem(id: 90, text: \"Mategram\", icon: MategramLogo.centeredImage(size: CGSize(width: 29.0, height: 29.0), color: .white, background: .black, cornerRadius: 7.0, fill: 0.56), action: {",
         "    interaction.openSettings(.mategram)",
         "}))"
       ],
@@ -466,13 +466,7 @@
         "occurrence": 1
       },
       "text": [
-        "if MategramSettings.shared.bool(.hidePremiumRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 100 }) }",
-        "if MategramSettings.shared.bool(.hideStarsRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 102 }) }",
-        "if MategramSettings.shared.bool(.hideTonRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 103 }) }",
-        "if MategramSettings.shared.bool(.hideBusinessRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 104 }) }",
-        "if MategramSettings.shared.bool(.hideGiftRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 105 }) }",
-        "if MategramSettings.shared.bool(.hideAppsRow) { items[.apps] = [] }",
-        "if MategramSettings.shared.bool(.hideTipsRow) { items[.support]?.removeAll(where: { ($0.id as? Int) == 1 || ($0.id as? Int) == 2 }) }"
+        "mategramHideSettingsRows(&items)"
       ],
       "required": true,
       "note": "hide chosen rows of the settings screen"
@@ -518,7 +512,8 @@
         "let mategramSpacing: CGFloat = (mategramRound && buttonKeys.count > 1) ? (width - stripLeft - stripRight - buttonSideInset * 2.0 - CGFloat(buttonKeys.count) * mategramSide) / CGFloat(buttonKeys.count - 1) : buttonSpacing"
       ],
       "required": true,
-      "note": "round profile buttons: size"
+      "note": "round profile buttons: size",
+      "enabled": false
     },
     {
       "id": "mate.btn.step",
@@ -531,7 +526,8 @@
         "buttonRightOrigin.x -= buttonSize.width + mategramSpacing"
       ],
       "required": true,
-      "note": "round profile buttons: spacing"
+      "note": "round profile buttons: spacing",
+      "enabled": false
     },
     {
       "id": "mate.btn.import",
@@ -556,7 +552,8 @@
       "text": [
         "transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: MategramSettings.shared.bool(.roundProfileButtons) ? backgroundFrame.height * 0.5 : min(16.0, backgroundFrame.height * 0.5))"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "mate.btn.source",
@@ -568,7 +565,8 @@
       "text": [
         "self.referenceNode.contextMenuSourcePath = UIBezierPath(roundedRect: backgroundFrame, cornerRadius: MategramSettings.shared.bool(.roundProfileButtons) ? backgroundFrame.height * 0.5 : min(16.0, backgroundFrame.height * 0.5))"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "mate.cam.import",

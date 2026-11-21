@@ -945,6 +945,226 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m5.settings.section",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "case myProfile",
+        "after": [
+          "case wallet"
+        ]
+      },
+      "text": [
+        "case mategramSection"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.glassimport",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import ComponentFlow"
+      },
+      "text": [
+        "import GlassBackgroundComponent"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.prop",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "let backgroundView: UIView",
+        "before": [
+          "let backgroundContainerView: UIView"
+        ]
+      },
+      "text": [
+        "var mategramGlassView: GlassBackgroundView?"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.glass",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "transition.updateFrame(view: self.backgroundView, frame: backgroundFrame)"
+      },
+      "text": [
+        "let mategramSide = min(size.width, size.height)",
+        "let mategramFrame = CGRect(x: floor((size.width - mategramSide) / 2.0), y: floor((size.height - mategramSide) / 2.0), width: mategramSide, height: mategramSide)",
+        "let mategramGlass: GlassBackgroundView",
+        "if let current = self.mategramGlassView {",
+        "    mategramGlass = current",
+        "} else {",
+        "    mategramGlass = GlassBackgroundView()",
+        "    mategramGlass.isUserInteractionEnabled = false",
+        "    self.contentNode.view.insertSubview(mategramGlass, at: 0)",
+        "    self.mategramGlassView = mategramGlass",
+        "}",
+        "self.backgroundContainerView.isHidden = true",
+        "self.textNode.isHidden = true",
+        "transition.updateFrame(view: mategramGlass, frame: mategramFrame)",
+        "mategramGlass.update(size: mategramFrame.size, cornerRadius: mategramSide * 0.5, isDark: presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .clear), transition: ComponentTransition(transition))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.source",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.referenceNode.contextMenuSourcePath = UIBezierPath(roundedRect: backgroundFrame, cornerRadius: min(16.0, backgroundFrame.height * 0.5))"
+      },
+      "text": [
+        "self.referenceNode.contextMenuSourcePath = UIBezierPath(ovalIn: CGRect(x: floor((size.width - min(size.width, size.height)) / 2.0), y: floor((size.height - min(size.width, size.height)) / 2.0), width: min(size.width, size.height), height: min(size.width, size.height)))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.icon1",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "transition.updateFrame(node: self.iconNode, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: 1.0), size: iconSize))"
+      },
+      "text": [
+        "transition.updateFrame(node: self.iconNode, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: floor((size.height - iconSize.height) / 2.0)), size: iconSize))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.icon2",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderButtonNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "transition.updateFrame(view: animatedIconView, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: 1.0), size: iconSize))"
+      },
+      "text": [
+        "transition.updateFrame(view: animatedIconView, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: floor((size.height - iconSize.height) / 2.0)), size: iconSize))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.btn.height",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let buttonSize = CGSize(width: buttonWidth, height: 58.0)"
+      },
+      "text": [
+        "let buttonSize = CGSize(width: buttonWidth, height: min(buttonWidth, 64.0))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.av.import",
+      "file": "submodules/AvatarNode/Sources/AvatarNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.av.build",
+      "file": "submodules/AvatarNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/AsyncDisplayKit:AsyncDisplayKit\",",
+        "before": [
+          "deps = ["
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.av.square0",
+      "file": "submodules/AvatarNode/Sources/AvatarNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var synchronousLoad = synchronousLoad",
+        "before": [
+          "cutoutRect: CGRect? = nil",
+          ") {"
+        ]
+      },
+      "text": [
+        "let clipStyle: AvatarNodeClipStyle = clipStyle == .round ? .roundedRect : clipStyle"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.av.square1",
+      "file": "submodules/AvatarNode/Sources/AvatarNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "let smallProfileImage = peer?.smallProfileImage"
+      },
+      "text": [
+        "let clipStyle: AvatarNodeClipStyle = clipStyle == .round ? .roundedRect : clipStyle"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.av.square2",
+      "file": "submodules/AvatarNode/Sources/AvatarNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "let resolved = avatarNodeResolvedImage(context: genericContext, peer: peer, overrideImage: overrideImage, synchronousLoad: synchronousLoad)"
+      },
+      "text": [
+        "let clipStyle: AvatarNodeClipStyle = clipStyle == .round ? .roundedRect : clipStyle"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.menu.quick",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "return ContextController.Items(content: .list(actions), tip: nil)"
+      },
+      "text": [
+        "return ContextController.Items(content: .list(mategramQuickActions(actions, strings: chatPresentationInterfaceState.strings)), tip: nil)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.menu.noblur",
+      "file": "submodules/TelegramUI/Components/ContextControllerImpl/Sources/ContextControllerImpl.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.effectView = UIVisualEffectView()"
+      },
+      "text": [
+        "self.effectView.isHidden = true"
+      ],
+      "required": true
+    },
+    {
+      "id": "m5.menu.reactions",
+      "file": "submodules/ReactionSelectionNode/Sources/ReactionContextNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var itemSize: CGFloat = 36.0"
+      },
+      "text": [
+        "var itemSize: CGFloat = 40.0"
+      ],
+      "required": true
     }
   ]
 }
