@@ -85,7 +85,7 @@ def clean_lines(lines):
     keep = []
     idx = []
     for i, l in enumerate(lines):
-        if ("// %s:" % MARK) in l:
+        if has_mark(l):
             continue
         keep.append(l)
         idx.append(i)
@@ -195,6 +195,17 @@ def indent_of(line):
     return line[: len(line) - len(line.lstrip())]
 
 
+def comment_token(path):
+    name = path.rsplit("/", 1)[-1]
+    if name in ("BUILD", "BUILD.bazel", "WORKSPACE") or name.endswith(".bzl") or name.endswith(".py"):
+        return "#"
+    return "//"
+
+
+def has_mark(line):
+    return ("// %s:" % MARK) in line or ("# %s:" % MARK) in line
+
+
 def render(hook, anchor_line):
     base = indent_of(anchor_line)
     default_extra = 4 if hook.get("action", "insert_after") == "insert_after" and anchor_line.rstrip().endswith("{") else 0
@@ -205,7 +216,7 @@ def render(hook, anchor_line):
         if not stripped:
             out.append("")
             continue
-        out.append("%s%s%s  // %s:%s" % (base, extra, t.strip() if hook.get("strip", True) else t, MARK, hook["id"]))
+        out.append("%s%s%s  %s %s:%s" % (base, extra, t.strip() if hook.get("strip", True) else t, comment_token(hook["file"]), MARK, hook["id"]))
     return out
 
 
@@ -495,8 +506,8 @@ def build_anchor(text, line_no, n=3):
     i = line_no - 1
     return {
         "line": lines[i].strip(),
-        "before": [l.strip() for l in lines[max(0, i - n): i] if "// %s:" % MARK not in l],
-        "after": [l.strip() for l in lines[i + 1: i + 1 + n] if "// %s:" % MARK not in l],
+        "before": [l.strip() for l in lines[max(0, i - n): i] if not has_mark(l)],
+        "after": [l.strip() for l in lines[i + 1: i + 1 + n] if not has_mark(l)],
     }
 
 
