@@ -1433,6 +1433,57 @@
         "let counterText = (MategramSettings.shared.bool(.charCounter) && textCount > 0 && remainingCount >= 5) ? \"\\(textCount)\" : (remainingCount >= 5 ? \"\" : \"\\(remainingCount)\")"
       ],
       "required": true
+    },
+    {
+      "id": "m6.gifts.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoData.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.gifts.a",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoData.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "availablePanes?.insert(.gifts, at: 1)"
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideProfileGifts) { availablePanes?.insert(.gifts, at: 1) }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.gifts.b1",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoData.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "availablePanes?.insert(.gifts, at: hasStories ? 1 : 0)",
+        "occurrence": 1
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideProfileGifts) { availablePanes?.insert(.gifts, at: hasStories ? 1 : 0) }"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.gifts.b2",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoData.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "availablePanes?.insert(.gifts, at: hasStories ? 1 : 0)",
+        "occurrence": 2
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideProfileGifts) { availablePanes?.insert(.gifts, at: hasStories ? 1 : 0) }"
+      ],
+      "required": true
     }
   ]
 }

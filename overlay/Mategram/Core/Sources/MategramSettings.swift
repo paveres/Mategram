@@ -63,6 +63,7 @@ public enum MategramKey: String, CaseIterable {
     case serviceMessageTime
     case builtInMic
     case charCounter
+    case hideProfileGifts
     case hideMyProfileRow
     case hideWalletRow
     case hideProxyRow
