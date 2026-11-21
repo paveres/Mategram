@@ -6,6 +6,7 @@ public enum MategramSection: Int, CaseIterable {
     case messages
     case chatList
     case calls
+    case settings
 
     public func title(_ language: MategramLanguage) -> String {
         switch (self, language) {
@@ -19,6 +20,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.chatList, .english): return "Chat list"
         case (.calls, .russian): return "Звонки и ссылки"
         case (.calls, .english): return "Calls and links"
+        case (.settings, .russian): return "Пункты настроек"
+        case (.settings, .english): return "Settings items"
         }
     }
 }
@@ -77,6 +80,27 @@ public enum MategramCatalog {
             footerEn: "Asks «Call?» before dialing so you never call by accident."),
         MategramOption(key: .openLinksExternal, section: .calls, titleRu: "Ссылки в браузере", titleEn: "Open links in browser",
             footerRu: "Обычные ссылки открываются в вашем браузере, а не во встроенном просмотре Telegram.",
-            footerEn: "Regular links open in your browser instead of the built-in Telegram viewer.")
+            footerEn: "Regular links open in your browser instead of the built-in Telegram viewer."),
+        MategramOption(key: .hidePremiumRow, section: .settings, titleRu: "Скрыть Premium", titleEn: "Hide Premium",
+            footerRu: "Убирает пункт Telegram Premium из настроек.",
+            footerEn: "Removes the Telegram Premium row from settings."),
+        MategramOption(key: .hideStarsRow, section: .settings, titleRu: "Скрыть Звёзды", titleEn: "Hide Stars",
+            footerRu: "Убирает пункт «Звёзды» из настроек.",
+            footerEn: "Removes the Stars row from settings."),
+        MategramOption(key: .hideTonRow, section: .settings, titleRu: "Скрыть TON", titleEn: "Hide TON",
+            footerRu: "Убирает пункт «Мой TON» из настроек.",
+            footerEn: "Removes the My TON row from settings."),
+        MategramOption(key: .hideBusinessRow, section: .settings, titleRu: "Скрыть Бизнес", titleEn: "Hide Business",
+            footerRu: "Убирает пункт «Telegram для бизнеса» из настроек.",
+            footerEn: "Removes the Telegram Business row from settings."),
+        MategramOption(key: .hideGiftRow, section: .settings, titleRu: "Скрыть «Отправить подарок»", titleEn: "Hide Send a Gift",
+            footerRu: "Убирает пункт «Отправить подарок» из настроек.",
+            footerEn: "Removes the Send a Gift row from settings."),
+        MategramOption(key: .hideAppsRow, section: .settings, titleRu: "Скрыть мини-приложения", titleEn: "Hide mini apps",
+            footerRu: "Убирает список мини-приложений из настроек.",
+            footerEn: "Removes the mini apps list from settings."),
+        MategramOption(key: .hideTipsRow, section: .settings, titleRu: "Скрыть «Возможности Telegram»", titleEn: "Hide Telegram Features",
+            footerRu: "Убирает пункты «Вопросы о Telegram» и «Возможности Telegram».",
+            footerEn: "Removes the Telegram FAQ and Telegram Features rows.")
     ]
 }

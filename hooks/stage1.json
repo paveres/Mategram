@@ -294,6 +294,31 @@
       "text": ["title = MategramSettings.shared.bool(.hideChatsTitle) ? \"\" : self.presentationData.strings.DialogList_Title"],
       "required": true,
       "note": "hide the Chats title"
+    },
+    {
+      "id": "mate.sitems.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
+      "action": "insert_after",
+      "anchor": { "line": "import TelegramCore" },
+      "text": ["import MategramCore"],
+      "required": true
+    },
+    {
+      "id": "mate.sitems.hide",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
+      "action": "insert_before",
+      "anchor": { "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []", "before": ["interaction.openSettings(.tips)", "}))"], "occurrence": 1 },
+      "text": [
+        "if MategramSettings.shared.bool(.hidePremiumRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 100 }) }",
+        "if MategramSettings.shared.bool(.hideStarsRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 102 }) }",
+        "if MategramSettings.shared.bool(.hideTonRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 103 }) }",
+        "if MategramSettings.shared.bool(.hideBusinessRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 104 }) }",
+        "if MategramSettings.shared.bool(.hideGiftRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 105 }) }",
+        "if MategramSettings.shared.bool(.hideAppsRow) { items[.apps] = [] }",
+        "if MategramSettings.shared.bool(.hideTipsRow) { items[.support]?.removeAll(where: { ($0.id as? Int) == 1 || ($0.id as? Int) == 2 }) }"
+      ],
+      "required": true,
+      "note": "hide chosen rows of the settings screen"
     }
   ]
 }

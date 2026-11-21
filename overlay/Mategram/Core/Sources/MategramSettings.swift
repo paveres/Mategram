@@ -13,6 +13,13 @@ public enum MategramKey: String, CaseIterable {
     case hideChatsTitle
     case confirmCalls
     case openLinksExternal
+    case hidePremiumRow
+    case hideStarsRow
+    case hideTonRow
+    case hideBusinessRow
+    case hideGiftRow
+    case hideAppsRow
+    case hideTipsRow
 
     public var defaultValue: Bool {
         switch self {
