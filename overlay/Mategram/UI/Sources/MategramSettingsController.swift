@@ -8,6 +8,7 @@ import ItemListUI
 import PresentationDataUtils
 import AccountContext
 import MategramCore
+import UndoUI
 
 private final class MategramHeaderItem: ListViewItem, ItemListItem {
     let presentationData: ItemListPresentationData
@@ -133,11 +134,13 @@ private final class MategramSettingsArguments {
     let toggle: (MategramKey, Bool) -> Void
     let openSection: (MategramSection) -> Void
     let updateText: (MategramTextKey, String) -> Void
+    let backup: (Bool) -> Void
 
-    init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }) {
+    init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }, backup: @escaping (Bool) -> Void = { _ in }) {
         self.toggle = toggle
         self.openSection = openSection
         self.updateText = updateText
+        self.backup = backup
     }
 }
 
@@ -148,6 +151,7 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case footer(index: Int32, section: Int32, text: String)
     case textHeader(index: Int32, section: Int32, text: String)
     case textInput(index: Int32, section: Int32, key: MategramTextKey, placeholder: String, value: String)
+    case backupAction(index: Int32, section: Int32, isExport: Bool, title: String)
 
     var section: ItemListSectionId {
         switch self {
@@ -162,6 +166,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .textHeader(_, section, _):
             return section
         case let .textInput(_, section, _, _, _):
+            return section
+        case let .backupAction(_, section, _, _):
             return section
         }
     }
@@ -179,6 +185,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .textHeader(index, _, _):
             return index
         case let .textInput(index, _, _, _, _):
+            return index
+        case let .backupAction(index, _, _, _):
             return index
         }
     }
@@ -209,6 +217,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             return ItemListMultilineInputItem(presentationData: presentationData, systemStyle: .glass, text: value, placeholder: placeholder, maxLength: nil, sectionId: section, style: .blocks, capitalization: false, autocorrection: false, textUpdated: { text in
                 arguments.updateText(key, text)
             })
+        case let .backupAction(_, section, isExport, title):
+            return ItemListActionItem(presentationData: presentationData, systemStyle: .glass, title: title, kind: .generic, alignment: .natural, sectionId: section, style: .blocks, action: {
+                arguments.backup(isExport)
+            })
         }
     }
 }
@@ -227,6 +239,9 @@ private func mategramMainEntries(language: MategramLanguage) -> [MategramSetting
         index += 1
         entries.append(.sectionRow(index: index, section: 1, kind: section, title: section.title(language), subtitle: section.subtitle(language)))
     }
+    entries.append(.backupAction(index: 100, section: 2, isExport: true, title: language == .russian ? "Скопировать настройки" : "Copy settings"))
+    entries.append(.backupAction(index: 101, section: 2, isExport: false, title: language == .russian ? "Вставить настройки из буфера" : "Paste settings from clipboard"))
+    entries.append(.footer(index: 102, section: 2, text: language == .russian ? "Все переключатели Mategram копируются одной строкой. Вставьте её на другом устройстве или после переустановки." : "All Mategram switches are copied as one line. Paste it on another device or after reinstalling."))
     return entries
 }
 
@@ -291,14 +306,33 @@ public func mategramSettingsController(context: AccountContext) -> ViewControlle
     let refresh = ValuePromise<Int>(0, ignoreRepeated: false)
     var pushControllerImpl: ((ViewController) -> Void)?
 
+    var presentImpl: ((ViewController) -> Void)?
     let arguments = MategramSettingsArguments(toggle: { _, _ in
     }, openSection: { section in
         pushControllerImpl?(mategramSectionController(context: context, section: section))
+    }, backup: { isExport in
+        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+        let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
+        let text: String
+        if isExport {
+            UIPasteboard.general.string = MategramBackup.export()
+            text = language == .russian ? "Настройки скопированы" : "Settings copied"
+        } else if let string = UIPasteboard.general.string, MategramBackup.importSettings(string) {
+            text = language == .russian ? "Настройки применены" : "Settings applied"
+        } else {
+            text = language == .russian ? "В буфере нет настроек Mategram" : "No Mategram settings in clipboard"
+        }
+        presentImpl?(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: text, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: false, action: { _ in
+            return false
+        }))
     })
 
     let controller = ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: nil))
     pushControllerImpl = { [weak controller] next in
         controller?.push(next)
+    }
+    presentImpl = { [weak controller] next in
+        controller?.present(next, in: .current)
     }
     return controller
 }

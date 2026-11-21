@@ -628,6 +628,46 @@
         "let displaySize = CGSize(width: 184.0 * MategramLook.stickerScale, height: 184.0 * MategramLook.stickerScale)"
       ],
       "required": true
+    },
+    {
+      "id": "m3.fetch.import",
+      "file": "submodules/TelegramCore/Sources/Network/FetchV2.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.fetch.part",
+      "file": "submodules/TelegramCore/Sources/Network/FetchV2.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.defaultPartSize = 128 * 1024",
+        "before": [
+          "} else {"
+        ]
+      },
+      "text": [
+        "self.defaultPartSize = MategramSettings.shared.bool(.fastDownload) ? 512 * 1024 : 128 * 1024"
+      ],
+      "required": true
+    },
+    {
+      "id": "m3.fetch.parallel",
+      "file": "submodules/TelegramCore/Sources/Network/FetchV2.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.masterPendingParts = self.fastDownloads ? fastDownloadMasterPendingParts : 6"
+      },
+      "text": [
+        "self.masterPendingParts = (self.fastDownloads || MategramSettings.shared.bool(.fastDownload)) ? fastDownloadMasterPendingParts : 6"
+      ],
+      "required": true
     }
   ]
 }

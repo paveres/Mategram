@@ -240,6 +240,9 @@ public enum MategramCatalog {
         MategramOption(key: .alwaysHD, section: .media, titleRu: "Всегда HD", titleEn: "Always HD",
             footerRu: "Фото в галерее сразу отправляются в высоком качестве.",
             footerEn: "Photos from the gallery are always sent in high quality."),
+        MategramOption(key: .fastDownload, section: .media, titleRu: "Ускорить скачивание", titleEn: "Faster downloads",
+            footerRu: "Файлы качаются большими частями и в 16 потоков. Расходует больше трафика за раз.",
+            footerEn: "Files download in larger parts with 16 parallel requests. Uses more traffic at once."),
         MategramOption(key: .cameraInGallery, section: .media, titleRu: "Камера в галерее", titleEn: "Camera in gallery",
             footerRu: "Живая камера первой ячейкой в галерее. Выключена, галерея открывается легче.",
             footerEn: "Live camera as the first gallery cell. Off keeps the gallery lighter.")

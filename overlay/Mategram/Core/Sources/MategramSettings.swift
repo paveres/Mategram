@@ -46,6 +46,7 @@ public enum MategramKey: String, CaseIterable {
     case alwaysHD
     case mutedNameColors
     case smallStickers
+    case fastDownload
 
     public var defaultValue: Bool {
         switch self {

@@ -18,6 +18,7 @@ swift_library(
         "//submodules/AccountContext:AccountContext",
         "//submodules/ItemListUI:ItemListUI",
         "//submodules/PresentationDataUtils:PresentationDataUtils",
+        "//submodules/UndoUI:UndoUI",
     ],
     visibility = [
         "//visibility:public",
