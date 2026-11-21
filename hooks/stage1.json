@@ -4,16 +4,33 @@
       "id": "mate.presence.import",
       "file": "submodules/TelegramStringFormatting/Sources/PresenceStrings.swift",
       "action": "insert_after",
-      "anchor": { "line": "import TextFormat", "before": ["import TelegramPresentationData"], "after": [""] },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import TextFormat",
+        "before": [
+          "import TelegramPresentationData"
+        ],
+        "after": [
+          ""
+        ]
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.presence.build",
       "file": "submodules/TelegramStringFormatting/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/AppBundle:AppBundle\",", "before": ["\"//submodules/TelegramPresentationData:TelegramPresentationData\","] },
-      "text": ["\"//Mategram/Core:MategramCore\","],
+      "anchor": {
+        "line": "\"//submodules/AppBundle:AppBundle\",",
+        "before": [
+          "\"//submodules/TelegramPresentationData:TelegramPresentationData\","
+        ]
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
       "required": true
     },
     {
@@ -35,31 +52,58 @@
       "id": "mate.info.section",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
       "action": "insert_after",
-      "anchor": { "line": "case peerInfo", "before": ["case personalChannel"], "after": ["case agentProviders"] },
-      "text": ["case mategram"],
+      "anchor": {
+        "line": "case peerInfo",
+        "before": [
+          "case personalChannel"
+        ],
+        "after": [
+          "case agentProviders"
+        ]
+      },
+      "text": [
+        "case mategram"
+      ],
       "required": true
     },
     {
       "id": "mate.info.items",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
       "action": "insert_before",
-      "anchor": { "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []", "occurrence": 1 },
-      "text": ["items[.mategram]!.append(contentsOf: mategramPeerInfoItems(data: data, context: context, presentationData: presentationData, interaction: interaction))"],
+      "anchor": {
+        "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []",
+        "occurrence": 1
+      },
+      "text": [
+        "items[.mategram]!.append(contentsOf: mategramPeerInfoItems(data: data, context: context, presentationData: presentationData, interaction: interaction))"
+      ],
       "required": true
     },
     {
       "id": "mate.settings.case",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
       "action": "insert_after",
-      "anchor": { "line": "case chatFolders", "before": ["case devices"], "after": ["case notificationsAndSounds"] },
-      "text": ["case mategram"],
+      "anchor": {
+        "line": "case chatFolders",
+        "before": [
+          "case devices"
+        ],
+        "after": [
+          "case notificationsAndSounds"
+        ]
+      },
+      "text": [
+        "case mategram"
+      ],
       "required": true
     },
     {
       "id": "mate.settings.row",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
       "action": "insert_before",
-      "anchor": { "line": "let notificationsWarning: Bool" },
+      "anchor": {
+        "line": "let notificationsWarning: Bool"
+      },
       "text": [
         "items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 90, text: \"Mategram\", icon: PresentationResourcesSettings.chatFolders, action: {",
         "    interaction.openSettings(.mategram)",
@@ -71,7 +115,9 @@
       "id": "mate.settings.open",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenSettingsActions.swift",
       "action": "insert_before",
-      "anchor": { "line": "case .chatFolders:" },
+      "anchor": {
+        "line": "case .chatFolders:"
+      },
       "text": [
         "case .mategram:",
         "    push(mategramSettingsController(context: self.context))"
@@ -82,40 +128,70 @@
       "id": "mate.settings.import",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenSettingsActions.swift",
       "action": "insert_after",
-      "anchor": { "line": "import SettingsUI" },
-      "text": ["import MategramUI"],
+      "anchor": {
+        "line": "import SettingsUI"
+      },
+      "text": [
+        "import MategramUI"
+      ],
       "required": true
     },
     {
       "id": "mate.peerinfo.build",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/ItemListUI\"," },
-      "text": ["\"//Mategram/Core:MategramCore\",", "\"//Mategram/UI:MategramUI\","],
+      "anchor": {
+        "line": "\"//submodules/ItemListUI\","
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\",",
+        "\"//Mategram/UI:MategramUI\","
+      ],
       "required": true
     },
     {
       "id": "mate.badge.import",
       "file": "submodules/TelegramCore/Sources/Utils/PeerUtils.swift",
       "action": "insert_after",
-      "anchor": { "line": "import Postbox", "before": ["import Foundation"] },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import Postbox",
+        "before": [
+          "import Foundation"
+        ]
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.badge.build",
       "file": "submodules/TelegramCore/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/MediaPreuploadRegistry:MediaPreuploadRegistry\"," },
-      "text": ["\"//Mategram/Core:MategramCore\","],
+      "anchor": {
+        "line": "\"//submodules/MediaPreuploadRegistry:MediaPreuploadRegistry\","
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
       "required": true
     },
     {
       "id": "mate.badge.status",
       "file": "submodules/TelegramCore/Sources/Utils/PeerUtils.swift",
       "action": "replace",
-      "anchor": { "line": "return user.emojiStatus", "before": ["case let user as TelegramUser:"], "after": ["case let channel as TelegramChannel:"] },
-      "text": ["return MategramBadges.emojiFileId(userId: user.id.id._internalGetInt64Value()).map { PeerEmojiStatus(content: .emoji(fileId: $0), expirationDate: nil) } ?? user.emojiStatus"],
+      "anchor": {
+        "line": "return user.emojiStatus",
+        "before": [
+          "case let user as TelegramUser:"
+        ],
+        "after": [
+          "case let channel as TelegramChannel:"
+        ]
+      },
+      "text": [
+        "return MategramBadges.emojiFileId(userId: user.id.id._internalGetInt64Value()).map { PeerEmojiStatus(content: .emoji(fileId: $0), expirationDate: nil) } ?? user.emojiStatus"
+      ],
       "required": true,
       "note": "client-only Mategram badge shown as emoji status"
     },
@@ -123,16 +199,24 @@
       "id": "mate.views.import",
       "file": "submodules/TelegramUI/Components/Chat/ChatMessageDateAndStatusNode/Sources/ChatMessageDateAndStatusNode.swift",
       "action": "insert_after",
-      "anchor": { "line": "import StaticGlassBackground" },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import StaticGlassBackground"
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.views.build",
       "file": "submodules/TelegramUI/Components/Chat/ChatMessageDateAndStatusNode/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/TelegramStringFormatting\"," },
-      "text": ["\"//Mategram/Core:MategramCore\","],
+      "anchor": {
+        "line": "\"//submodules/TelegramStringFormatting\","
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
       "required": true
     },
     {
@@ -155,24 +239,37 @@
       "id": "mate.stories.import",
       "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
       "action": "insert_after",
-      "anchor": { "line": "import Foundation" },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import Foundation"
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.stories.build",
       "file": "submodules/ChatListUI/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/TelegramPresentationData:TelegramPresentationData\",", "occurrence": 1 },
-      "text": ["\"//Mategram/Core:MategramCore\","],
+      "anchor": {
+        "line": "\"//submodules/TelegramPresentationData:TelegramPresentationData\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
       "required": true
     },
     {
       "id": "mate.stories.hide",
       "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
       "action": "insert_after",
-      "anchor": { "line": "func shouldDisplayStoriesInChatListHeader(storySubscriptions: EngineStorySubscriptions, isHidden: Bool) -> Bool {" },
-      "text": ["if MategramSettings.shared.bool(.hideStoriesBar) { return false }"],
+      "anchor": {
+        "line": "func shouldDisplayStoriesInChatListHeader(storySubscriptions: EngineStorySubscriptions, isHidden: Bool) -> Bool {"
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.hideStoriesBar) { return false }"
+      ],
       "required": true,
       "note": "hide stories bar"
     },
@@ -180,24 +277,37 @@
       "id": "mate.seconds.import",
       "file": "submodules/TextFormat/Sources/DateFormat.swift",
       "action": "insert_after",
-      "anchor": { "line": "import TelegramUIPreferences" },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import TelegramUIPreferences"
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.seconds.build",
       "file": "submodules/TextFormat/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/Display:Display\",", "occurrence": 1 },
-      "text": ["\"//Mategram/Core:MategramCore\","],
+      "anchor": {
+        "line": "\"//submodules/Display:Display\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
       "required": true
     },
     {
       "id": "mate.seconds.apply",
       "file": "submodules/TextFormat/Sources/DateFormat.swift",
       "action": "insert_after",
-      "anchor": { "line": "public func stringForMessageTimestamp(timestamp: Int32, dateTimeFormat: PresentationDateTimeFormat, withSeconds: Bool = false, local: Bool = true) -> String {" },
-      "text": ["let withSeconds = withSeconds || MategramSettings.shared.bool(.timeSeconds)"],
+      "anchor": {
+        "line": "public func stringForMessageTimestamp(timestamp: Int32, dateTimeFormat: PresentationDateTimeFormat, withSeconds: Bool = false, local: Bool = true) -> String {"
+      },
+      "text": [
+        "let withSeconds = withSeconds || MategramSettings.shared.bool(.timeSeconds)"
+      ],
       "required": true,
       "note": "seconds in message time"
     },
@@ -205,23 +315,33 @@
       "id": "mate.ctx.import",
       "file": "submodules/TelegramUI/Sources/AccountContext.swift",
       "action": "insert_after",
-      "anchor": { "line": "import MessageWidget" },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import MessageWidget"
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.ctx.build",
       "file": "submodules/TelegramUI/BUILD",
       "action": "insert_after",
-      "anchor": { "line": "\"//submodules/AlertUI:AlertUI\"," },
-      "text": ["\"//Mategram/Core:MategramCore\","],
+      "anchor": {
+        "line": "\"//submodules/AlertUI:AlertUI\","
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
       "required": true
     },
     {
       "id": "mate.call.confirm",
       "file": "submodules/TelegramUI/Sources/AccountContext.swift",
       "action": "insert_after",
-      "anchor": { "line": "public func requestCall(peerId: EnginePeer.Id, isVideo: Bool, completion: @escaping () -> Void) {" },
+      "anchor": {
+        "line": "public func requestCall(peerId: EnginePeer.Id, isVideo: Bool, completion: @escaping () -> Void) {"
+      },
       "strip": false,
       "text": [
         "if MategramSettings.shared.bool(.confirmCalls) && !MategramCallGate.consume() {",
@@ -242,15 +362,22 @@
       "id": "mate.url.import",
       "file": "submodules/TelegramUI/Sources/OpenUrl.swift",
       "action": "insert_after",
-      "anchor": { "line": "import Foundation", "occurrence": 1 },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.url.external",
       "file": "submodules/TelegramUI/Sources/OpenUrl.swift",
       "action": "insert_after",
-      "anchor": { "line": "func openExternalUrlImpl(context: AccountContext, urlContext: OpenURLContext, url: String, forceExternal: Bool, presentationData: PresentationData, navigationController: NavigationController?, dismissInput: @escaping () -> Void) {" },
+      "anchor": {
+        "line": "func openExternalUrlImpl(context: AccountContext, urlContext: OpenURLContext, url: String, forceExternal: Bool, presentationData: PresentationData, navigationController: NavigationController?, dismissInput: @escaping () -> Void) {"
+      },
       "text": [
         "if MategramSettings.shared.bool(.openLinksExternal), let mategramUrl = URL(string: url), mategramUrl.scheme == \"http\" || mategramUrl.scheme == \"https\" {",
         "    context.sharedContext.applicationBindings.openUrl(url)",
@@ -265,16 +392,25 @@
       "id": "mate.rating.import",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
       "action": "insert_after",
-      "anchor": { "line": "import AsyncDisplayKit", "occurrence": 1 },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import AsyncDisplayKit",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.rating.hide",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
       "action": "replace",
-      "anchor": { "line": "if let cachedData = cachedData as? CachedUserData, let starRating = cachedData.starRating {" },
-      "text": ["if !MategramSettings.shared.bool(.hideStarRating), let cachedData = cachedData as? CachedUserData, let starRating = cachedData.starRating {"],
+      "anchor": {
+        "line": "if let cachedData = cachedData as? CachedUserData, let starRating = cachedData.starRating {"
+      },
+      "text": [
+        "if !MategramSettings.shared.bool(.hideStarRating), let cachedData = cachedData as? CachedUserData, let starRating = cachedData.starRating {"
+      ],
       "required": true,
       "note": "hide star rating"
     },
@@ -282,16 +418,26 @@
       "id": "mate.title.import",
       "file": "submodules/ChatListUI/Sources/ChatListController.swift",
       "action": "insert_after",
-      "anchor": { "line": "import Foundation", "occurrence": 1 },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.title.hide",
       "file": "submodules/ChatListUI/Sources/ChatListController.swift",
       "action": "replace",
-      "anchor": { "line": "title = self.presentationData.strings.DialogList_Title", "occurrence": 1 },
-      "text": ["title = MategramSettings.shared.bool(.hideChatsTitle) ? \"\" : self.presentationData.strings.DialogList_Title"],
+      "anchor": {
+        "line": "title = self.presentationData.strings.DialogList_Title",
+        "occurrence": 1
+      },
+      "text": [
+        "title = MategramSettings.shared.bool(.hideChatsTitle) ? \"\" : self.presentationData.strings.DialogList_Title"
+      ],
       "required": true,
       "note": "hide the Chats title"
     },
@@ -299,15 +445,26 @@
       "id": "mate.sitems.import",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
       "action": "insert_after",
-      "anchor": { "line": "import TelegramCore" },
-      "text": ["import MategramCore"],
+      "anchor": {
+        "line": "import TelegramCore"
+      },
+      "text": [
+        "import MategramCore"
+      ],
       "required": true
     },
     {
       "id": "mate.sitems.hide",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift",
       "action": "insert_before",
-      "anchor": { "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []", "before": ["interaction.openSettings(.tips)", "}))"], "occurrence": 1 },
+      "anchor": {
+        "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []",
+        "before": [
+          "interaction.openSettings(.tips)",
+          "}))"
+        ],
+        "occurrence": 1
+      },
       "text": [
         "if MategramSettings.shared.bool(.hidePremiumRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 100 }) }",
         "if MategramSettings.shared.bool(.hideStarsRow) { items[.payment]?.removeAll(where: { ($0.id as? Int) == 102 }) }",
@@ -319,6 +476,33 @@
       ],
       "required": true,
       "note": "hide chosen rows of the settings screen"
+    },
+    {
+      "id": "mate.app.import",
+      "file": "submodules/TelegramUI/Sources/AppDelegate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import UIKit",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "mate.app.group",
+      "file": "submodules/TelegramUI/Sources/AppDelegate.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)",
+        "occurrence": 1
+      },
+      "text": [
+        "let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName) ?? MategramStorage.fallbackDirectory()"
+      ],
+      "required": true,
+      "note": "sideloaded builds without app groups: use app storage instead of failing with a black screen"
     }
   ]
 }
