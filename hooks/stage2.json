@@ -1238,6 +1238,113 @@
         "})?.withRenderingMode(.alwaysTemplate)"
       ],
       "required": true
+    },
+    {
+      "id": "m6.prof.expand",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.data = data",
+        "before": [
+          "}"
+        ]
+      },
+      "text": [
+        "self.mategramBackdrop.attach(to: self.view)",
+        "self.mategramBackdrop.update(context: self.context, peer: data.peer)",
+        "if previousData == nil, let peer = data.peer, peer.smallProfileImage != nil, self.chatLocation.threadId == nil, !self.headerNode.isAvatarExpanded {",
+        "    self.headerNode.updateIsAvatarExpanded(true, transition: .immediate)",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.prof.layout",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func containerLayoutUpdated(layout: ContainerViewLayout, navigationHeight: CGFloat, transition: ContainedViewLayoutTransition, additive: Bool = false) {"
+      },
+      "text": [
+        "self.mategramBackdrop.layout(size: layout.size)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.title.center",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var minTitleFrame = CGRect(origin: CGPoint(x: 16.0 + stripLeft, y: expandedAvatarHeight - bottomInset - 58.0 - UIScreenPixel + (subtitleSize.height.isZero ? 10.0 : 0.0)), size: minTitleSize)"
+      },
+      "text": [
+        "minTitleFrame.origin.x = floor((width - minTitleSize.width) / 2.0)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.subtitle.center",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "subtitleFrame = CGRect(origin: CGPoint(x: 16.0 + stripLeft - subtitleButtonHorizontalOffset * (1.0 - titleCollapseFraction), y: minTitleFrame.maxY + 2.0), size: subtitleSize)"
+      },
+      "text": [
+        "subtitleFrame.origin.x = floor((width - subtitleSize.width) / 2.0)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.sec.imp1",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenItemSectionContainerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import TelegramPresentationData"
+      },
+      "text": [
+        "import ComponentFlow",
+        "import GlassBackgroundComponent"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.sec.prop",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenItemSectionContainerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private let backgroundNode: ASDisplayNode"
+      },
+      "text": [
+        "private var mategramGlass: GlassBackgroundView?"
+      ],
+      "required": true
+    },
+    {
+      "id": "m6.sec.glass",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenItemSectionContainerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "transition.updateFrame(node: self.backgroundNode, frame: CGRect(origin: CGPoint(x: 0.0, y: contentWithBackgroundOffset), size: CGSize(width: width, height: max(0.0, contentWithBackgroundHeight - contentWithBackgroundOffset))))"
+      },
+      "text": [
+        "let mategramGlassFrame = CGRect(origin: CGPoint(x: 0.0, y: contentWithBackgroundOffset), size: CGSize(width: width, height: max(0.0, contentWithBackgroundHeight - contentWithBackgroundOffset)))",
+        "let mategramGlassView: GlassBackgroundView",
+        "if let current = self.mategramGlass {",
+        "    mategramGlassView = current",
+        "} else {",
+        "    mategramGlassView = GlassBackgroundView()",
+        "    mategramGlassView.isUserInteractionEnabled = false",
+        "    self.view.insertSubview(mategramGlassView, at: 0)",
+        "    self.mategramGlass = mategramGlassView",
+        "}",
+        "self.backgroundNode.isHidden = true",
+        "self.topSeparatorNode.isHidden = true",
+        "self.bottomSeparatorNode.isHidden = true",
+        "mategramGlassView.isHidden = mategramGlassFrame.height < 1.0",
+        "transition.updateFrame(view: mategramGlassView, frame: mategramGlassFrame)",
+        "mategramGlassView.update(size: mategramGlassFrame.size, cornerRadius: min(26.0, mategramGlassFrame.height * 0.5), isDark: presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .clear), transition: ComponentTransition(transition))"
+      ],
+      "required": true
     }
   ]
 }
