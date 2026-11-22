@@ -2711,6 +2711,21 @@
         "return MTSocksProxySettings(ip: MategramDNS.resolve(self.host), port: UInt16(clamping: self.port), username: nil, password: nil, secret: secret)"
       ],
       "required": true
+    },
+    {
+      "id": "m9.autoproxy.start",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "super.viewDidAppear(animated)",
+        "before": [
+          "override public func viewDidAppear(_ animated: Bool) {"
+        ]
+      },
+      "text": [
+        "mategramStartAutoProxy(context: self.context)"
+      ],
+      "required": true
     }
   ]
 }

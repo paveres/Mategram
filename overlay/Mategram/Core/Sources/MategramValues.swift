@@ -8,6 +8,7 @@ public enum MategramValueKey: String, CaseIterable {
     case maxPinnedPreview
     case peekDuration
     case crossfadeSeconds
+    case autoProxyDelay
 
     public var defaultValue: Int {
         switch self {
@@ -23,6 +24,8 @@ public enum MategramValueKey: String, CaseIterable {
             return 10
         case .crossfadeSeconds:
             return 5
+        case .autoProxyDelay:
+            return 15
         }
     }
 
@@ -40,6 +43,8 @@ public enum MategramValueKey: String, CaseIterable {
             return [5, 10, 15, 30, 60]
         case .crossfadeSeconds:
             return [2, 3, 5, 8, 10, 12]
+        case .autoProxyDelay:
+            return [5, 10, 15, 30, 60]
         }
     }
 
@@ -57,13 +62,15 @@ public enum MategramValueKey: String, CaseIterable {
             return 3 ... 600
         case .crossfadeSeconds:
             return 1 ... 30
+        case .autoProxyDelay:
+            return 3 ... 600
         }
     }
 
     public func format(_ value: Int, _ language: MategramLanguage) -> String {
         let isRussian = language == .russian
         switch self {
-        case .sendDelay, .onlineInterval, .peekDuration, .crossfadeSeconds:
+        case .sendDelay, .onlineInterval, .peekDuration, .crossfadeSeconds, .autoProxyDelay:
             if value >= 3600 && value % 3600 == 0 {
                 return isRussian ? "\(value / 3600) ч" : "\(value / 3600) h"
             } else if value >= 60 && value % 60 == 0 {
@@ -102,6 +109,7 @@ public extension MategramCatalog {
         MategramValueOption(key: .onlineInterval, section: .ghost, titleRu: "Интервал «в сети»", titleEn: "Online interval", footerRu: "Как часто обновлять статус «в сети» для «Всегда в сети».", footerEn: "How often the online status is refreshed for «Always online»."),
         MategramValueOption(key: .peekDuration, section: .ghost, titleRu: "Время подглядывания", titleEn: "Peek duration", footerRu: "Сколько держать «был(а)» открытым при «Подглядеть онлайн».", footerEn: "How long last seen stays open for «Peek last seen»."),
         MategramValueOption(key: .crossfadeSeconds, section: .voice, titleRu: "Длина кроссфейда", titleEn: "Crossfade length", footerRu: "Сколько секунд трек затухает в конце и нарастает в начале.", footerEn: "How many seconds a track fades out at the end and in at the start."),
+        MategramValueOption(key: .autoProxyDelay, section: .network, titleRu: "Ожидание автопрокси", titleEn: "Auto proxy wait", footerRu: "Сколько ждать соединения, прежде чем включить или сменить прокси.", footerEn: "How long to wait for a connection before turning on or switching the proxy."),
         MategramValueOption(key: .stickerSize, section: .chat, titleRu: "Размер стикеров", titleEn: "Sticker size", footerRu: "Размер стикеров при включённых маленьких стикерах.", footerEn: "Sticker size when small stickers are on.")
     ]
 
