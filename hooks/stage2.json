@@ -2269,6 +2269,71 @@
         "items.append(contentsOf: mategramChatGhostItems(context: context, peer: EnginePeer(peer), presentationData: strongSelf.presentationData))"
       ],
       "required": true
+    },
+    {
+      "id": "m9.speech.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageInteractiveFileNode/Sources/ChatMessageInteractiveFileNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.speech.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageInteractiveFileNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/AsyncDisplayKit\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.speech.gate",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageInteractiveFileNode/Sources/ChatMessageInteractiveFileNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if transcriptionText == nil && !arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost {",
+        "occurrence": 1
+      },
+      "text": [
+        "if transcriptionText == nil && !arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost && !MategramSettings.shared.bool(.appleSpeech) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.speech.local",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageInteractiveFileNode/Sources/ChatMessageInteractiveFileNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if context.sharedContext.immediateExperimentalUISettings.localTranscription {",
+        "occurrence": 1
+      },
+      "text": [
+        "if context.sharedContext.immediateExperimentalUISettings.localTranscription || (MategramSettings.shared.bool(.appleSpeech) && !arguments.associatedData.isPremium) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.speech.show",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageInteractiveFileNode/Sources/ChatMessageInteractiveFileNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if arguments.associatedData.isPremium || arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost {",
+        "occurrence": 1
+      },
+      "text": [
+        "if arguments.associatedData.isPremium || arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost || MategramSettings.shared.bool(.appleSpeech) {"
+      ],
+      "required": true
     }
   ]
 }
