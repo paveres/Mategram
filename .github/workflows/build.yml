@@ -194,4 +194,4 @@ jobs:
           } > notes.md
           TITLE=$(head -n 1 notes.md)
           tail -n +2 notes.md > notes_body.md
-          gh release create "$TAG" "Mategram_$VERSION.ipa" SHA256SUMS latest.json -R "$REPO" --title "$TITLE" --notes-file notes_body.md
+          gh release create "$TAG" "Mategram_$VERSION.ipa" SHA256SUMS latest.json -R "$REPO" --target "$GITHUB_SHA" --title "$TITLE" --notes-file notes_body.md
