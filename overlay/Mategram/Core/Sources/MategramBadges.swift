@@ -1,13 +1,21 @@
 import Foundation
 
+public struct MategramRole: Equatable {
+    public let key: String
+    public let text: String
+    public let emojiId: Int64?
+}
+
 public enum MategramBadges {
     private static let lock = NSLock()
     private static var users: [Int64: Int64] = [37203514: 0]
     private static var signatures: [Int64: String] = [:]
+    private static var roles: [Int64: (key: String, text: String?, emojiId: Int64?)] = [:]
+    private static var catalog: [String: (ru: String, en: String, emojiId: Int64?)] = [:]
     private static var defaultEmojiId: Int64 = 5771816900518489704
     private static var loaded = false
     private static var lastRefresh: TimeInterval = 0
-    private static let cacheKey = "mategram.badges.cache.v2"
+    private static let cacheKey = "mategram.badges.cache.v3"
     private static let source = "https://api.mates.wtf/v1/marks"
     static let eventsSource = "https://api.mates.wtf/v1/live"
 
@@ -27,18 +35,35 @@ public enum MategramBadges {
         }
         var newUsers: [Int64: Int64] = [:]
         var newSignatures: [Int64: String] = [:]
+        var newRoles: [Int64: (key: String, text: String?, emojiId: Int64?)] = [:]
         for row in list {
             guard let userId = parseId(row["userId"]) else {
                 continue
             }
-            newUsers[userId] = parseId(row["emojiId"]) ?? 0
+            if hasBadge(row) {
+                newUsers[userId] = parseId(row["emojiId"]) ?? 0
+            }
+            if let role = parseRole(row) {
+                newRoles[userId] = role
+            }
             if let signature = row["signature"] as? String, !signature.isEmpty {
                 newSignatures[userId] = signature
+            }
+        }
+        var newCatalog: [String: (ru: String, en: String, emojiId: Int64?)] = [:]
+        if let rolesObject = object["roles"] as? [String: [String: Any]] {
+            for (key, value) in rolesObject {
+                let ru = value["ru"] as? String ?? key
+                newCatalog[key] = (ru: ru, en: value["en"] as? String ?? ru, emojiId: parseId(value["emojiId"]))
             }
         }
         lock.lock()
         users = newUsers
         signatures = newSignatures
+        roles = newRoles
+        if !newCatalog.isEmpty {
+            catalog = newCatalog
+        }
         if let value = parseId(object["defaultEmojiId"]), value != 0 {
             defaultEmojiId = value
         }
@@ -46,9 +71,39 @@ public enum MategramBadges {
         return true
     }
 
+    private static func hasBadge(_ row: [String: Any]) -> Bool {
+        if let flag = row["badge"] as? Bool {
+            return flag
+        }
+        if let flag = row["badge"] as? NSNumber {
+            return flag.boolValue
+        }
+        return row["role"] == nil
+    }
+
+    private static func parseRole(_ row: [String: Any]) -> (key: String, text: String?, emojiId: Int64?)? {
+        guard let key = row["role"] as? String, !key.isEmpty else {
+            return nil
+        }
+        let text = (row["roleText"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+        return (key: key, text: text, emojiId: parseId(row["roleEmojiId"]))
+    }
+
     static func applyEvent(userId: Int64, badge: [String: Any]?) {
         lock.lock()
-        if let badge {
+        if let badge, let role = parseRole(badge) {
+            roles[userId] = role
+        } else {
+            roles.removeValue(forKey: userId)
+        }
+        if let badge, !hasBadge(badge) {
+            users.removeValue(forKey: userId)
+            if let signature = badge["signature"] as? String, !signature.isEmpty {
+                signatures[userId] = signature
+            } else {
+                signatures.removeValue(forKey: userId)
+            }
+        } else if let badge {
             users[userId] = parseId(badge["emojiId"]) ?? 0
             if let signature = badge["signature"] as? String, !signature.isEmpty {
                 signatures[userId] = signature
@@ -110,6 +165,27 @@ public enum MategramBadges {
         }
         return emoji != 0 ? emoji : defaultEmojiId
     }
+
+    public static func role(userId: Int64, russian: Bool) -> MategramRole? {
+        prepare()
+        lock.lock()
+        defer { lock.unlock() }
+        guard let role = roles[userId] else {
+            return nil
+        }
+        let entry = catalog[role.key] ?? defaultCatalog[role.key]
+        let text = role.text ?? (russian ? entry?.ru : entry?.en) ?? role.key
+        return MategramRole(key: role.key, text: text, emojiId: role.emojiId ?? entry?.emojiId)
+    }
+
+    private static let defaultCatalog: [String: (ru: String, en: String, emojiId: Int64?)] = [
+        "owner": (ru: "Владелец клиента MateGram", en: "MateGram owner", emojiId: 5807868868886009920),
+        "coowner": (ru: "Со-владелец клиента MateGram", en: "MateGram co-owner", emojiId: 5807465992363710697),
+        "developer": (ru: "Разработчик клиента MateGram", en: "MateGram developer", emojiId: 5931415565955503486),
+        "coder": (ru: "Кодер клиента MateGram", en: "MateGram coder", emojiId: 5879841310902324730),
+        "beta": (ru: "Бета-тестер клиента MateGram", en: "MateGram beta tester", emojiId: 5213073897628378814),
+        "sponsor": (ru: "Спонсор клиента MateGram", en: "MateGram sponsor", emojiId: 5994453058656931434)
+    ]
 
     public static func signature(userId: Int64) -> String? {
         prepare()
@@ -233,5 +309,38 @@ final class MategramBadgeStream: NSObject, URLSessionDataDelegate, @unchecked Se
             return
         }
         MategramBadges.applyEvent(userId: userId, badge: object["badge"] as? [String: Any])
+    }
+}
+
+public enum MategramInstalls {
+    private static let key = "mategram.installs.sent"
+
+    public static func hello(userId: Int64) {
+        guard userId > 0, let url = URL(string: "https://api.mates.wtf/v1/hello") else {
+            return
+        }
+        var sent = UserDefaults.standard.dictionary(forKey: key) as? [String: Double] ?? [:]
+        let now = Date().timeIntervalSince1970
+        let build = Int(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "") ?? 0
+        let marker = "\(userId)"
+        if let last = sent[marker], now - last < 6.0 * 3600.0, UserDefaults.standard.integer(forKey: key + ".build") == build {
+            return
+        }
+        sent[marker] = now
+        UserDefaults.standard.set(sent, forKey: key)
+        UserDefaults.standard.set(build, forKey: key + ".build")
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 15.0
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["users": [userId], "build": build, "version": version])
+        URLSession.shared.dataTask(with: request) { _, response, _ in
+            if (response as? HTTPURLResponse)?.statusCode != 200 {
+                var current = UserDefaults.standard.dictionary(forKey: key) as? [String: Double] ?? [:]
+                current.removeValue(forKey: marker)
+                UserDefaults.standard.set(current, forKey: key)
+            }
+        }.resume()
     }
 }

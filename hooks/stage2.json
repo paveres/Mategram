@@ -3520,6 +3520,100 @@
       "required": true
     },
     {
+      "id": "m13.role.section",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "case peerInfo",
+        "after": [
+          "case agentProviders"
+        ]
+      },
+      "text": [
+        "case mategramRole"
+      ],
+      "required": true
+    },
+    {
+      "id": "m13.role.items",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []",
+        "occurrence": 1
+      },
+      "text": [
+        "items[.mategramRole]!.append(contentsOf: mategramRoleItems(data: data, presentationData: presentationData))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m13.bg.screen",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.backgroundColor = color",
+        "before": [
+          "}"
+        ]
+      },
+      "text": [
+        "self.backgroundColor = self.mategramBackdrop.isShowing ? .clear : color"
+      ],
+      "required": true
+    },
+    {
+      "id": "m13.bg.expansion",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "expansionBackgroundView.backgroundColor = color"
+      },
+      "text": [
+        "expansionBackgroundView.backgroundColor = self.mategramBackdrop.isShowing ? .clear : color"
+      ],
+      "required": true
+    },
+    {
+      "id": "m13.bg.edge",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.edgeEffectView.update(content: self.presentationData.theme.list.blocksBackgroundColor, rect: edgeEffectFrame, edge: .bottom, edgeSize: edgeEffectFrame.height, transition: ComponentTransition(transition))"
+      },
+      "text": [
+        "self.edgeEffectView.update(content: self.mategramBackdrop.isShowing ? .clear : self.presentationData.theme.list.blocksBackgroundColor, rect: edgeEffectFrame, edge: .bottom, edgeSize: edgeEffectFrame.height, transition: ComponentTransition(transition))",
+        "self.edgeEffectView.isHidden = self.mategramBackdrop.isShowing"
+      ],
+      "required": true
+    },
+    {
+      "id": "m13.av.notrans",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func avatarTransitionArguments(entry: AvatarGalleryEntry) -> (ASDisplayNode, CGRect, () -> (UIView?, UIView?))? {"
+      },
+      "text": [
+        "if self.isAvatarExpanded && MategramDesign.keepAvatarExpanded {",
+        "    return nil",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m13.av.nohide",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func updateAvatarIsHidden(entry: AvatarGalleryEntry?) {"
+      },
+      "text": [
+        "let entry = self.isAvatarExpanded && MategramDesign.keepAvatarExpanded ? nil : entry"
+      ],
+      "required": true
+    },
+    {
       "id": "m11.screen.import",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
       "action": "insert_after",

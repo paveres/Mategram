@@ -44,6 +44,22 @@ private func mategramSameColor(_ lhs: CGColor?, _ rhs: UIColor) -> Bool {
     return abs(r1 - r2) < 0.02 && abs(g1 - g2) < 0.02 && abs(b1 - b2) < 0.02 && abs(a1 - a2) < 0.05
 }
 
+private func mategramBetween(_ value: CGColor?, _ lhs: UIColor, _ rhs: UIColor) -> Bool {
+    guard let value, value.alpha > 0.01 else {
+        return false
+    }
+    var r: CGFloat = 0.0, g: CGFloat = 0.0, b: CGFloat = 0.0, a: CGFloat = 0.0
+    var r1: CGFloat = 0.0, g1: CGFloat = 0.0, b1: CGFloat = 0.0, a1: CGFloat = 0.0
+    var r2: CGFloat = 0.0, g2: CGFloat = 0.0, b2: CGFloat = 0.0, a2: CGFloat = 0.0
+    guard UIColor(cgColor: value).getRed(&r, green: &g, blue: &b, alpha: &a), lhs.getRed(&r1, green: &g1, blue: &b1, alpha: &a1), rhs.getRed(&r2, green: &g2, blue: &b2, alpha: &a2) else {
+        return false
+    }
+    func inside(_ x: CGFloat, _ p: CGFloat, _ q: CGFloat) -> Bool {
+        return x >= min(p, q) - 0.02 && x <= max(p, q) + 0.02
+    }
+    return inside(r, r1, r2) && inside(g, g1, g2) && inside(b, b1, b2) && a > 0.9
+}
+
 final class MategramProfileBackdrop: NSObject {
     private static let instances = NSHashTable<MategramProfileBackdrop>.weakObjects()
     private static let blurCache = NSCache<NSString, UIImage>()
@@ -55,6 +71,10 @@ final class MategramProfileBackdrop: NSObject {
                 instance.startBurst()
             }
         }
+    }
+
+    var isShowing: Bool {
+        return self.isActive && self.imageView.image != nil
     }
 
     let imageView = UIImageView()
@@ -201,7 +221,7 @@ final class MategramProfileBackdrop: NSObject {
         }
         let color = view.backgroundColor?.cgColor
         let size = view.bounds.size
-        if self.clearColors.contains(where: { mategramSameColor(color, $0) }) {
+        if self.clearColors.contains(where: { mategramSameColor(color, $0) }) || (self.clearColors.count == 2 && mategramBetween(color, self.clearColors[0], self.clearColors[1])) {
             view.backgroundColor = .clear
         } else if let itemColor = self.itemColor, mategramSameColor(color, itemColor) {
             view.backgroundColor = .clear
@@ -233,7 +253,7 @@ final class MategramProfileBackdrop: NSObject {
                 return
             }
         }
-        if self.clearColors.contains(where: { mategramSameColor(layer.backgroundColor, $0) }) {
+        if self.clearColors.contains(where: { mategramSameColor(layer.backgroundColor, $0) }) || (self.clearColors.count == 2 && mategramBetween(layer.backgroundColor, self.clearColors[0], self.clearColors[1])) {
             layer.backgroundColor = UIColor.clear.cgColor
         } else if let itemColor = self.itemColor, mategramSameColor(layer.backgroundColor, itemColor) {
             if layer.bounds.width >= 250.0 {

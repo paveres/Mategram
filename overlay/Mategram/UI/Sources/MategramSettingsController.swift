@@ -142,6 +142,7 @@ private final class MategramSettingsArguments {
     var setValueSilently: (MategramValueKey, Int) -> Void = { _, _ in }
     var openFont: () -> Void = {}
     var search: (String) -> Void = { _ in }
+    var openSearch: () -> Void = {}
     var searchQuery: String = ""
     var setFont: (String) -> Void = { _ in }
 
@@ -170,6 +171,7 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case infoRow(index: Int32, section: Int32, title: String, value: String)
     case valueSlider(index: Int32, section: Int32, key: MategramValueKey, title: String, value: Int)
     case searchInput(section: Int32, text: String, placeholder: String)
+    case searchRow(section: Int32, title: String)
 
     var section: ItemListSectionId {
         switch self {
@@ -204,6 +206,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .valueSlider(_, section, _, _, _):
             return section
         case let .searchInput(section, _, _):
+            return section
+        case let .searchRow(section, _):
             return section
         }
     }
@@ -241,6 +245,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .valueSlider(index, _, _, _, _):
             return index
         case .searchInput:
+            return 1
+        case .searchRow:
             return 1
         }
     }
@@ -315,6 +321,11 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
                 arguments.search(value)
             }, action: {
             })
+        case let .searchRow(section, title):
+            let icon = MategramLogo.symbol("magnifyingglass", color: presentationData.theme.list.itemPrimaryTextColor)
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, icon: icon, title: title, label: "", sectionId: section, style: .blocks, disclosureStyle: .arrow, action: {
+                arguments.openSearch()
+            })
         }
     }
 }
@@ -351,11 +362,7 @@ private func mategramSearchEntries(query: String, language: MategramLanguage) ->
 
 private func mategramMainEntries(language: MategramLanguage, query: String) -> [MategramSettingsEntry] {
     var entries: [MategramSettingsEntry] = [.header(section: 0, version: mategramVersionString())]
-    entries.append(.searchInput(section: 1, text: query, placeholder: language == .russian ? "Поиск функций" : "Search features"))
-    let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-    if !trimmed.isEmpty {
-        return entries + mategramSearchEntries(query: trimmed, language: language)
-    }
+    entries.append(.searchRow(section: 1, title: language == .russian ? "Поиск функций" : "Search features"))
     var index: Int32 = 1
     for section in MategramSection.allCases {
         index += 1
@@ -533,7 +540,17 @@ private func mategramFontController(context: AccountContext, changed: @escaping 
     return controller
 }
 
-private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromise<Int>, arguments: MategramSettingsArguments, section: MategramSection?) -> Signal<(ItemListControllerState, (ItemListNodeState, Any)), NoError> {
+private func mategramSearchScreenEntries(language: MategramLanguage, query: String) -> [MategramSettingsEntry] {
+    var entries: [MategramSettingsEntry] = [.searchInput(section: 0, text: query, placeholder: language == .russian ? "Название функции" : "Feature name")]
+    let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+    if trimmed.isEmpty {
+        entries.append(.footer(index: 2, section: 0, text: language == .russian ? "Начните вводить название, и здесь появятся подходящие функции Mategram." : "Start typing and matching Mategram features will appear here."))
+        return entries
+    }
+    return entries + mategramSearchEntries(query: trimmed, language: language)
+}
+
+private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromise<Int>, arguments: MategramSettingsArguments, section: MategramSection?, isSearch: Bool = false) -> Signal<(ItemListControllerState, (ItemListNodeState, Any)), NoError> {
     return combineLatest(queue: .mainQueue(),
         context.sharedContext.presentationData,
         refresh.get()
@@ -541,17 +558,62 @@ private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromi
     |> deliverOnMainQueue
     |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
-        let title = section?.title(language) ?? "Mategram"
+        let title = isSearch ? (language == .russian ? "Поиск" : "Search") : (section?.title(language) ?? "Mategram")
         let entries: [MategramSettingsEntry]
-        if let section {
+        if isSearch {
+            entries = mategramSearchScreenEntries(language: language, query: arguments.searchQuery)
+        } else if let section {
             entries = mategramSectionEntries(section: section, language: language)
         } else {
             entries = mategramMainEntries(language: language, query: arguments.searchQuery)
         }
         let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
-        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks, animateChanges: true)
+        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks, animateChanges: !isSearch)
         return (controllerState, (listState, arguments))
     }
+}
+
+private func mategramSearchController(context: AccountContext) -> ViewController {
+    let refresh = ValuePromise<Int>(0, ignoreRepeated: false)
+    var counter = 0
+    var presentImpl: ((ViewController) -> Void)?
+    let arguments = MategramSettingsArguments(toggle: { key, value in
+        MategramSettings.shared.set(value, for: key)
+        counter += 1
+        refresh.set(counter)
+        if MategramCatalog.restartKeys.contains(key) {
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            let isRussian = presentationData.strings.baseLanguageCode.hasPrefix("ru")
+            presentImpl?(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: isRussian ? "Перезапустите Mategram, чтобы изменение применилось." : "Restart Mategram to apply this change.", timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: true, action: { _ in
+                return false
+            }))
+        }
+    }, openSection: { _ in
+    })
+    arguments.context = context
+    arguments.search = { [weak arguments] query in
+        guard let arguments, arguments.searchQuery != query else {
+            return
+        }
+        arguments.searchQuery = query
+        counter += 1
+        refresh.set(counter)
+    }
+    let controller = ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: nil, isSearch: true))
+    presentImpl = { [weak controller] next in
+        controller?.present(next, in: .current)
+    }
+    controller.didAppear = { [weak controller] firstTime in
+        guard firstTime else {
+            return
+        }
+        controller?.forEachItemNode { node in
+            if let node = node as? ItemListSingleLineInputItemNode {
+                node.focus()
+            }
+        }
+    }
+    return controller
 }
 
 private func mategramSectionController(context: AccountContext, section: MategramSection) -> ViewController {
@@ -647,6 +709,9 @@ public func mategramSettingsController(context: AccountContext) -> ViewControlle
         arguments.searchQuery = query
         counter += 1
         refresh.set(counter)
+    }
+    arguments.openSearch = {
+        pushControllerImpl?(mategramSearchController(context: context))
     }
     let controller = ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: nil))
     pushControllerImpl = { [weak controller] next in
