@@ -81,8 +81,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.media, .english): return "Video and photo"
         case (.calls, .russian): return "Подтверждение, TCP, ссылки"
         case (.calls, .english): return "Confirmation, TCP, links"
-        case (.network, .russian): return "Ускорение загрузки"
-        case (.network, .english): return "Faster downloads"
+        case (.network, .russian): return "Загрузка, прокси, память"
+        case (.network, .english): return "Downloads, proxy, memory"
         case (.time, .russian): return "Секунды, точный визит, просмотры"
         case (.time, .english): return "Seconds, exact visit, views"
         case (.security, .russian): return "Номер телефона, сеансы"
@@ -450,6 +450,9 @@ public enum MategramCatalog {
         MategramOption(key: .alwaysHD, section: .media, titleRu: "Всегда HD", titleEn: "Always HD",
             footerRu: "Фото в галерее сразу отправляются в высоком качестве.",
             footerEn: "Photos from the gallery are always sent in high quality."),
+        MategramOption(key: .proxyLocalDNS, section: .network, titleRu: "Локальный DNS для прокси", titleEn: "Local DNS for proxy",
+            footerRu: "Адрес прокси превращается в IP на устройстве, если DNS провайдера его блокирует.",
+            footerEn: "The proxy address is resolved to an IP on the device when your provider's DNS blocks it."),
         MategramOption(key: .ramMonitor, section: .network, titleRu: "RAM под часами", titleEn: "RAM under the clock",
             footerRu: "Показывает, сколько памяти занимает приложение.",
             footerEn: "Shows how much memory the app uses."),

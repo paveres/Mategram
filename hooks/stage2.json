@@ -2672,6 +2672,45 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m9.dns.import",
+      "file": "submodules/TelegramCore/Sources/Settings/ProxySettings.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.dns.socks",
+      "file": "submodules/TelegramCore/Sources/Settings/ProxySettings.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "return MTSocksProxySettings(ip: self.host, port: UInt16(clamping: self.port), username: username, password: password, secret: nil)",
+        "occurrence": 1
+      },
+      "text": [
+        "return MTSocksProxySettings(ip: MategramDNS.resolve(self.host), port: UInt16(clamping: self.port), username: username, password: password, secret: nil)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.dns.mtp",
+      "file": "submodules/TelegramCore/Sources/Settings/ProxySettings.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "return MTSocksProxySettings(ip: self.host, port: UInt16(clamping: self.port), username: nil, password: nil, secret: secret)",
+        "occurrence": 1
+      },
+      "text": [
+        "return MTSocksProxySettings(ip: MategramDNS.resolve(self.host), port: UInt16(clamping: self.port), username: nil, password: nil, secret: secret)"
+      ],
+      "required": true
     }
   ]
 }

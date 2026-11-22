@@ -88,3 +88,51 @@ public enum MategramServiceTime {
         return result
     }
 }
+
+public enum MategramDNS {
+    private static let lock = NSLock()
+    private static var cache: [String: String] = [:]
+
+    public static func resolve(_ host: String) -> String {
+        guard MategramSettings.shared.bool(.proxyLocalDNS) else {
+            return host
+        }
+        if host.isEmpty || host.allSatisfy({ $0.isNumber || $0 == "." || $0 == ":" }) {
+            return host
+        }
+        lock.lock()
+        let cached = cache[host]
+        lock.unlock()
+        if let cached {
+            return cached
+        }
+        var hints = addrinfo()
+        hints.ai_family = AF_INET
+        hints.ai_socktype = SOCK_STREAM
+        var result: UnsafeMutablePointer<addrinfo>?
+        guard getaddrinfo(host, nil, &hints, &result) == 0, let first = result else {
+            return host
+        }
+        defer {
+            freeaddrinfo(result)
+        }
+        var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+        guard let address = first.pointee.ai_addr else {
+            return host
+        }
+        let resolved: String? = address.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { pointer -> String? in
+            var inAddress = pointer.pointee.sin_addr
+            guard inet_ntop(AF_INET, &inAddress, &buffer, socklen_t(INET_ADDRSTRLEN)) != nil else {
+                return nil
+            }
+            return String(cString: buffer)
+        }
+        guard let resolved else {
+            return host
+        }
+        lock.lock()
+        cache[host] = resolved
+        lock.unlock()
+        return resolved
+    }
+}

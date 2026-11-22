@@ -105,6 +105,7 @@ public enum MategramKey: String, CaseIterable {
     case chatTranslateFree
     case compactFolders
     case musicCrossfade
+    case proxyLocalDNS
 
     public var defaultValue: Bool {
         switch self {
