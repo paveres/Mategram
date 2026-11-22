@@ -3583,7 +3583,7 @@
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
       "action": "insert_before",
       "anchor": {
-        "line": "func updateIsAvatarExpanded(_ isAvatarExpanded: Bool, transition: ContainedViewLayoutTransition) {",
+        "line": "private func updateAvatarMask(transition: ContainedViewLayoutTransition) {",
         "occurrence": 1
       },
       "text": [
