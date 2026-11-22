@@ -95,6 +95,9 @@ public enum MategramKey: String, CaseIterable {
     case systemShare
     case glassMessages
     case glassInlineButtons
+    case noDoubleTapReaction
+    case hideSponsored
+    case hideChatListStatus
 
     public var defaultValue: Bool {
         switch self {
