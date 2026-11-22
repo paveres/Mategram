@@ -67,6 +67,25 @@ public enum MategramValueKey: String, CaseIterable {
         }
     }
 
+    public var sliderRange: ClosedRange<Int> {
+        switch self {
+        case .sendDelay:
+            return 1 ... 600
+        case .onlineInterval:
+            return 5 ... 300
+        case .stickerSize:
+            return 30 ... 200
+        case .maxPinnedPreview:
+            return 1 ... 3
+        case .peekDuration:
+            return 3 ... 120
+        case .crossfadeSeconds:
+            return 1 ... 30
+        case .autoProxyDelay:
+            return 3 ... 120
+        }
+    }
+
     public var parent: MategramKey? {
         switch self {
         case .sendDelay:

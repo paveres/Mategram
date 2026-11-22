@@ -141,6 +141,8 @@ private final class MategramSettingsArguments {
     var setValue: (MategramValueKey, Int) -> Void = { _, _ in }
     var setValueSilently: (MategramValueKey, Int) -> Void = { _, _ in }
     var openFont: () -> Void = {}
+    var search: (String) -> Void = { _ in }
+    var searchQuery: String = ""
     var setFont: (String) -> Void = { _ in }
 
     init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }, backup: @escaping (Bool) -> Void = { _ in }) {
@@ -166,6 +168,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case fontRow(index: Int32, section: Int32, title: String, value: String)
     case fontOption(index: Int32, section: Int32, family: String, title: String, checked: Bool)
     case infoRow(index: Int32, section: Int32, title: String, value: String)
+    case valueSlider(index: Int32, section: Int32, key: MategramValueKey, title: String, value: Int)
+    case searchInput(section: Int32, text: String, placeholder: String)
 
     var section: ItemListSectionId {
         switch self {
@@ -196,6 +200,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .fontOption(_, section, _, _, _):
             return section
         case let .infoRow(_, section, _, _):
+            return section
+        case let .valueSlider(_, section, _, _, _):
+            return section
+        case let .searchInput(section, _, _):
             return section
         }
     }
@@ -230,6 +238,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             return index
         case let .infoRow(index, _, _, _):
             return index
+        case let .valueSlider(index, _, _, _, _):
+            return index
+        case .searchInput:
+            return 1
         }
     }
 
@@ -293,6 +305,16 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             })
         case let .infoRow(_, section, title, value):
             return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: title, label: value, sectionId: section, style: .blocks, disclosureStyle: .none, action: nil)
+        case let .valueSlider(_, section, key, title, value):
+            let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
+            return MategramSliderItem(theme: presentationData.theme, title: title, value: value, minValue: key.sliderRange.lowerBound, maxValue: key.sliderRange.upperBound, format: { key.format($0, language) }, sectionId: section, updated: { newValue in
+                arguments.setValueSilently(key, newValue)
+            })
+        case let .searchInput(section, text, placeholder):
+            return ItemListSingleLineInputItem(presentationData: presentationData, systemStyle: .glass, title: NSAttributedString(), text: text, placeholder: placeholder, type: .regular(capitalization: false, autocorrection: false), clearType: .always, sectionId: section, textUpdated: { value in
+                arguments.search(value)
+            }, action: {
+            })
         }
     }
 }
@@ -304,16 +326,44 @@ private func mategramVersionString() -> String {
     return build.isEmpty ? version : "\(version) (\(build))"
 }
 
-private func mategramMainEntries(language: MategramLanguage) -> [MategramSettingsEntry] {
+private func mategramSearchEntries(query: String, language: MategramLanguage) -> [MategramSettingsEntry] {
+    let settings = MategramSettings.shared
+    let words = query.lowercased().split(separator: " ").map(String.init).filter { !$0.isEmpty }
+    var entries: [MategramSettingsEntry] = []
+    var index: Int32 = 10
+    var sectionId: Int32 = 10
+    for option in MategramCatalog.options {
+        let haystack = (option.titleRu + " " + option.titleEn + " " + option.footerRu + " " + option.footerEn + " " + option.section.title(language)).lowercased()
+        if !words.allSatisfy({ haystack.contains($0) }) {
+            continue
+        }
+        sectionId += 1
+        index += 1
+        entries.append(.toggle(index: index, section: sectionId, key: option.key, title: option.title(language), value: settings.bool(option.key)))
+        index += 1
+        entries.append(.footer(index: index, section: sectionId, text: option.section.title(language) + " · " + option.footer(language)))
+    }
+    if entries.isEmpty {
+        entries.append(.footer(index: 11, section: 11, text: language == .russian ? "Ничего не найдено." : "Nothing found."))
+    }
+    return entries
+}
+
+private func mategramMainEntries(language: MategramLanguage, query: String) -> [MategramSettingsEntry] {
     var entries: [MategramSettingsEntry] = [.header(section: 0, version: mategramVersionString())]
-    var index: Int32 = 0
+    entries.append(.searchInput(section: 1, text: query, placeholder: language == .russian ? "Поиск функций" : "Search features"))
+    let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+    if !trimmed.isEmpty {
+        return entries + mategramSearchEntries(query: trimmed, language: language)
+    }
+    var index: Int32 = 1
     for section in MategramSection.allCases {
         index += 1
-        entries.append(.sectionRow(index: index, section: 1, kind: section, title: section.title(language), subtitle: section.subtitle(language)))
+        entries.append(.sectionRow(index: index, section: 2, kind: section, title: section.title(language), subtitle: section.subtitle(language)))
     }
-    entries.append(.backupAction(index: 100, section: 2, isExport: true, title: language == .russian ? "Скопировать настройки" : "Copy settings"))
-    entries.append(.backupAction(index: 101, section: 2, isExport: false, title: language == .russian ? "Вставить настройки из буфера" : "Paste settings from clipboard"))
-    entries.append(.footer(index: 102, section: 2, text: language == .russian ? "Все переключатели Mategram копируются одной строкой. Вставьте её на другом устройстве или после переустановки." : "All Mategram switches are copied as one line. Paste it on another device or after reinstalling."))
+    entries.append(.backupAction(index: 100, section: 3, isExport: true, title: language == .russian ? "Скопировать настройки" : "Copy settings"))
+    entries.append(.backupAction(index: 101, section: 3, isExport: false, title: language == .russian ? "Вставить настройки из буфера" : "Paste settings from clipboard"))
+    entries.append(.footer(index: 102, section: 3, text: language == .russian ? "Все переключатели Mategram копируются одной строкой. Вставьте её на другом устройстве или после переустановки." : "All Mategram switches are copied as one line. Paste it on another device or after reinstalling."))
     return entries
 }
 
@@ -368,7 +418,7 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
         if let valueOption = MategramCatalog.valueOption(for: option.key) {
             placedValues.insert(valueOption.key)
             index += 1
-            entries.append(.valueRow(index: index, section: sectionId, key: valueOption.key, title: valueOption.title(language), value: valueOption.key.format(settings.value(valueOption.key), language)))
+            entries.append(.valueSlider(index: index, section: sectionId, key: valueOption.key, title: valueOption.title(language), value: settings.value(valueOption.key)))
         }
         var footer = option.footer(language)
         if MategramCatalog.restartKeys.contains(option.key) {
@@ -380,7 +430,7 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
     for option in MategramCatalog.valueOptions(in: section) where !placedValues.contains(option.key) {
         sectionId += 1
         index += 1
-        entries.append(.valueRow(index: index, section: sectionId, key: option.key, title: option.title(language), value: option.key.format(settings.value(option.key), language)))
+        entries.append(.valueSlider(index: index, section: sectionId, key: option.key, title: option.title(language), value: settings.value(option.key)))
         index += 1
         entries.append(.footer(index: index, section: sectionId, text: option.footer(language)))
     }
@@ -496,7 +546,7 @@ private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromi
         if let section {
             entries = mategramSectionEntries(section: section, language: language)
         } else {
-            entries = mategramMainEntries(language: language)
+            entries = mategramMainEntries(language: language, query: arguments.searchQuery)
         }
         let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
         let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks, animateChanges: true)
@@ -525,6 +575,9 @@ private func mategramSectionController(context: AccountContext, section: Mategra
         MategramSettings.shared.setText(text, for: key)
     })
     arguments.context = context
+    arguments.setValueSilently = { key, value in
+        MategramSettings.shared.setValue(value, for: key)
+    }
     var pushImpl: ((ViewController) -> Void)?
     arguments.openValue = { key in
         let presentationData = context.sharedContext.currentPresentationData.with { $0 }
@@ -556,7 +609,18 @@ public func mategramSettingsController(context: AccountContext) -> ViewControlle
     var pushControllerImpl: ((ViewController) -> Void)?
 
     var presentImpl: ((ViewController) -> Void)?
-    let arguments = MategramSettingsArguments(toggle: { _, _ in
+    var counter = 0
+    let arguments = MategramSettingsArguments(toggle: { key, value in
+        MategramSettings.shared.set(value, for: key)
+        counter += 1
+        refresh.set(counter)
+        if MategramCatalog.restartKeys.contains(key) {
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            let isRussian = presentationData.strings.baseLanguageCode.hasPrefix("ru")
+            presentImpl?(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: isRussian ? "Перезапустите Mategram, чтобы изменение применилось." : "Restart Mategram to apply this change.", timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: true, action: { _ in
+                return false
+            }))
+        }
     }, openSection: { section in
         pushControllerImpl?(mategramSectionController(context: context, section: section))
     }, backup: { isExport in
@@ -576,6 +640,14 @@ public func mategramSettingsController(context: AccountContext) -> ViewControlle
         }))
     })
 
+    arguments.search = { [weak arguments] query in
+        guard let arguments, arguments.searchQuery != query else {
+            return
+        }
+        arguments.searchQuery = query
+        counter += 1
+        refresh.set(counter)
+    }
     let controller = ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: nil))
     pushControllerImpl = { [weak controller] next in
         controller?.push(next)
