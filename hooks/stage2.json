@@ -2883,6 +2883,39 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m9.swipeedit.add",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.mediaActionButtons.expandMediaInputButton.addTarget(self, action: #selector(self.expandButtonPressed), for: .touchUpInside)",
+        "occurrence": 1
+      },
+      "text": [
+        "let mategramSwipeUp = UISwipeGestureRecognizer(target: self, action: #selector(self.mategramSwipeUpInput(_:)))",
+        "mategramSwipeUp.direction = .up",
+        "self.view.addGestureRecognizer(mategramSwipeUp)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.swipeedit.fn",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "@objc public func expandButtonPressed() {",
+        "occurrence": 1
+      },
+      "text": [
+        "@objc private func mategramSwipeUpInput(_ recognizer: UISwipeGestureRecognizer) {",
+        "    if MategramSettings.shared.bool(.swipeUpEditor) {",
+        "        self.toggleExpandMediaInput?()",
+        "    }",
+        "}",
+        ""
+      ],
+      "required": true
     }
   ]
 }

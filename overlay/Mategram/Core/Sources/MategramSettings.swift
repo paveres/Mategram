@@ -115,6 +115,7 @@ public enum MategramKey: String, CaseIterable {
     case fastUpload
     case sessionBackup
     case formatExtras
+    case swipeUpEditor
 
     public var defaultValue: Bool {
         switch self {
