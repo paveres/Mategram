@@ -9,19 +9,44 @@ import MategramCore
 
 private final class MategramUpdateState {
     static var checking = false
-    static var shownThisLaunch = false
+    static var shownBuild = 0
+    static var timer: Foundation.Timer?
+    static var observer: NSObjectProtocol?
+    static var lastContext: AccountContext?
+    static var lastPresent: ((ViewController) -> Void)?
+}
+
+private final class MategramUpdateTicker: NSObject {
+    static let shared = MategramUpdateTicker()
+
+    @objc func tick() {
+        guard let context = MategramUpdateState.lastContext, let present = MategramUpdateState.lastPresent else {
+            return
+        }
+        mategramCheckForUpdate(context: context, present: present)
+    }
 }
 
 private let mategramUpdateCheckKey = "mategram.update.lastCheck"
 private let mategramUpdateSkipKey = "mategram.update.skipped"
 
 func mategramCheckForUpdate(context: AccountContext, present: @escaping (ViewController) -> Void) {
-    guard MategramSettings.shared.bool(.updateCheck), !MategramUpdateState.checking, !MategramUpdateState.shownThisLaunch else {
+    MategramUpdateState.lastContext = context
+    MategramUpdateState.lastPresent = present
+    if MategramUpdateState.timer == nil {
+        let timer = Foundation.Timer(timeInterval: 60.0, target: MategramUpdateTicker.shared, selector: #selector(MategramUpdateTicker.tick), userInfo: nil, repeats: true)
+        RunLoop.main.add(timer, forMode: .common)
+        MategramUpdateState.timer = timer
+        MategramUpdateState.observer = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main, using: { _ in
+            MategramUpdateTicker.shared.tick()
+        })
+    }
+    guard MategramSettings.shared.bool(.updateCheck), !MategramUpdateState.checking else {
         return
     }
     let now = Date().timeIntervalSince1970
     let last = UserDefaults.standard.double(forKey: mategramUpdateCheckKey)
-    if now - last < 3.0 * 60.0 * 60.0 {
+    if now - last < 55.0 {
         return
     }
     guard let url = URL(string: "https://get.mates.wtf/latest.json") else {
@@ -45,7 +70,7 @@ func mategramCheckForUpdate(context: AccountContext, present: @escaping (ViewCon
             let remoteBuild = (info["build"] as? NSNumber)?.intValue ?? 0
             let localBuild = Int((Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "") ?? 0
             let skipped = UserDefaults.standard.integer(forKey: mategramUpdateSkipKey)
-            guard remoteBuild > 0, localBuild > 0, remoteBuild > localBuild, remoteBuild != skipped else {
+            guard remoteBuild > 0, localBuild > 0, remoteBuild > localBuild, remoteBuild != skipped, remoteBuild != MategramUpdateState.shownBuild else {
                 return
             }
             let version = (info["version"] as? String) ?? ""
@@ -54,7 +79,7 @@ func mategramCheckForUpdate(context: AccountContext, present: @escaping (ViewCon
             let isRussian = presentationData.strings.baseLanguageCode.hasPrefix("ru")
             let title = isRussian ? "Доступно обновление" : "Update available"
             let text = isRussian ? "Вышел Mategram \(version). Скачайте новую сборку и установите поверх через Sideloadly." : "Mategram \(version) is out. Download the new build and install it over the current one with Sideloadly."
-            MategramUpdateState.shownThisLaunch = true
+            MategramUpdateState.shownBuild = remoteBuild
             let controller = textAlertController(context: context, title: title, text: text, actions: [
                 TextAlertAction(type: .genericAction, title: isRussian ? "Пропустить" : "Skip", action: {
                     UserDefaults.standard.set(remoteBuild, forKey: mategramUpdateSkipKey)
