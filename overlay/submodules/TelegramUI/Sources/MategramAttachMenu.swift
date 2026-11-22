@@ -130,7 +130,7 @@ extension ChatControllerImpl {
             return
         }
         self.chatDisplayNode.dismissInput()
-        let container: UIView = self.view.window ?? self.view
+        let container: UIView = self.view
         let panel = MategramAttachPanel(items: items, isDark: self.presentationData.theme.overallDarkAppearance, select: { index in
             open(keys[index])
         })

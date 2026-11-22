@@ -67,6 +67,25 @@ public enum MategramValueKey: String, CaseIterable {
         }
     }
 
+    public var parent: MategramKey? {
+        switch self {
+        case .sendDelay:
+            return .ghostDelaySend
+        case .onlineInterval:
+            return .ghostAlwaysOnline
+        case .stickerSize:
+            return .smallStickers
+        case .peekDuration:
+            return .peekOnline
+        case .crossfadeSeconds:
+            return .musicCrossfade
+        case .autoProxyDelay:
+            return .autoProxy
+        case .maxPinnedPreview:
+            return nil
+        }
+    }
+
     public func format(_ value: Int, _ language: MategramLanguage) -> String {
         let isRussian = language == .russian
         switch self {
@@ -104,6 +123,19 @@ public struct MategramValueOption {
 }
 
 public extension MategramCatalog {
+    static let restartKeys: Set<MategramKey> = [
+        .hideCallsTab, .hideTabTitles, .hideAllChatsTab, .longAllChats, .compactFolders, .rememberFolder,
+        .glassMessages, .glassInlineButtons, .hideStoriesBar, .hideChatsTitle, .singleLinePreview,
+        .fastDownload, .fastUpload, .builtInMic, .swipeUpCamera, .swipeUpEditor, .sessionBackup,
+        .chatTranslateFree, .appleSpeech, .mutedNameColors, .smallStickers, .hideChatListStatus,
+        .hideEmojiStatus, .hideProfileColor, .hideProfileGifts, .proxyLocalDNS, .autoProxy, .ramMonitor,
+        .disableChatSwipes, .hideProxySponsor, .hideSponsored, .alwaysHD
+    ]
+
+    static func valueOption(for key: MategramKey) -> MategramValueOption? {
+        return valueOptions.first(where: { $0.key.parent == key })
+    }
+
     static let valueOptions: [MategramValueOption] = [
         MategramValueOption(key: .sendDelay, section: .ghost, titleRu: "Время задержки", titleEn: "Delay time", footerRu: "Насколько откладывать отправку при включённой задержке.", footerEn: "How long sending is delayed when the delay is on."),
         MategramValueOption(key: .onlineInterval, section: .ghost, titleRu: "Интервал «в сети»", titleEn: "Online interval", footerRu: "Как часто обновлять статус «в сети» для «Всегда в сети».", footerEn: "How often the online status is refreshed for «Always online»."),

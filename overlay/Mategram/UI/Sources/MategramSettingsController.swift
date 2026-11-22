@@ -360,14 +360,24 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
         index += 1
         entries.append(.footer(index: index, section: sectionId, text: language == .russian ? "Шрифт всего приложения. Применяется после перезапуска." : "Font of the whole app. Applies after a restart."))
     }
+    var placedValues = Set<MategramValueKey>()
     for option in MategramCatalog.options(in: section) {
         sectionId += 1
         index += 1
         entries.append(.toggle(index: index, section: sectionId, key: option.key, title: option.title(language), value: settings.bool(option.key)))
+        if let valueOption = MategramCatalog.valueOption(for: option.key) {
+            placedValues.insert(valueOption.key)
+            index += 1
+            entries.append(.valueRow(index: index, section: sectionId, key: valueOption.key, title: valueOption.title(language), value: valueOption.key.format(settings.value(valueOption.key), language)))
+        }
+        var footer = option.footer(language)
+        if MategramCatalog.restartKeys.contains(option.key) {
+            footer += language == .russian ? " Нужен перезапуск приложения." : " Requires an app restart."
+        }
         index += 1
-        entries.append(.footer(index: index, section: sectionId, text: option.footer(language)))
+        entries.append(.footer(index: index, section: sectionId, text: footer))
     }
-    for option in MategramCatalog.valueOptions(in: section) {
+    for option in MategramCatalog.valueOptions(in: section) where !placedValues.contains(option.key) {
         sectionId += 1
         index += 1
         entries.append(.valueRow(index: index, section: sectionId, key: option.key, title: option.title(language), value: option.key.format(settings.value(option.key), language)))
@@ -437,11 +447,17 @@ private func mategramFontController(context: AccountContext, changed: @escaping 
     let arguments = MategramSettingsArguments(toggle: { _, _ in
     }, openSection: { _ in
     })
+    var presentImpl: ((ViewController) -> Void)?
     arguments.setFont = { family in
         MategramSettings.shared.setText(family, for: .customFont)
         counter += 1
         refresh.set(counter)
         changed()
+        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+        let isRussian = presentationData.strings.baseLanguageCode.hasPrefix("ru")
+        presentImpl?(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: isRussian ? "Шрифт сменится после перезапуска Mategram." : "The font changes after restarting Mategram.", timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: true, action: { _ in
+            return false
+        }))
     }
     let families = UIFont.familyNames.sorted()
     let signal = combineLatest(queue: .mainQueue(), context.sharedContext.presentationData, refresh.get())
@@ -460,7 +476,11 @@ private func mategramFontController(context: AccountContext, changed: @escaping 
         let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks, animateChanges: false)
         return (controllerState, (listState, arguments))
     }
-    return ItemListController(context: context, state: signal)
+    let controller = ItemListController(context: context, state: signal)
+    presentImpl = { [weak controller] next in
+        controller?.present(next, in: .current)
+    }
+    return controller
 }
 
 private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromise<Int>, arguments: MategramSettingsArguments, section: MategramSection?) -> Signal<(ItemListControllerState, (ItemListNodeState, Any)), NoError> {
@@ -487,10 +507,19 @@ private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromi
 private func mategramSectionController(context: AccountContext, section: MategramSection) -> ViewController {
     let refresh = ValuePromise<Int>(0, ignoreRepeated: false)
     var counter = 0
+    var presentImpl: ((ViewController) -> Void)?
     let arguments = MategramSettingsArguments(toggle: { key, value in
         MategramSettings.shared.set(value, for: key)
         counter += 1
         refresh.set(counter)
+        if MategramCatalog.restartKeys.contains(key) {
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            let isRussian = presentationData.strings.baseLanguageCode.hasPrefix("ru")
+            let text = isRussian ? "Перезапустите Mategram, чтобы изменение применилось." : "Restart Mategram to apply this change."
+            presentImpl?(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: text, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: true, action: { _ in
+                return false
+            }))
+        }
     }, openSection: { _ in
     }, updateText: { key, text in
         MategramSettings.shared.setText(text, for: key)
@@ -515,6 +544,9 @@ private func mategramSectionController(context: AccountContext, section: Mategra
     let controller = ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: section))
     pushImpl = { [weak controller] next in
         controller?.push(next)
+    }
+    presentImpl = { [weak controller] next in
+        controller?.present(next, in: .current)
     }
     return controller
 }

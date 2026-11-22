@@ -4,6 +4,7 @@ import CoreImage
 import ObjectiveC
 import SwiftSignalKit
 import TelegramCore
+import TelegramPresentationData
 import AccountContext
 import AvatarNode
 import ComponentFlow
@@ -44,6 +45,14 @@ private func mategramSameColor(_ lhs: CGColor?, _ rhs: UIColor) -> Bool {
 }
 
 final class MategramProfileBackdrop: NSObject {
+    private static let instances = NSHashTable<MategramProfileBackdrop>.weakObjects()
+
+    static func sweepAll() {
+        for instance in instances.allObjects {
+            instance.sweep()
+        }
+    }
+
     let imageView = UIImageView()
     let dimView = UIView()
     private let disposable = MetaDisposable()
@@ -53,7 +62,10 @@ final class MategramProfileBackdrop: NSObject {
     private var timer: Foundation.Timer?
     private var clearColors: [UIColor] = []
     private var itemColor: UIColor?
+    private var cornerImages: [CGImage] = []
     private var isDark = true
+    private var isActive = false
+    private var lastSweep: Double = 0.0
 
     override init() {
         super.init()
@@ -63,6 +75,7 @@ final class MategramProfileBackdrop: NSObject {
         self.dimView.isUserInteractionEnabled = false
         self.dimView.backgroundColor = UIColor(white: 0.0, alpha: 0.22)
         self.dimView.alpha = 0.0
+        MategramProfileBackdrop.instances.add(self)
     }
 
     deinit {
@@ -77,10 +90,14 @@ final class MategramProfileBackdrop: NSObject {
         }
         self.rootView = view
         if self.timer == nil {
-            let timer = Foundation.Timer(timeInterval: 0.4, target: self, selector: #selector(self.timerFired), userInfo: nil, repeats: true)
+            let timer = Foundation.Timer(timeInterval: 0.25, target: self, selector: #selector(self.timerFired), userInfo: nil, repeats: true)
             RunLoop.main.add(timer, forMode: .common)
             self.timer = timer
         }
+    }
+
+    @objc private func timerFired() {
+        self.sweep()
     }
 
     func layout(size: CGSize) {
@@ -90,35 +107,58 @@ final class MategramProfileBackdrop: NSObject {
         self.sweep()
     }
 
-    @objc private func timerFired() {
+    func sweepThrottled() {
+        let now = CACurrentMediaTime()
+        if now - self.lastSweep < 0.12 {
+            return
+        }
         self.sweep()
     }
 
-    private func sweep() {
+    func sweep() {
+        self.lastSweep = CACurrentMediaTime()
         guard let rootView = self.rootView else {
             self.timer?.invalidate()
             self.timer = nil
             return
         }
-        guard rootView.window != nil, self.imageView.image != nil, !self.clearColors.isEmpty else {
+        guard self.isActive, !self.clearColors.isEmpty else {
             return
         }
-        var budget = 6000
+        var budget = 8000
         self.visit(rootView, budget: &budget)
     }
 
+    private func isCornerImage(_ view: UIView) -> Bool {
+        guard let contents = view.layer.contents else {
+            return false
+        }
+        let object = contents as AnyObject
+        for image in self.cornerImages where object === image {
+            return true
+        }
+        return false
+    }
+
     private func visit(_ view: UIView, budget: inout Int) {
-        if budget <= 0 || view.isHidden || view === self.imageView || view === self.dimView || view is GlassBackgroundView {
+        if budget <= 0 || view === self.imageView || view === self.dimView || view is GlassBackgroundView {
             return
         }
         budget -= 1
+        if !self.cornerImages.isEmpty, !view.isHidden, self.isCornerImage(view) {
+            view.isHidden = true
+            return
+        }
+        if view.isHidden {
+            return
+        }
         let color = view.backgroundColor?.cgColor
         if self.clearColors.contains(where: { mategramSameColor(color, $0) }) {
             view.backgroundColor = .clear
         } else if let itemColor = self.itemColor, mategramSameColor(color, itemColor), view.bounds.width > 40.0, view.bounds.height > 40.0, view.bounds.width < 600.0 {
             view.backgroundColor = .clear
             self.addGlass(to: view)
-        } else if view.viewWithTag(mategramGlassTag)?.superview === view {
+        } else if let glass = view.viewWithTag(mategramGlassTag), glass.superview === view {
             self.addGlass(to: view)
         }
         if let sublayers = view.layer.sublayers {
@@ -159,7 +199,18 @@ final class MategramProfileBackdrop: NSObject {
         self.isDark = theme.overallDarkAppearance
         self.clearColors = [theme.list.blocksBackgroundColor, theme.list.plainBackgroundColor]
         self.itemColor = theme.list.itemBlocksBackgroundColor
+        var corners: [CGImage] = []
+        for (top, bottom) in [(true, false), (false, true), (true, true)] {
+            if let image = PresentationResourcesItemList.cornersImage(theme, top: top, bottom: bottom, glass: true)?.cgImage {
+                corners.append(image)
+            }
+            if let image = PresentationResourcesItemList.cornersImage(theme, top: top, bottom: bottom, glass: false)?.cgImage {
+                corners.append(image)
+            }
+        }
+        self.cornerImages = corners
         guard let peer, let representation = peer.smallProfileImage else {
+            self.isActive = false
             self.currentPeerId = nil
             self.currentRepresentation = nil
             self.disposable.set(nil)
@@ -167,6 +218,8 @@ final class MategramProfileBackdrop: NSObject {
             self.dimView.alpha = 0.0
             return
         }
+        self.isActive = true
+        self.sweep()
         if self.currentPeerId == peer.id, let currentRepresentation = self.currentRepresentation, currentRepresentation == representation {
             return
         }
@@ -187,7 +240,9 @@ final class MategramProfileBackdrop: NSObject {
             guard let self else {
                 return
             }
-            self.imageView.image = image
+            if image != nil {
+                self.imageView.image = image
+            }
             self.dimView.alpha = image == nil ? 0.0 : 1.0
             self.sweep()
         }))

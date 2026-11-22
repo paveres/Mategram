@@ -48,7 +48,7 @@ final class MategramMusicCardComponent: Component {
 
     final class View: UIView {
         private let backgroundNode = TransformImageNode()
-        private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
+        private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterialDark))
         private let dimView = UIView()
         private let coverNode = TransformImageNode()
         private let titleLabel = UILabel()
@@ -59,9 +59,9 @@ final class MategramMusicCardComponent: Component {
             super.init(frame: frame)
             self.isUserInteractionEnabled = false
             self.clipsToBounds = true
-            self.layer.cornerRadius = 18.0
+            self.layer.cornerRadius = 26.0
             self.layer.cornerCurve = .continuous
-            self.backgroundColor = UIColor(white: 0.12, alpha: 1.0)
+            self.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
             self.backgroundNode.contentAnimations = [.firstUpdate]
             self.addSubview(self.backgroundNode.view)
             self.addSubview(self.blurView)
@@ -88,7 +88,7 @@ final class MategramMusicCardComponent: Component {
                 let reference: FileMediaReference = .standalone(media: component.file)
                 let albumArt = SharedMediaPlaybackAlbumArt(thumbnailResource: ExternalMusicAlbumArtResource(file: reference, title: component.title, performer: component.artist, isThumbnail: true), fullSizeResource: ExternalMusicAlbumArtResource(file: reference, title: component.title, performer: component.artist, isThumbnail: false))
                 self.coverNode.setSignal(playerAlbumArt(engine: component.context.engine, fileReference: reference, albumArt: albumArt, thumbnail: false))
-                self.backgroundNode.setSignal(playerAlbumArt(engine: component.context.engine, fileReference: reference, albumArt: albumArt, thumbnail: true))
+                self.backgroundNode.setSignal(playerAlbumArt(engine: component.context.engine, fileReference: reference, albumArt: albumArt, thumbnail: true, drawPlaceholderWhenEmpty: false))
             }
             let backgroundFrame = CGRect(x: -20.0, y: -size.width * 0.5 + size.height * 0.5, width: size.width + 40.0, height: size.width + 40.0)
             self.backgroundNode.frame = backgroundFrame

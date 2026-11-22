@@ -281,7 +281,8 @@
       "text": [
         "if MategramSettings.shared.bool(.hidePhone) { subtitle = MategramPhone.mask(subtitle) }"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m2.phone.import",
@@ -306,7 +307,8 @@
       "text": [
         "let formattedPhone = (MategramSettings.shared.bool(.hidePhone) && user.id == context.account.peerId) ? MategramPhone.mask(formatPhoneNumber(context: context, number: phone)) : formatPhoneNumber(context: context, number: phone)"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m2.menu.import",
@@ -1892,7 +1894,8 @@
         ]
       },
       "text": [
-        "self.backgroundColor = backgroundColor.withAlphaComponent(0.0)"
+        "self.backgroundColor = backgroundColor.withAlphaComponent(0.0)",
+        "MategramProfileBackdrop.sweepAll()"
       ],
       "required": true
     },
@@ -1946,7 +1949,8 @@
       "text": [
         "let musicHeight: CGFloat = 80.0"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.music.mask",
@@ -1959,7 +1963,8 @@
       "text": [
         "musicBackground.backgroundColor = .clear"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.music.icon",
@@ -1972,7 +1977,8 @@
       "text": [
         "component: AnyComponent(MategramEmptyComponent())"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.music.card",
@@ -1985,7 +1991,8 @@
       "text": [
         "component: AnyComponent(MategramMusicCardComponent(context: self.context, file: currentSavedMusic, title: track ?? \"\", artist: artist, width: max(1.0, musicBandWidth - 8.0)))"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.music.arrow",
@@ -2000,7 +2007,8 @@
       "text": [
         "component: AnyComponent(MategramEmptyComponent())"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.bglass.import",
@@ -2015,7 +2023,8 @@
         "import ComponentFlow",
         "import GlassBackgroundComponent"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.bglass.build",
@@ -2030,7 +2039,8 @@
         "\"//submodules/ComponentFlow:ComponentFlow\",",
         "\"//submodules/TelegramUI/Components/GlassBackgroundComponent\","
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.bglass.fn",
@@ -2070,7 +2080,8 @@
         "}",
         ""
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.bglass.l1",
@@ -2083,7 +2094,8 @@
       "text": [
         "self.mategramUpdateGlass(size: size)"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.bglass.l2",
@@ -2096,7 +2108,8 @@
       "text": [
         "self.mategramUpdateGlass(size: size)"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.iglass.import",
@@ -2135,7 +2148,8 @@
       "text": [
         "let isGlass = !bubbleCorners.bubbleMode || MategramSettings.shared.bool(.glassInlineButtons)"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m8.dtr.one",
@@ -2856,12 +2870,13 @@
       "text": [
         "if MategramSettings.shared.bool(.formatExtras) {",
         "    let mategramRu = self.strings?.baseLanguageCode.hasPrefix(\"ru\") ?? false",
-        "    children.append(UIAction(title: mategramRu ? \"Выделить всё\" : \"Select All\", image: nil) { _ in",
-        "        UIApplication.shared.sendAction(#selector(UIResponder.selectAll(_:)), to: nil, from: nil, for: nil)",
-        "    })",
-        "    children.append(UIAction(title: mategramRu ? \"Отменить\" : \"Undo\", image: nil) { [weak self] _ in",
-        "        self?.richTextInputNode?.view.undoManager?.undo()",
-        "    })",
+        "    let mategramRoot: UIView? = self.richTextInputNode?.asNode.view",
+        "    children.append(UIAction(title: mategramRu ? \"Выделить всё\" : \"Select All\", image: nil, handler: { [weak mategramRoot] _ in",
+        "        mategramSelectAll(in: mategramRoot)",
+        "    }))",
+        "    children.append(UIAction(title: mategramRu ? \"Отменить\" : \"Undo\", image: nil, handler: { [weak mategramRoot] _ in",
+        "        mategramUndo(in: mategramRoot)",
+        "    }))",
         "}"
       ],
       "required": true
@@ -2877,12 +2892,13 @@
       "text": [
         "if MategramSettings.shared.bool(.formatExtras) {",
         "    let mategramRu = self.strings?.baseLanguageCode.hasPrefix(\"ru\") ?? false",
-        "    children.append(UIAction(title: mategramRu ? \"Выделить всё\" : \"Select All\", image: nil) { _ in",
-        "        UIApplication.shared.sendAction(#selector(UIResponder.selectAll(_:)), to: nil, from: nil, for: nil)",
-        "    })",
-        "    children.append(UIAction(title: mategramRu ? \"Отменить\" : \"Undo\", image: nil) { [weak self] _ in",
-        "        self?.richTextInputNode?.view.undoManager?.undo()",
-        "    })",
+        "    let mategramRoot: UIView? = self.richTextInputNode?.asNode.view",
+        "    children.append(UIAction(title: mategramRu ? \"Выделить всё\" : \"Select All\", image: nil, handler: { [weak mategramRoot] _ in",
+        "        mategramSelectAll(in: mategramRoot)",
+        "    }))",
+        "    children.append(UIAction(title: mategramRu ? \"Отменить\" : \"Undo\", image: nil, handler: { [weak mategramRoot] _ in",
+        "        mategramUndo(in: mategramRoot)",
+        "    }))",
         "}"
       ],
       "required": true
@@ -2915,6 +2931,307 @@
         "    if MategramSettings.shared.bool(.swipeUpEditor) {",
         "        self.toggleExpandMediaInput?()",
         "    }",
+        "}",
+        ""
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.phone.header",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var subtitle = formatPhoneNumber(context: self.context, number: user.phone ?? \"\")",
+        "occurrence": 1
+      },
+      "text": [
+        "var subtitle = MategramSettings.shared.bool(.hidePhone) ? \"\" : formatPhoneNumber(context: self.context, number: user.phone ?? \"\")"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.phone.username",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "subtitle = \"\\(subtitle) • @\\(mainUsername)\"",
+        "occurrence": 1
+      },
+      "text": [
+        "subtitle = subtitle.isEmpty ? \"@\\(mainUsername)\" : \"\\(subtitle) • @\\(mainUsername)\""
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.phone.row",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if let phone = user.phone {",
+        "after": [
+          "let formattedPhone = formatPhoneNumber(context: context, number: phone)"
+        ]
+      },
+      "text": [
+        "if let phone = user.phone, !(MategramSettings.shared.bool(.hidePhone) && user.id == context.account.peerId) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.counter.limit",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if let presentationInterfaceState = self.presentationInterfaceState, let inputTextMaxLength {",
+        "occurrence": 1
+      },
+      "text": [
+        "if inputTextMaxLength == nil && MategramSettings.shared.bool(.charCounter) {",
+        "    inputTextMaxLength = 4096",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.counter.alpha",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "transition.updateAlpha(node: self.counterTextNode, alpha: backgroundSize.height > 50.0 ? 1.0 : 0.0)",
+        "occurrence": 1
+      },
+      "text": [
+        "transition.updateAlpha(node: self.counterTextNode, alpha: (backgroundSize.height > 50.0 || MategramSettings.shared.bool(.charCounter)) ? 1.0 : 0.0)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.music.strip",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let currentSavedMusic = self.profileMusic(peer: peer, screenData: screenData)",
+        "occurrence": 1
+      },
+      "text": [
+        "let currentSavedMusic: TelegramMediaFile? = nil"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.music.section",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "case unofficial",
+        "occurrence": 1
+      },
+      "text": [
+        "case mategramMusic"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.music.items",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "var result: [(AnyHashable, [PeerInfoScreenItem])] = []",
+        "occurrence": 1
+      },
+      "text": [
+        "items[.mategramMusic]!.append(contentsOf: mategramMusicItems(data: data, context: context, presentationData: presentationData))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.av.island",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "clippingNodeRadiusTransition.updateCornerRadius(node: self.avatarClippingNode, cornerRadius: avatarClipOffset > 0.0 ? width / 2.5 : 0.0)",
+        "occurrence": 1
+      },
+      "text": [
+        "clippingNodeRadiusTransition.updateCornerRadius(node: self.avatarClippingNode, cornerRadius: 0.0)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.sweep.scroll",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func scrollViewDidScroll(_ scrollView: UIScrollView) {",
+        "occurrence": 1
+      },
+      "text": [
+        "self.mategramBackdrop.sweepThrottled()"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.mglass.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import ComponentFlow",
+        "occurrence": 1
+      },
+      "text": [
+        "import GlassBackgroundComponent"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.mglass.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/ComponentFlow\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//submodules/TelegramUI/Components/GlassBackgroundComponent\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.mglass.fn",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "private var backgroundType: ChatMessageBackgroundType?",
+        "occurrence": 1
+      },
+      "text": [
+        "private var mategramGlassView: GlassBackgroundView?",
+        "",
+        "private func updateMategramGlass(frame: CGRect) {",
+        "    if MategramSettings.shared.bool(.glassMessages) {",
+        "        let glassView: GlassBackgroundView",
+        "        if let current = self.mategramGlassView {",
+        "            glassView = current",
+        "        } else {",
+        "            glassView = GlassBackgroundView()",
+        "            glassView.isUserInteractionEnabled = false",
+        "            self.mategramGlassView = glassView",
+        "            self.backgroundNode.view.superview?.insertSubview(glassView, aboveSubview: self.backgroundNode.view)",
+        "        }",
+        "        let isDark = self.item?.presentationData.theme.theme.overallDarkAppearance ?? false",
+        "        glassView.isHidden = self.backgroundNode.isHidden",
+        "        glassView.frame = frame",
+        "        glassView.update(size: frame.size, cornerRadius: min(16.0, frame.height * 0.5), isDark: isDark, tintColor: GlassBackgroundView.TintColor(kind: .clear), transition: .immediate)",
+        "        self.backgroundNode.alpha = 0.0",
+        "        self.backgroundWallpaperNode.alpha = 0.0",
+        "    } else if let glassView = self.mategramGlassView {",
+        "        self.mategramGlassView = nil",
+        "        glassView.removeFromSuperview()",
+        "        self.backgroundNode.alpha = 1.0",
+        "        self.backgroundWallpaperNode.alpha = 1.0",
+        "    }",
+        "}",
+        ""
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.mglass.c1",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "animation.animator.updateFrame(layer: strongSelf.backgroundNode.layer, frame: backgroundFrame, completion: nil)",
+        "occurrence": 1
+      },
+      "text": [
+        "strongSelf.updateMategramGlass(frame: backgroundFrame)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.mglass.c2",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "strongSelf.backgroundWallpaperNode.frame = backgroundFrame",
+        "occurrence": 1
+      },
+      "text": [
+        "strongSelf.updateMategramGlass(frame: backgroundFrame)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.bglass.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/Sources/ChatMessageActionButtonsNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import ComponentFlow",
+        "occurrence": 1
+      },
+      "text": [
+        "import GlassBackgroundComponent"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.bglass.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/ComponentFlow\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//submodules/TelegramUI/Components/GlassBackgroundComponent\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.bglass.prop",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/Sources/ChatMessageActionButtonsNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private var backgroundContent: WallpaperBubbleBackgroundNode?",
+        "occurrence": 1
+      },
+      "text": [
+        "fileprivate var mategramGlassView: GlassBackgroundView?"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.bglass.apply",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/Sources/ChatMessageActionButtonsNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "let rect = CGRect(origin: CGPoint(), size: CGSize(width: max(0.0, width), height: 42.0))",
+        "before": [
+          "node.backgroundBlurView?.view.isHidden = false",
+          "}",
+          ""
+        ]
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.glassInlineButtons) {",
+        "    let glassView: GlassBackgroundView",
+        "    if let current = node.mategramGlassView {",
+        "        glassView = current",
+        "    } else {",
+        "        glassView = GlassBackgroundView()",
+        "        glassView.isUserInteractionEnabled = false",
+        "        node.mategramGlassView = glassView",
+        "        node.view.insertSubview(glassView, at: 0)",
+        "    }",
+        "    let glassSize = CGSize(width: max(0.0, width), height: 42.0)",
+        "    glassView.frame = CGRect(origin: CGPoint(), size: glassSize)",
+        "    glassView.update(size: glassSize, cornerRadius: bubbleCorners.auxiliaryRadius, isDark: theme.theme.overallDarkAppearance, tintColor: GlassBackgroundView.TintColor(kind: .clear), transition: .immediate)",
+        "    node.backgroundBlurView?.view.isHidden = true",
+        "    node.backgroundContent?.isHidden = true",
+        "} else if let glassView = node.mategramGlassView {",
+        "    node.mategramGlassView = nil",
+        "    glassView.removeFromSuperview()",
+        "    node.backgroundContent?.isHidden = false",
         "}",
         ""
       ],
