@@ -2,35 +2,53 @@ import Foundation
 
 public enum MategramSection: Int, CaseIterable {
     case ghost
+    case liquidGlass
     case profile
-    case time
-    case chat
+    case tabs
+    case folders
     case chatList
-    case calls
-    case settings
-    case security
+    case chat
+    case input
+    case voice
     case media
+    case calls
+    case network
+    case time
+    case security
+    case settings
 
     public func title(_ language: MategramLanguage) -> String {
         switch (self, language) {
         case (.ghost, .russian): return "Режим призрака"
         case (.ghost, .english): return "Ghost mode"
+        case (.liquidGlass, .russian): return "Liquid Glass"
+        case (.liquidGlass, .english): return "Liquid Glass"
         case (.profile, .russian): return "Профили"
         case (.profile, .english): return "Profiles"
-        case (.time, .russian): return "Время и статус"
-        case (.time, .english): return "Time and status"
-        case (.chat, .russian): return "Чат"
-        case (.chat, .english): return "Chat"
-        case (.security, .russian): return "Конфиденциальность"
-        case (.security, .english): return "Privacy"
+        case (.tabs, .russian): return "Вкладки"
+        case (.tabs, .english): return "Tabs"
+        case (.folders, .russian): return "Папки"
+        case (.folders, .english): return "Folders"
         case (.chatList, .russian): return "Список чатов"
         case (.chatList, .english): return "Chat list"
-        case (.calls, .russian): return "Звонки и ссылки"
-        case (.calls, .english): return "Calls and links"
+        case (.chat, .russian): return "Сообщения"
+        case (.chat, .english): return "Messages"
+        case (.input, .russian): return "Ввод"
+        case (.input, .english): return "Input"
+        case (.voice, .russian): return "Голосовые"
+        case (.voice, .english): return "Voice"
+        case (.media, .russian): return "Медиа и камера"
+        case (.media, .english): return "Media and camera"
+        case (.calls, .russian): return "Звонки"
+        case (.calls, .english): return "Calls"
+        case (.network, .russian): return "Сеть"
+        case (.network, .english): return "Network"
+        case (.time, .russian): return "Время и статус"
+        case (.time, .english): return "Time and status"
+        case (.security, .russian): return "Конфиденциальность"
+        case (.security, .english): return "Privacy"
         case (.settings, .russian): return "Разделы настроек"
         case (.settings, .english): return "Settings sections"
-        case (.media, .russian): return "Медиа"
-        case (.media, .english): return "Media"
         }
     }
 
@@ -38,36 +56,54 @@ public enum MategramSection: Int, CaseIterable {
         switch (self, language) {
         case (.ghost, .russian): return "Прочтение, печать, онлайн, истории"
         case (.ghost, .english): return "Read, typing, online, stories"
+        case (.liquidGlass, .russian): return "Стекло на сообщениях и кнопках"
+        case (.liquidGlass, .english): return "Glass on messages and buttons"
         case (.profile, .russian): return "ID, датацентр, регистрация"
         case (.profile, .english): return "ID, data center, registration"
+        case (.tabs, .russian): return "Панель вкладок"
+        case (.tabs, .english): return "Tab bar"
+        case (.folders, .russian): return "Папки чатов"
+        case (.folders, .english): return "Chat folders"
+        case (.chatList, .russian): return "Истории, заголовок, свайпы"
+        case (.chatList, .english): return "Stories, title, swipes"
+        case (.chat, .russian): return "Реакции, перевод, фильтры"
+        case (.chat, .english): return "Reactions, translation, filters"
+        case (.input, .russian): return "Клавиатура и отправка"
+        case (.input, .english): return "Keyboard and sending"
+        case (.voice, .russian): return "Микрофон и воспроизведение"
+        case (.voice, .english): return "Microphone and playback"
+        case (.media, .russian): return "Видео и фото"
+        case (.media, .english): return "Video and photo"
+        case (.calls, .russian): return "Подтверждение, TCP, ссылки"
+        case (.calls, .english): return "Confirmation, TCP, links"
+        case (.network, .russian): return "Ускорение загрузки"
+        case (.network, .english): return "Faster downloads"
         case (.time, .russian): return "Секунды, точный визит, просмотры"
         case (.time, .english): return "Seconds, exact visit, views"
-        case (.chat, .russian): return "Реакции, отправка, меню сообщения"
-        case (.chat, .english): return "Reactions, sending, message menu"
         case (.security, .russian): return "Номер телефона, сеансы"
         case (.security, .english): return "Phone number, sessions"
-        case (.chatList, .russian): return "Истории, заголовок, свайпы, прокси"
-        case (.chatList, .english): return "Stories, title, swipes, proxy"
-        case (.calls, .russian): return "Подтверждение, браузер"
-        case (.calls, .english): return "Confirmation, browser"
-        case (.settings, .russian): return "Любой пункт настроек можно скрыть"
+        case (.settings, .russian): return "Скрытие стандартных разделов"
         case (.settings, .english): return "Hide standard rows"
-        case (.media, .russian): return "Камера в галерее, HD"
-        case (.media, .english): return "Camera in gallery, HD"
         }
     }
 
     public var symbol: String {
         switch self {
         case .ghost: return "moon"
+        case .liquidGlass: return "drop"
         case .profile: return "person.crop.circle"
-        case .time: return "clock"
-        case .chat: return "bubble.left.and.bubble.right"
-        case .security: return "lock"
+        case .tabs: return "rectangle.bottomthird.inset.filled"
+        case .folders: return "folder"
         case .chatList: return "list.bullet"
+        case .chat: return "bubble.left"
+        case .input: return "keyboard"
+        case .voice: return "waveform"
+        case .media: return "photo"
         case .calls: return "phone"
+        case .network: return "arrow.up.arrow.down"
+        case .time: return "clock"
+        case .security: return "lock"
         case .settings: return "eye.slash"
-        case .media: return "camera"
         }
     }
 }
@@ -153,13 +189,13 @@ public enum MategramCatalog {
         MategramOption(key: .ghostAlwaysOnline, section: .ghost, titleRu: "Всегда в сети", titleEn: "Always online",
             footerRu: "Статус «в сети» обновляется каждые 30 секунд, пока приложение работает. Не действует, если включено «Не показывать онлайн».",
             footerEn: "The online status is refreshed every 30 seconds while the app runs. Has no effect when «Do not show online» is on."),
-        MategramOption(key: .viewOnceDefault, section: .chat, titleRu: "«Один раз» по умолчанию", titleEn: "«View once» by default",
+        MategramOption(key: .viewOnceDefault, section: .input, titleRu: "«Один раз» по умолчанию", titleEn: "«View once» by default",
             footerRu: "Голосовые и кружки сразу записываются с просмотром один раз. Кнопкой при записи можно снять.",
             footerEn: "Voice and video messages are recorded as view once. The button while recording turns it off."),
         MategramOption(key: .doubleTapEdit, section: .chat, titleRu: "Двойной тап — правка", titleEn: "Double tap to edit",
             footerRu: "Двойной тап по своему сообщению открывает его правку вместо реакции.",
             footerEn: "Double tap on your message opens editing instead of a reaction."),
-        MategramOption(key: .charCounter, section: .chat, titleRu: "Счётчик символов", titleEn: "Character counter",
+        MategramOption(key: .charCounter, section: .input, titleRu: "Счётчик символов", titleEn: "Character counter",
             footerRu: "В длинном сообщении в углу поля ввода видно, сколько символов набрано.",
             footerEn: "A long message shows how many characters are typed in the corner of the input field."),
         MategramOption(key: .hideBlockedMessages, section: .chat, titleRu: "Скрыть заблокированных", titleEn: "Hide blocked users",
@@ -168,10 +204,10 @@ public enum MategramCatalog {
         MategramOption(key: .hideReactions, section: .chat, titleRu: "Скрыть реакции", titleEn: "Hide reactions",
             footerRu: "Реакции под сообщениями не показываются.",
             footerEn: "Reactions under messages are not shown."),
-        MategramOption(key: .sendOnReturn, section: .chat, titleRu: "Отправка клавишей Return", titleEn: "Send with Return",
+        MategramOption(key: .sendOnReturn, section: .input, titleRu: "Отправка клавишей Return", titleEn: "Send with Return",
             footerRu: "Клавиша Return отправляет сообщение вместо новой строки.",
             footerEn: "The Return key sends the message instead of a new line."),
-        MategramOption(key: .hideSendAs, section: .chat, titleRu: "Скрыть «Отправить от имени»", titleEn: "Hide «Send as»",
+        MategramOption(key: .hideSendAs, section: .input, titleRu: "Скрыть «Отправить от имени»", titleEn: "Hide «Send as»",
             footerRu: "Убирает аватарку выбора отправителя в поле ввода групп и каналов.",
             footerEn: "Removes the sender picker avatar from the input field in groups and channels."),
         MategramOption(key: .zalgoFilter, section: .chat, titleRu: "Фильтр «ломаного» текста", titleEn: "Zalgo filter",
@@ -183,7 +219,7 @@ public enum MategramCatalog {
         MategramOption(key: .wordFilter, section: .chat, titleRu: "Фильтр по словам", titleEn: "Word filter",
             footerRu: "Входящие сообщения со словами из списка ниже становятся бледными. Слова через запятую или с новой строки.",
             footerEn: "Incoming messages with words from the list below are dimmed. Separate words with commas or new lines."),
-        MategramOption(key: .noAutoplayNextVoice, section: .chat, titleRu: "Не включать следующее голосовое", titleEn: "Do not play next voice",
+        MategramOption(key: .noAutoplayNextVoice, section: .voice, titleRu: "Не включать следующее голосовое", titleEn: "Do not play next voice",
             footerRu: "После голосового или кружка следующее не начинает играть само.",
             footerEn: "After a voice or video message the next one does not start by itself."),
         MategramOption(key: .alwaysTranslate, section: .chat, titleRu: "«Перевести» всегда", titleEn: "Always «Translate»",
@@ -207,6 +243,12 @@ public enum MategramCatalog {
         MategramOption(key: .showSessionApiId, section: .security, titleRu: "API ID в сеансах", titleEn: "API ID in sessions",
             footerRu: "В «Устройствах» рядом с приложением виден его API ID: так легче узнать неофициальный клиент.",
             footerEn: "Devices show each app's API ID, so unofficial clients are easier to spot."),
+        MategramOption(key: .glassMessages, section: .liquidGlass, titleRu: "Стекло на сообщениях", titleEn: "Glass messages",
+            footerRu: "Пузыри сообщений становятся жидким стеклом.",
+            footerEn: "Message bubbles become liquid glass."),
+        MategramOption(key: .glassInlineButtons, section: .liquidGlass, titleRu: "Стекло на кнопках ботов", titleEn: "Glass bot buttons",
+            footerRu: "Кнопки под сообщениями ботов становятся стеклянными капсулами.",
+            footerEn: "Buttons under bot messages become glass capsules."),
         MategramOption(key: .showProfileId, section: .profile, titleRu: "ID в профиле", titleEn: "ID in profile",
             footerRu: "Числовой ID пользователя, группы или канала. Нажмите на строку, чтобы скопировать.",
             footerEn: "Numeric ID of a user, group or channel. Tap the row to copy."),
@@ -255,16 +297,16 @@ public enum MategramCatalog {
         MategramOption(key: .singleLinePreview, section: .chatList, titleRu: "Одна строка текста", titleEn: "One line of text",
             footerRu: "В списке чатов последнее сообщение показывается одной строкой.",
             footerEn: "The chat list shows the last message in one line."),
-        MategramOption(key: .longAllChats, section: .chatList, titleRu: "Полное «Все чаты»", titleEn: "Full «All Chats»",
+        MategramOption(key: .longAllChats, section: .folders, titleRu: "Полное «Все чаты»", titleEn: "Full «All Chats»",
             footerRu: "Первая папка называется «Все чаты», а не «Все».",
             footerEn: "The first folder is called «All Chats» instead of «All»."),
-        MategramOption(key: .hideAllChatsTab, section: .chatList, titleRu: "Скрыть «Все чаты»", titleEn: "Hide «All Chats»",
+        MategramOption(key: .hideAllChatsTab, section: .folders, titleRu: "Скрыть «Все чаты»", titleEn: "Hide «All Chats»",
             footerRu: "Убирает папку «Все чаты», если есть другие папки.",
             footerEn: "Removes the «All Chats» folder when other folders exist."),
-        MategramOption(key: .rememberFolder, section: .chatList, titleRu: "Запоминать папку", titleEn: "Remember folder",
+        MategramOption(key: .rememberFolder, section: .folders, titleRu: "Запоминать папку", titleEn: "Remember folder",
             footerRu: "При запуске открывается последняя выбранная папка.",
             footerEn: "Opens the last selected folder on launch."),
-        MategramOption(key: .hideCallsTab, section: .chatList, titleRu: "Скрыть вкладку «Звонки»", titleEn: "Hide Calls tab",
+        MategramOption(key: .hideCallsTab, section: .tabs, titleRu: "Скрыть вкладку «Звонки»", titleEn: "Hide Calls tab",
             footerRu: "Убирает вкладку звонков внизу. Применяется после перезапуска.",
             footerEn: "Removes the Calls tab at the bottom. Applies after restart."),
         MategramOption(key: .disableChatSwipes, section: .chatList, titleRu: "Без свайпов в списке", titleEn: "No swipes in list",
@@ -273,7 +315,7 @@ public enum MategramCatalog {
         MategramOption(key: .hideProxySponsor, section: .chatList, titleRu: "Скрыть канал спонсора прокси", titleEn: "Hide proxy sponsor",
             footerRu: "Убирает закреплённый канал, который добавляет прокси-сервер.",
             footerEn: "Removes the pinned channel that a proxy server adds."),
-        MategramOption(key: .hideTabTitles, section: .chatList, titleRu: "Без подписей вкладок", titleEn: "No tab titles",
+        MategramOption(key: .hideTabTitles, section: .tabs, titleRu: "Без подписей вкладок", titleEn: "No tab titles",
             footerRu: "Внизу остаются только значки вкладок, без названий.",
             footerEn: "Only the tab icons stay at the bottom, without names."),
         MategramOption(key: .callsTcp, section: .calls, titleRu: "Звонки через TCP", titleEn: "TCP calls",
@@ -363,7 +405,7 @@ public enum MategramCatalog {
         MategramOption(key: .hideTipsRow, section: .settings, titleRu: "Скрыть «Возможности Telegram»", titleEn: "Hide Telegram Features",
             footerRu: "Убирает пункт «Возможности Telegram».",
             footerEn: "Removes Telegram Features."),
-        MategramOption(key: .builtInMic, section: .media, titleRu: "Встроенный микрофон", titleEn: "Built-in microphone",
+        MategramOption(key: .builtInMic, section: .voice, titleRu: "Встроенный микрофон", titleEn: "Built-in microphone",
             footerRu: "Голосовые и кружки пишутся микрофоном телефона, даже если подключены наушники.",
             footerEn: "Voice and video messages use the phone microphone even with headphones connected."),
         MategramOption(key: .backCameraRound, section: .media, titleRu: "Задняя камера для кружков", titleEn: "Back camera for round videos",
@@ -375,7 +417,7 @@ public enum MategramCatalog {
         MategramOption(key: .alwaysHD, section: .media, titleRu: "Всегда HD", titleEn: "Always HD",
             footerRu: "Фото в галерее сразу отправляются в высоком качестве.",
             footerEn: "Photos from the gallery are always sent in high quality."),
-        MategramOption(key: .fastDownload, section: .media, titleRu: "Ускорить скачивание", titleEn: "Faster downloads",
+        MategramOption(key: .fastDownload, section: .network, titleRu: "Ускорить скачивание", titleEn: "Faster downloads",
             footerRu: "Файлы качаются большими частями и в 16 потоков. Расходует больше трафика за раз.",
             footerEn: "Files download in larger parts with 16 parallel requests. Uses more traffic at once."),
         MategramOption(key: .cameraInGallery, section: .media, titleRu: "Камера в галерее", titleEn: "Camera in gallery",

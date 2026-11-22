@@ -19,6 +19,7 @@ swift_library(
         "//submodules/ItemListUI:ItemListUI",
         "//submodules/PresentationDataUtils:PresentationDataUtils",
         "//submodules/UndoUI:UndoUI",
+        "//submodules/SettingsUI:SettingsUI",
     ],
     visibility = [
         "//visibility:public",

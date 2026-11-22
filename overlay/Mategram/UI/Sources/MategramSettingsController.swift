@@ -9,6 +9,7 @@ import PresentationDataUtils
 import AccountContext
 import MategramCore
 import UndoUI
+import SettingsUI
 
 private final class MategramHeaderItem: ListViewItem, ItemListItem {
     let presentationData: ItemListPresentationData
@@ -135,6 +136,7 @@ private final class MategramSettingsArguments {
     let openSection: (MategramSection) -> Void
     let updateText: (MategramTextKey, String) -> Void
     let backup: (Bool) -> Void
+    var context: AccountContext?
 
     init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }, backup: @escaping (Bool) -> Void = { _ in }) {
         self.toggle = toggle
@@ -152,6 +154,7 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case textHeader(index: Int32, section: Int32, text: String)
     case textInput(index: Int32, section: Int32, key: MategramTextKey, placeholder: String, value: String)
     case backupAction(index: Int32, section: Int32, isExport: Bool, title: String)
+    case preview(section: Int32, glass: Bool)
 
     var section: ItemListSectionId {
         switch self {
@@ -168,6 +171,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .textInput(_, section, _, _, _):
             return section
         case let .backupAction(_, section, _, _):
+            return section
+        case let .preview(section, _):
             return section
         }
     }
@@ -188,6 +193,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             return index
         case let .backupAction(index, _, _, _):
             return index
+        case .preview:
+            return -1
         }
     }
 
@@ -221,6 +228,11 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             return ItemListActionItem(presentationData: presentationData, systemStyle: .glass, title: title, kind: .generic, alignment: .natural, sectionId: section, style: .blocks, action: {
                 arguments.backup(isExport)
             })
+        case let .preview(section, _):
+            if let context = arguments.context {
+                return mategramChatPreviewItem(context: context, presentationData: context.sharedContext.currentPresentationData.with { $0 }, sectionId: section)
+            }
+            return ItemListTextItem(presentationData: presentationData, text: .plain(""), sectionId: section)
         }
     }
 }
@@ -250,6 +262,9 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
     var entries: [MategramSettingsEntry] = []
     var index: Int32 = 0
     var sectionId: Int32 = 0
+    if section == .liquidGlass {
+        entries.append(.preview(section: 0, glass: MategramSettings.shared.bool(.glassMessages)))
+    }
     for option in MategramCatalog.options(in: section) {
         sectionId += 1
         index += 1
@@ -299,6 +314,7 @@ private func mategramSectionController(context: AccountContext, section: Mategra
     }, updateText: { key, text in
         MategramSettings.shared.setText(text, for: key)
     })
+    arguments.context = context
     return ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: section))
 }
 

@@ -8,6 +8,7 @@ import SwiftSignalKit
 import AsyncDisplayKit
 import UndoUI
 import MategramCore
+import ContextUI
 
 private func mategramCopy(context: AccountContext, presentationData: PresentationData, text: String, message: String) {
     UIPasteboard.general.string = text
@@ -131,28 +132,50 @@ func mategramPeerInfoItems(
         }
     }
 
-    if MategramGhost.showsServerReadAction, peer.id != context.account.peerId, MategramGhost.holdsReadReceipt(peer: peer.id.toInt64()) {
-        let readTitle = language == .russian ? "Прочитать на сервере" : "Mark as read on server"
-        let readDone = language == .russian ? "Чат отмечен прочитанным у собеседника" : "The chat is marked as read for the other side"
+    return result
+}
+
+func mategramGhostMenuItems(context: AccountContext, peer: EnginePeer, presentationData: PresentationData) -> [ContextMenuItem] {
+    let settings = MategramSettings.shared
+    if peer.id == context.account.peerId || !settings.bool(.ghostMode) {
+        return []
+    }
+    let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
+    let isRussian = language == .russian
+    var items: [ContextMenuItem] = []
+    let peerKey = peer.id.toInt64()
+    let isOn = !MategramGhost.isException(peer: peerKey)
+    items.append(.action(ContextMenuActionItem(text: isRussian ? "Призрак в этом чате" : "Ghost in this chat", icon: { theme in
+        return generateTintedImage(image: UIImage(bundleImageName: isOn ? "Chat/Context Menu/EyeLocked" : "Chat/Context Menu/Eye"), color: theme.contextMenu.primaryColor)
+    }, action: { _, f in
+        f(.default)
+        MategramGhost.setException(peer: peerKey, isOn)
+        let text: String
+        if isOn {
+            text = isRussian ? "Призрак выключен в этом чате" : "Ghost mode is off in this chat"
+        } else {
+            text = isRussian ? "Призрак включён в этом чате" : "Ghost mode is on in this chat"
+        }
+        context.sharedContext.mainWindow?.present(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: text, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: false, action: { _ in
+            return false
+        }), on: .root)
+    })))
+    if MategramGhost.showsServerReadAction, MategramGhost.holdsReadReceipt(peer: peerKey) {
         let peerId = peer.id
-        result.append(PeerInfoScreenActionItem(id: 9007, text: readTitle, action: {
+        items.append(.action(ContextMenuActionItem(text: isRussian ? "Прочитать на сервере" : "Mark as read on server", icon: { theme in
+            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Read"), color: theme.contextMenu.primaryColor)
+        }, action: { _, f in
+            f(.default)
+            let doneText = isRussian ? "Чат отмечен прочитанным у собеседника" : "The chat is marked as read for the other side"
             let _ = mategramPushReadStateNow(account: context.account, peerId: peerId).start(completed: {
                 Queue.mainQueue().async {
-                    context.sharedContext.mainWindow?.present(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: readDone, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: false, action: { _ in
+                    context.sharedContext.mainWindow?.present(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: doneText, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: false, action: { _ in
                         return false
                     }), on: .root)
                 }
             })
-        }))
+        })))
     }
-
-    if settings.bool(.ghostMode), peer.id != context.account.peerId {
-        let peerKey = peer.id.toInt64()
-        let ghostTitle = language == .russian ? "Режим призрака в этом чате" : "Ghost mode in this chat"
-        result.append(PeerInfoScreenSwitchItem(id: 9005, text: ghostTitle, value: !MategramGhost.isException(peer: peerKey), toggled: { value in
-            MategramGhost.setException(peer: peerKey, !value)
-        }))
-    }
-
-    return result
+    items.append(.separator)
+    return items
 }

@@ -1,7 +1,6 @@
 import Foundation
 import UIKit
 import Display
-import ContextUI
 import AttachmentUI
 import TelegramCore
 import TelegramPresentationData
@@ -44,19 +43,6 @@ func mategramAttachKey(_ button: AttachmentButtonType) -> String {
     }
 }
 
-private func mategramAttachIcon(_ symbol: String, _ color: UIColor) -> UIImage? {
-    let side: CGFloat = 30.0
-    let configuration = UIImage.SymbolConfiguration(pointSize: 15.0, weight: .semibold)
-    let glyph = UIImage(systemName: symbol, withConfiguration: configuration)?.withTintColor(.white, renderingMode: .alwaysOriginal)
-    return UIGraphicsImageRenderer(size: CGSize(width: side, height: side)).image { _ in
-        color.setFill()
-        UIBezierPath(ovalIn: CGRect(x: 0.0, y: 0.0, width: side, height: side)).fill()
-        if let glyph {
-            glyph.draw(at: CGPoint(x: (side - glyph.size.width) / 2.0, y: (side - glyph.size.height) / 2.0))
-        }
-    }
-}
-
 extension ChatControllerImpl {
     func mategramPresentAttachMenu(sourceView: UIView, buttons: [AttachmentButtonType]) {
         let strings = self.presentationData.strings
@@ -87,6 +73,7 @@ extension ChatControllerImpl {
                 return
             }
             if key == "gift" && available["gift"] == nil {
+                MategramAttach.forced = "gift"
                 self.presentAttachmentMenu(subject: .gift)
                 return
             }
@@ -94,23 +81,17 @@ extension ChatControllerImpl {
             self.presentAttachmentMenu(subject: .default)
         }
 
-        var items: [ContextMenuItem] = []
+        var items: [MategramAttachPanelItem] = []
+        var keys: [String] = []
         var used = Set<String>()
         for (key, title, symbol, color) in mainOrder {
             if available[key] == nil && !(key == "gift" && canGift) {
                 continue
             }
             used.insert(key)
-            let icon = mategramAttachIcon(symbol, color)
-            items.append(.action(ContextMenuActionItem(text: title, icon: { _ in
-                return icon
-            }, iconPosition: .left, action: { _, f in
-                f(.default)
-                open(key)
-            })))
+            keys.append(key)
+            items.append(MategramAttachPanelItem(title: title, symbol: symbol, color: color))
         }
-
-        var moreItems: [ContextMenuItem] = []
         for button in buttons {
             let key = mategramAttachKey(button)
             if used.contains(key) {
@@ -118,39 +99,30 @@ extension ChatControllerImpl {
             }
             let title: String
             let symbol: String
+            let color: UIColor
             switch button {
             case .poll:
                 title = strings.Attachment_Poll
                 symbol = "chart.bar.fill"
+                color = UIColor(rgb: 0xf5c400)
             case .money:
                 title = strings.Attachment_Money
                 symbol = "creditcard.fill"
+                color = UIColor(rgb: 0x34c759)
             case .quickReply:
                 title = strings.Attachment_Reply
                 symbol = "arrowshape.turn.up.left.fill"
+                color = UIColor(rgb: 0x2f8cf5)
             case let .app(bot):
                 title = bot.shortName
                 symbol = "square.grid.2x2.fill"
+                color = UIColor(rgb: 0x5e5ce6)
             default:
                 continue
             }
-            let icon = mategramAttachIcon(symbol, UIColor(rgb: 0x5e5ce6))
-            moreItems.append(.action(ContextMenuActionItem(text: title, icon: { _ in
-                return icon
-            }, iconPosition: .left, action: { _, f in
-                f(.default)
-                open(key)
-            })))
-        }
-        if !moreItems.isEmpty {
-            let icon = mategramAttachIcon("ellipsis", UIColor(rgb: 0x8e8e93))
-            let submenu = moreItems
-            items.append(.separator)
-            items.append(.action(ContextMenuActionItem(text: isRussian ? "Ещё" : "More", icon: { _ in
-                return icon
-            }, iconPosition: .left, action: { c, _ in
-                c?.pushItems(items: .single(ContextController.Items(content: .list(submenu))))
-            })))
+            used.insert(key)
+            keys.append(key)
+            items.append(MategramAttachPanelItem(title: title, symbol: symbol, color: color))
         }
         if items.isEmpty {
             MategramAttach.forced = "gallery"
@@ -158,7 +130,10 @@ extension ChatControllerImpl {
             return
         }
         self.chatDisplayNode.dismissInput()
-        let contextController = makeContextController(presentationData: self.presentationData, source: .reference(ChatControllerContextReferenceContentSource(controller: self, sourceView: sourceView, insets: .zero)), items: .single(ContextController.Items(content: .list(items))), gesture: nil)
-        self.presentInGlobalOverlay(contextController)
+        let container: UIView = self.view.window ?? self.view
+        let panel = MategramAttachPanel(items: items, isDark: self.presentationData.theme.overallDarkAppearance, select: { index in
+            open(keys[index])
+        })
+        panel.show(in: container, anchor: sourceView.convert(sourceView.bounds, to: container))
     }
 }

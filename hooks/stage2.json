@@ -1105,7 +1105,8 @@
       "text": [
         "let clipStyle: AvatarNodeClipStyle = clipStyle == .round ? .roundedRect : clipStyle"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m5.av.square1",
@@ -1117,7 +1118,8 @@
       "text": [
         "let clipStyle: AvatarNodeClipStyle = clipStyle == .round ? .roundedRect : clipStyle"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m5.av.square2",
@@ -1129,7 +1131,8 @@
       "text": [
         "let clipStyle: AvatarNodeClipStyle = clipStyle == .round ? .roundedRect : clipStyle"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m5.menu.quick",
@@ -1153,7 +1156,8 @@
       "text": [
         "self.effectView.isHidden = true"
       ],
-      "required": true
+      "required": true,
+      "enabled": false
     },
     {
       "id": "m5.menu.reactions",
@@ -1777,6 +1781,359 @@
         "    mategramImmediate = true",
         "}",
         "self.immediateExternalShare = mategramImmediate"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.av.tc1",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoAvatarTransformContainerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var isForum = false",
+        "occurrence": 1
+      },
+      "text": [
+        "isForum = true"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.av.tc2",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoAvatarTransformContainerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var isForum = false",
+        "occurrence": 2
+      },
+      "text": [
+        "isForum = true"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.av.tc3",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoAvatarTransformContainerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "avatarCornerRadius = avatarSize / 2.0",
+        "occurrence": 1
+      },
+      "text": [
+        "avatarCornerRadius = floor(avatarSize * 0.25)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.av.header",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var isForum = false",
+        "occurrence": 1
+      },
+      "text": [
+        "isForum = true"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.menu.noblur1",
+      "file": "submodules/TelegramUI/Components/ContextControllerImpl/Sources/ContextSourceContainer.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "enableBlur: extracted.blurBackground,",
+        "occurrence": 1
+      },
+      "text": [
+        "enableBlur: false,"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.menu.noblur2",
+      "file": "submodules/TelegramUI/Components/ContextControllerImpl/Sources/ContextSourceContainer.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "forceKeepBlur: extracted.blurBackground,",
+        "occurrence": 1
+      },
+      "text": [
+        "forceKeepBlur: false,"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.tabs.center",
+      "file": "submodules/TelegramUI/Components/TabBarComponent/Sources/TabBarComponent.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if component.showsTitle {",
+        "before": [
+          "func iconY(regular: CGFloat, height: CGFloat) -> CGFloat {"
+        ]
+      },
+      "text": [
+        "if component.showsTitle && !MategramSettings.shared.bool(.hideTabTitles) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.pane.clear",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoPaneContainerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.backgroundColor = backgroundColor",
+        "before": [
+          "}"
+        ],
+        "after": [
+          "",
+          "let isScrollingLockedAtTop = expansionFraction < 1.0 - CGFloat.ulpOfOne"
+        ]
+      },
+      "text": [
+        "self.backgroundColor = .clear"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.pane.tabs",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoPaneContainerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.tabsBackgroundView.update(size: tabContainerFrame.size, cornerRadius: tabContainerFrame.height * 0.5, isDark: presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .panel), transition: ComponentTransition(transition))",
+        "occurrence": 1
+      },
+      "text": [
+        "self.tabsBackgroundView.update(size: tabContainerFrame.size, cornerRadius: tabContainerFrame.height * 0.5, isDark: presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .clear), transition: ComponentTransition(transition))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.more.ghost",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenPerformButtonAction.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "let headerButtons = Set(peerInfoHeaderButtons(peer: peer, cachedData: data.cachedData, isOpenedFromChat: strongSelf.isOpenedFromChat, isExpanded: true, videoCallsEnabled: strongSelf.videoCallsEnabled, isSecretChat: strongSelf.peerId.namespace == Namespaces.Peer.SecretChat, isContact: strongSelf.data?.isContact ?? false, threadInfo: strongSelf.data?.threadData?.info))",
+        "occurrence": 1
+      },
+      "text": [
+        "items.append(contentsOf: mategramGhostMenuItems(context: strongSelf.context, peer: peer, presentationData: presentationData))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.music.build",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/PhotoResources\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//submodules/MusicAlbumArtResources:MusicAlbumArtResources\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.music.height",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let musicHeight: CGFloat = hasBackground || self.isAvatarExpanded ? 24.0 : 16.0",
+        "occurrence": 1
+      },
+      "text": [
+        "let musicHeight: CGFloat = 80.0"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.music.mask",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "musicBackground.backgroundColor = .white",
+        "occurrence": 1
+      },
+      "text": [
+        "musicBackground.backgroundColor = .clear"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.music.icon",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "component: AnyComponent(BundleIconComponent(name: \"Media Editor/SmallAudio\", tintColor: isOverlay ? .white : presentationData.theme.list.itemAccentColor))",
+        "occurrence": 1
+      },
+      "text": [
+        "component: AnyComponent(MategramEmptyComponent())"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.music.card",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "component: AnyComponent(MarqueeComponent(attributedText: musicString, maxWidth: max(1.0, musicBandWidth - 96.0)))",
+        "occurrence": 1
+      },
+      "text": [
+        "component: AnyComponent(MategramMusicCardComponent(context: self.context, file: currentSavedMusic, title: track ?? \"\", artist: artist, width: max(1.0, musicBandWidth - 8.0)))"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.music.arrow",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "component: AnyComponent(BundleIconComponent(name: \"Item List/InlineTextRightArrow\", tintColor: stripSecondaryColor))",
+        "before": [
+          "id: \"arrow\","
+        ]
+      },
+      "text": [
+        "component: AnyComponent(MategramEmptyComponent())"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.bglass.import",
+      "file": "submodules/ChatMessageBackground/Sources/ChatMessageBackground.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore",
+        "import ComponentFlow",
+        "import GlassBackgroundComponent"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.bglass.build",
+      "file": "submodules/ChatMessageBackground/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/AsyncDisplayKit:AsyncDisplayKit\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\",",
+        "\"//submodules/ComponentFlow:ComponentFlow\",",
+        "\"//submodules/TelegramUI/Components/GlassBackgroundComponent\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.bglass.fn",
+      "file": "submodules/ChatMessageBackground/Sources/ChatMessageBackground.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "public func setMaskMode(_ maskMode: Bool) {",
+        "occurrence": 1
+      },
+      "text": [
+        "private var mategramGlassView: GlassBackgroundView?",
+        "",
+        "private func mategramUpdateGlass(size: CGSize) {",
+        "    guard self.isNodeLoaded else {",
+        "        return",
+        "    }",
+        "    if MategramSettings.shared.bool(.glassMessages) && self.maskMode != true && size.width > 1.0 && size.height > 1.0 {",
+        "        let glass: GlassBackgroundView",
+        "        if let current = self.mategramGlassView {",
+        "            glass = current",
+        "        } else {",
+        "            glass = GlassBackgroundView()",
+        "            glass.isUserInteractionEnabled = false",
+        "            self.view.insertSubview(glass, at: 0)",
+        "            self.mategramGlassView = glass",
+        "        }",
+        "        glass.frame = CGRect(origin: CGPoint(), size: size)",
+        "        glass.update(size: size, cornerRadius: min(17.0, size.height * 0.5), isDark: self.view.traitCollection.userInterfaceStyle != .light, tintColor: .init(kind: .clear), transition: .immediate)",
+        "        self.imageView?.alpha = 0.0",
+        "        self.outlineImageNode.alpha = 0.0",
+        "    } else if let glass = self.mategramGlassView {",
+        "        glass.removeFromSuperview()",
+        "        self.mategramGlassView = nil",
+        "        self.imageView?.alpha = 1.0",
+        "        self.outlineImageNode.alpha = 1.0",
+        "    }",
+        "}",
+        ""
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.bglass.l1",
+      "file": "submodules/ChatMessageBackground/Sources/ChatMessageBackground.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.updateTearMask(size: size, animation: .None)",
+        "occurrence": 1
+      },
+      "text": [
+        "self.mategramUpdateGlass(size: size)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.bglass.l2",
+      "file": "submodules/ChatMessageBackground/Sources/ChatMessageBackground.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.updateTearMask(size: size, animation: transition)",
+        "occurrence": 1
+      },
+      "text": [
+        "self.mategramUpdateGlass(size: size)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.iglass.import",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/Sources/ChatMessageActionButtonsNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.iglass.build",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/SSignalKit/SwiftSignalKit\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m8.iglass.on",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageActionButtonsNode/Sources/ChatMessageActionButtonsNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let isGlass = !bubbleCorners.bubbleMode",
+        "occurrence": 1
+      },
+      "text": [
+        "let isGlass = !bubbleCorners.bubbleMode || MategramSettings.shared.bool(.glassInlineButtons)"
       ],
       "required": true
     }

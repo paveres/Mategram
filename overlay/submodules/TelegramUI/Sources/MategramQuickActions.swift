@@ -32,25 +32,28 @@ private final class MategramQuickActionButton: UIControl {
     override func layoutSubviews() {
         super.layoutSubviews()
         let size = self.bounds.size
-        self.iconView.frame = CGRect(x: 0.0, y: 10.0, width: size.width, height: 26.0)
-        self.label.frame = CGRect(x: 4.0, y: 40.0, width: max(0.0, size.width - 8.0), height: 18.0)
+        self.iconView.frame = CGRect(x: 0.0, y: 10.0, width: size.width, height: 32.0)
+        self.label.frame = CGRect(x: 4.0, y: 46.0, width: max(0.0, size.width - 8.0), height: 18.0)
     }
 }
 
 final class MategramQuickActionsItem: ContextMenuCustomItem {
     let items: [ContextMenuActionItem]
+    let symbols: [String]
 
-    init(items: [ContextMenuActionItem]) {
+    init(items: [ContextMenuActionItem], symbols: [String]) {
         self.items = items
+        self.symbols = symbols
     }
 
     func node(presentationData: PresentationData, getController: @escaping () -> ContextControllerProtocol?, actionSelected: @escaping (ContextMenuActionResult) -> Void) -> ContextMenuCustomNode {
-        return MategramQuickActionsNode(presentationData: presentationData, items: self.items, getController: getController, actionSelected: actionSelected)
+        return MategramQuickActionsNode(presentationData: presentationData, items: self.items, symbols: self.symbols, getController: getController, actionSelected: actionSelected)
     }
 }
 
 private final class MategramQuickActionsNode: ASDisplayNode, ContextMenuCustomNode {
     private let items: [ContextMenuActionItem]
+    private let symbols: [String]
     private let getController: () -> ContextControllerProtocol?
     private let actionSelected: (ContextMenuActionResult) -> Void
     private var presentationData: PresentationData
@@ -64,9 +67,10 @@ private final class MategramQuickActionsNode: ASDisplayNode, ContextMenuCustomNo
         return false
     }
 
-    init(presentationData: PresentationData, items: [ContextMenuActionItem], getController: @escaping () -> ContextControllerProtocol?, actionSelected: @escaping (ContextMenuActionResult) -> Void) {
+    init(presentationData: PresentationData, items: [ContextMenuActionItem], symbols: [String], getController: @escaping () -> ContextControllerProtocol?, actionSelected: @escaping (ContextMenuActionResult) -> Void) {
         self.presentationData = presentationData
         self.items = items
+        self.symbols = symbols
         self.getController = getController
         self.actionSelected = actionSelected
         super.init()
@@ -93,7 +97,11 @@ private final class MategramQuickActionsNode: ASDisplayNode, ContextMenuCustomNo
             } else {
                 color = self.presentationData.theme.contextMenu.primaryColor
             }
-            button.iconView.image = item.icon(self.presentationData.theme)?.withRenderingMode(.alwaysTemplate)
+            if index < self.symbols.count, let symbolImage = UIImage(systemName: self.symbols[index], withConfiguration: UIImage.SymbolConfiguration(pointSize: 24.0, weight: .medium)) {
+                button.iconView.image = symbolImage.withRenderingMode(.alwaysTemplate)
+            } else {
+                button.iconView.image = item.icon(self.presentationData.theme)?.withRenderingMode(.alwaysTemplate)
+            }
             button.iconView.tintColor = color
             button.label.text = item.text
             button.label.font = Font.regular(12.0)
@@ -112,7 +120,7 @@ private final class MategramQuickActionsNode: ASDisplayNode, ContextMenuCustomNo
 
     func updateLayout(constrainedWidth: CGFloat, constrainedHeight: CGFloat) -> (CGSize, (CGSize, ContainedViewLayoutTransition) -> Void) {
         let width = max(constrainedWidth, 220.0)
-        let size = CGSize(width: min(width, 280.0), height: 64.0)
+        let size = CGSize(width: min(width, 280.0), height: 72.0)
         return (size, { [weak self] size, _ in
             guard let self else {
                 return
@@ -152,12 +160,18 @@ func mategramQuickActions(_ actions: [ContextMenuItem], strings: PresentationStr
             rest.append(item)
         }
     }
+    let symbolByText: [String: String] = [
+        strings.Conversation_ContextMenuSelect: "checkmark.circle.fill",
+        strings.Conversation_ContextMenuCopy: "doc.on.doc.fill",
+        strings.Conversation_ContextMenuDelete: "trash.fill"
+    ]
     let quick = order.compactMap { found[$0] }
+    let symbols = quick.map { symbolByText[$0.text] ?? "circle.fill" }
     if quick.isEmpty {
         return actions
     }
     while let first = rest.first, case .separator = first {
         rest.removeFirst()
     }
-    return [.custom(MategramQuickActionsItem(items: quick), false)] + rest
+    return [.custom(MategramQuickActionsItem(items: quick, symbols: symbols), false)] + rest
 }

@@ -93,6 +93,8 @@ public enum MategramKey: String, CaseIterable {
     case ghostPrivateOnly
     case externalVideoPlayer
     case systemShare
+    case glassMessages
+    case glassInlineButtons
 
     public var defaultValue: Bool {
         switch self {
