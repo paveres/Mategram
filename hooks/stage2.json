@@ -2615,6 +2615,63 @@
         "mategramInstallCustomFont()"
       ],
       "required": true
+    },
+    {
+      "id": "m9.fade.import",
+      "file": "submodules/MediaPlayer/Sources/MediaPlayer.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.fade.build",
+      "file": "submodules/MediaPlayer/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/TelegramCore:TelegramCore\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.fade.apply",
+      "file": "submodules/MediaPlayer/Sources/MediaPlayer.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "let _ = self.playerStatusValue.swap(status)",
+        "before": [
+          "self.playerStatus.set(.single(status))"
+        ],
+        "after": [
+          "}",
+          "",
+          "if performActionAtEndNow {"
+        ]
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.musicCrossfade), self.fadeTimer == nil, duration > 60.0, case .playing = playbackStatus {",
+        "    let mategramFade = Double(MategramSettings.shared.value(.crossfadeSeconds))",
+        "    var mategramLevel = 1.0",
+        "    let mategramRemaining = duration - statusTimestamp",
+        "    if mategramRemaining < mategramFade {",
+        "        mategramLevel = max(0.0, mategramRemaining / mategramFade)",
+        "    }",
+        "    if statusTimestamp < mategramFade {",
+        "        mategramLevel = min(mategramLevel, max(0.05, statusTimestamp / mategramFade))",
+        "    }",
+        "    self.audioRenderer?.renderer.setVolume(mategramLevel)",
+        "}"
+      ],
+      "required": true
     }
   ]
 }

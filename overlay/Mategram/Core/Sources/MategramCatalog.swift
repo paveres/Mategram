@@ -38,8 +38,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.chat, .english): return "Messages"
         case (.input, .russian): return "Ввод"
         case (.input, .english): return "Input"
-        case (.voice, .russian): return "Голосовые"
-        case (.voice, .english): return "Voice"
+        case (.voice, .russian): return "Голосовые и музыка"
+        case (.voice, .english): return "Voice and music"
         case (.media, .russian): return "Медиа и камера"
         case (.media, .english): return "Media and camera"
         case (.calls, .russian): return "Звонки"
@@ -435,6 +435,9 @@ public enum MategramCatalog {
         MategramOption(key: .appleSpeech, section: .voice, titleRu: "Расшифровка без Premium", titleEn: "Transcription without Premium",
             footerRu: "Голосовые и кружки расшифровываются на устройстве через Apple Speech.",
             footerEn: "Voice and video messages are transcribed on device with Apple Speech."),
+        MategramOption(key: .musicCrossfade, section: .voice, titleRu: "Кроссфейд музыки", titleEn: "Music crossfade",
+            footerRu: "Треки длиннее минуты плавно затухают в конце и плавно начинаются.",
+            footerEn: "Tracks longer than a minute fade out at the end and fade in at the start."),
         MategramOption(key: .builtInMic, section: .voice, titleRu: "Встроенный микрофон", titleEn: "Built-in microphone",
             footerRu: "Голосовые и кружки пишутся микрофоном телефона, даже если подключены наушники.",
             footerEn: "Voice and video messages use the phone microphone even with headphones connected."),
