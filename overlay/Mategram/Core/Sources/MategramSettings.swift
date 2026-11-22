@@ -89,6 +89,8 @@ public enum MategramKey: String, CaseIterable {
     case hideEmojiStatus
     case hideProfileColor
     case backCameraRound
+    case hideBlockedMessages
+    case ghostPrivateOnly
 
     public var defaultValue: Bool {
         switch self {
@@ -201,4 +203,8 @@ public enum MategramChatRelay {
 
 public enum MategramAttach {
     public static var forced: String?
+}
+
+public enum MategramBlocked {
+    public static var ids: Set<Int64> = []
 }

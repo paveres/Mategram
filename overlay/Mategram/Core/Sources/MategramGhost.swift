@@ -45,14 +45,24 @@ public enum MategramGhost {
         allowedReads.remove(peer)
     }
 
-    public static func holdsReadReceipt(peer: Int64? = nil) -> Bool {
+    private static func skips(group: Bool) -> Bool {
+        return group && MategramSettings.shared.bool(.ghostPrivateOnly)
+    }
+
+    public static func holdsReadReceipt(peer: Int64? = nil, group: Bool = false) -> Bool {
+        if skips(group: group) {
+            return false
+        }
         if let peer, isException(peer: peer) || allowedReads.contains(peer) {
             return false
         }
         return active(.ghostRead)
     }
 
-    public static func holdsTyping(peer: Int64? = nil) -> Bool {
+    public static func holdsTyping(peer: Int64? = nil, group: Bool = false) -> Bool {
+        if skips(group: group) {
+            return false
+        }
         if let peer, isException(peer: peer) {
             return false
         }
@@ -76,8 +86,8 @@ public enum MategramGhost {
         return settings.bool(.ghostMode) && settings.bool(.ghostAlwaysOnline) && !settings.bool(.ghostOnline)
     }
 
-    public static func holdsActivity(kind: Int, peer: Int64) -> Bool {
-        if isException(peer: peer) {
+    public static func holdsActivity(kind: Int, peer: Int64, group: Bool = false) -> Bool {
+        if skips(group: group) || isException(peer: peer) {
             return false
         }
         switch kind {

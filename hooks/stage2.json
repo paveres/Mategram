@@ -727,7 +727,7 @@
         "    default:",
         "        mategramKind = 0",
         "    }",
-        "    if MategramGhost.holdsActivity(kind: mategramKind, peer: peerId.toInt64()) {",
+        "    if MategramGhost.holdsActivity(kind: mategramKind, peer: peerId.toInt64(), group: peerId.namespace == Namespaces.Peer.CloudGroup || peerId.namespace == Namespaces.Peer.CloudChannel) {",
         "        return .complete()",
         "    }",
         "}"
@@ -942,7 +942,8 @@
         "        return",
         "    }",
         "    self.interfaceInteraction?.setupEditMessage(messageId, { _ in })",
-        "}"
+        "}",
+        "mategramLoadBlocked(context: self.context)"
       ],
       "required": true
     },
@@ -1658,6 +1659,34 @@
       },
       "text": [
         "let isFrontPosition = !MategramSettings.shared.bool(.backCameraRound)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.blocked.import",
+      "file": "submodules/TelegramUI/Sources/ChatHistoryEntriesForView.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.blocked.skip",
+      "file": "submodules/TelegramUI/Sources/ChatHistoryEntriesForView.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if pendingRemovedMessages.contains(message.id) {",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.hideBlockedMessages), message.flags.contains(.Incoming), let mategramAuthor = message.author?.id, mategramAuthor != message.id.peerId, MategramBlocked.ids.contains(mategramAuthor.toInt64()) {",
+        "    continue",
+        "}"
       ],
       "required": true
     }
