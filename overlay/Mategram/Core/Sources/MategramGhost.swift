@@ -67,6 +67,9 @@ public enum MategramGhost {
         if let peer, isException(peer: peer) {
             return false
         }
+        if active(.ghostOnline) && MategramSettings.shared.bool(.ghostTypingFollowsOnline) {
+            return true
+        }
         return active(.ghostTyping)
     }
 
@@ -94,6 +97,9 @@ public enum MategramGhost {
     public static func holdsActivity(kind: Int, peer: Int64, group: Bool = false) -> Bool {
         if skips(group: group) || isException(peer: peer) {
             return false
+        }
+        if active(.ghostOnline) && MategramSettings.shared.bool(.ghostTypingFollowsOnline) && kind != 0 {
+            return true
         }
         switch kind {
         case 1:
