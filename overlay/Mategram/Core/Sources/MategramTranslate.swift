@@ -37,4 +37,45 @@ public enum MategramGoogleTranslate {
         task.resume()
         return task
     }
+
+    public static func translateAll(_ texts: [String], toLang: String, completion: @escaping ([String?]) -> Void) {
+        if texts.isEmpty {
+            completion([])
+            return
+        }
+        let box = MategramTranslateBox(count: texts.count)
+        let group = DispatchGroup()
+        for (index, text) in texts.enumerated() {
+            group.enter()
+            translate(text: text, toLang: toLang, completion: { translated in
+                box.set(index, translated)
+                group.leave()
+            })
+        }
+        group.notify(queue: .main) {
+            completion(box.values())
+        }
+    }
+}
+
+private final class MategramTranslateBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storage: [String?]
+
+    init(count: Int) {
+        self.storage = Array(repeating: nil, count: count)
+    }
+
+    func set(_ index: Int, _ value: String?) {
+        self.lock.lock()
+        self.storage[index] = value
+        self.lock.unlock()
+    }
+
+    func values() -> [String?] {
+        self.lock.lock()
+        let result = self.storage
+        self.lock.unlock()
+        return result
+    }
 }

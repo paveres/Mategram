@@ -2334,6 +2334,235 @@
         "if arguments.associatedData.isPremium || arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost || MategramSettings.shared.bool(.appleSpeech) {"
       ],
       "required": true
+    },
+    {
+      "id": "m9.ctr.i1",
+      "file": "submodules/TranslateUI/Sources/ChatTranslation.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.i2",
+      "file": "submodules/TranslateUI/Sources/Translate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.i3",
+      "file": "submodules/TelegramUI/Sources/ChatControllerContentData.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.i4",
+      "file": "submodules/TelegramUI/Sources/Chat/ChatControllerLoadDisplayNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.i5",
+      "file": "submodules/TelegramUI/Sources/ChatHistoryListNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.i6",
+      "file": "submodules/TelegramUI/Components/TranslateHeaderPanelComponent/Sources/ChatTranslationPanelNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.b1",
+      "file": "submodules/TranslateUI/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.b2",
+      "file": "submodules/TelegramUI/Components/TranslateHeaderPanelComponent/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/Display\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.gate",
+      "file": "submodules/TranslateUI/Sources/ChatTranslation.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if !settings.translateChats && !autoTranslateEnabled {",
+        "occurrence": 1
+      },
+      "text": [
+        "if !settings.translateChats && !autoTranslateEnabled && !MategramSettings.shared.bool(.chatTranslateFree) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.local",
+      "file": "submodules/TranslateUI/Sources/ChatTranslation.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "var enableLocalIfPossible = false",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.chatTranslateFree) {",
+        "    enableLocalIfPossible = true",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.can",
+      "file": "submodules/TranslateUI/Sources/Translate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "public func canTranslateChats(context: AccountContext) -> Bool {",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.chatTranslateFree) {",
+        "    return true",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.state",
+      "file": "submodules/TelegramUI/Sources/ChatControllerContentData.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if (isPremium || maybeSuggestPremium || hasAutoTranslate) && !isHidden {",
+        "occurrence": 1
+      },
+      "text": [
+        "if (isPremium || maybeSuggestPremium || hasAutoTranslate || MategramSettings.shared.bool(.chatTranslateFree)) && !isHidden {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.list",
+      "file": "submodules/TelegramUI/Sources/ChatHistoryListNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if let translationState, (isPremium || autoTranslate)  && translationState.isEnabled {",
+        "occurrence": 1
+      },
+      "text": [
+        "if let translationState, (isPremium || autoTranslate || MategramSettings.shared.bool(.chatTranslateFree))  && translationState.isEnabled {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.service",
+      "file": "submodules/TelegramUI/Sources/Chat/ChatControllerLoadDisplayNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if #available(iOS 18.0, *) {",
+        "after": [
+          "if engineExperimentalInternalTranslationService == nil, let hostView = self.context.sharedContext.mainWindow?.hostView {"
+        ]
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.chatTranslateFree) {",
+        "    engineExperimentalInternalTranslationService = MategramTranslationService.shared",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.p1",
+      "file": "submodules/TelegramUI/Components/TranslateHeaderPanelComponent/Sources/ChatTranslationPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var translationAvailable = isPremium",
+        "occurrence": 1
+      },
+      "text": [
+        "var translationAvailable = isPremium || MategramSettings.shared.bool(.chatTranslateFree)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.p2",
+      "file": "submodules/TelegramUI/Components/TranslateHeaderPanelComponent/Sources/ChatTranslationPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "var translationAvailable = isPremium",
+        "occurrence": 2
+      },
+      "text": [
+        "var translationAvailable = isPremium || MategramSettings.shared.bool(.chatTranslateFree)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctr.p3",
+      "file": "submodules/TelegramUI/Components/TranslateHeaderPanelComponent/Sources/ChatTranslationPanelNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if info.isPremium {",
+        "occurrence": 1
+      },
+      "text": [
+        "if info.isPremium || MategramSettings.shared.bool(.chatTranslateFree) {"
+      ],
+      "required": true
     }
   ]
 }

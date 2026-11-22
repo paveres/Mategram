@@ -102,6 +102,7 @@ public enum MategramKey: String, CaseIterable {
     case ramMonitor
     case ghostChatButtons
     case appleSpeech
+    case chatTranslateFree
 
     public var defaultValue: Bool {
         switch self {
