@@ -183,11 +183,11 @@ jobs:
             echo
             echo "Сборка для iPhone на основе Telegram ${UPSTREAM_TAG#release-}."
             echo
-            echo "Изменения"
+            echo "### Изменения"
             echo
-            echo "$CHANGES" | tac | sed 's/^/* /'
+            echo "$CHANGES" | grep -v -i "сборк" | awk '!seen[$0]++' | sed 's/^/* /'
             echo
-            echo "Установка"
+            echo "### Установка"
             echo
             echo "* Скачайте файл \`Mategram_$VERSION.ipa\`."
             echo "* Откройте его в Sideloadly и войдите под своим Apple ID. Приложение подписывается вашим аккаунтом."
