@@ -126,6 +126,9 @@ public enum MategramKey: String, CaseIterable {
     case menuSelectFromUser
     case noStorySwipe
     case hideShareToStory
+    case glassDarker
+    case transparentMessages
+    case semiTransparentMessages
 
     public var defaultValue: Bool {
         switch self {

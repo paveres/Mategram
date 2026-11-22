@@ -148,7 +148,7 @@ public extension MategramCatalog {
         .fastDownload, .fastUpload, .builtInMic, .swipeUpCamera, .swipeUpEditor, .sessionBackup,
         .chatTranslateFree, .appleSpeech, .mutedNameColors, .smallStickers, .hideChatListStatus,
         .hideEmojiStatus, .hideProfileColor, .hideProfileGifts, .proxyLocalDNS, .autoProxy, .ramMonitor,
-        .disableChatSwipes, .hideProxySponsor, .hideSponsored, .alwaysHD, .wideChannelPosts, .noDeleteEffect, .hideStickerTime, .noDeleteSwipe
+        .disableChatSwipes, .hideProxySponsor, .hideSponsored, .alwaysHD, .wideChannelPosts, .noDeleteEffect, .hideStickerTime, .noDeleteSwipe, .glassDarker, .transparentMessages, .semiTransparentMessages
     ]
 
     static func valueOption(for key: MategramKey) -> MategramValueOption? {
