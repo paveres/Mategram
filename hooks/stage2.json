@@ -1689,6 +1689,53 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m7.extvideo.import",
+      "file": "submodules/GalleryUI/Sources/Items/UniversalVideoGalleryItem.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.extvideo.build",
+      "file": "submodules/GalleryUI/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/Postbox:Postbox\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.extvideo.item",
+      "file": "submodules/GalleryUI/Sources/Items/UniversalVideoGalleryItem.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if let peer, let (message, _, _) = strongSelf.contentInfo(), canSendMessagesToPeer(peer) {",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.externalVideoPlayer), let (message, _, _) = strongSelf.contentInfo(), !message.isCopyProtected() && !item.peerIsCopyProtected && message.paidContent == nil, message.media.contains(where: { $0 is TelegramMediaFile }) {",
+        "    items.append(.action(ContextMenuActionItem(text: strongSelf.presentationData.strings.Conversation_FileOpenIn, icon: { theme in generateTintedImage(image: UIImage(bundleImageName: \"Chat/Context Menu/Share\"), color: theme.contextMenu.primaryColor) }, action: { [weak self] _, f in",
+        "        f(.default)",
+        "        guard let self else {",
+        "            return",
+        "        }",
+        "        mategramOpenVideoExternally(context: self.context, message: message, from: self.view.window?.rootViewController)",
+        "    })))",
+        "}"
+      ],
+      "required": true
     }
   ]
 }

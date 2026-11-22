@@ -91,6 +91,7 @@ public enum MategramKey: String, CaseIterable {
     case backCameraRound
     case hideBlockedMessages
     case ghostPrivateOnly
+    case externalVideoPlayer
 
     public var defaultValue: Bool {
         switch self {
