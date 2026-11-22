@@ -3319,6 +3319,99 @@
         "if canDelete && !MategramSettings.shared.bool(.noDeleteSwipe) {"
       ],
       "required": true
+    },
+    {
+      "id": "m10.emoji.kbimport",
+      "file": "submodules/TelegramUI/Components/ChatEntityKeyboardInputNode/Sources/ChatEntityKeyboardInputNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.emoji.kbbuild",
+      "file": "submodules/TelegramUI/Components/ChatEntityKeyboardInputNode/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.emoji.kbdefault",
+      "file": "submodules/TelegramUI/Components/ChatEntityKeyboardInputNode/Sources/ChatEntityKeyboardInputNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.defaultToEmojiTab = defaultToEmojiTab",
+        "occurrence": 1
+      },
+      "text": [
+        "self.defaultToEmojiTab = MategramSettings.shared.bool(.forceEmojiTab) ? true : defaultToEmojiTab"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.emoji.icimport",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceInputContexts.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.emoji.icon",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceInputContexts.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if stickersEnabled {",
+        "after": [
+          "accessoryItems.append(.input(isEnabled: true, inputMode: stickersAreEmoji ? .emoji : .stickers))"
+        ]
+      },
+      "text": [
+        "if stickersEnabled, !MategramSettings.shared.bool(.forceEmojiTab) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.nextch.1",
+      "file": "submodules/TelegramUI/Sources/ChatControllerContentData.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if strongSelf.nextChannelToReadDisposable == nil, let peerId = chatLocation.peerId, let customChatNavigationStack {",
+        "occurrence": 1
+      },
+      "text": [
+        "if strongSelf.nextChannelToReadDisposable == nil, let peerId = chatLocation.peerId, let customChatNavigationStack, !MategramSettings.shared.bool(.noNextChannel) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.nextch.2",
+      "file": "submodules/TelegramUI/Sources/ChatControllerContentData.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "} else if isRegularChat, strongSelf.nextChannelToReadDisposable == nil {",
+        "occurrence": 1
+      },
+      "text": [
+        "} else if isRegularChat, strongSelf.nextChannelToReadDisposable == nil, !MategramSettings.shared.bool(.noNextChannel) {"
+      ],
+      "required": true
     }
   ]
 }

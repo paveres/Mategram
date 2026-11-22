@@ -121,6 +121,8 @@ public enum MategramKey: String, CaseIterable {
     case noDeleteEffect
     case hideStickerTime
     case noDeleteSwipe
+    case forceEmojiTab
+    case noNextChannel
 
     public var defaultValue: Bool {
         switch self {
