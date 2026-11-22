@@ -42,8 +42,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.voice, .english): return "Voice and music"
         case (.media, .russian): return "Медиа и камера"
         case (.media, .english): return "Media and camera"
-        case (.calls, .russian): return "Звонки"
-        case (.calls, .english): return "Calls"
+        case (.calls, .russian): return "Звонки и уведомления"
+        case (.calls, .english): return "Calls and notifications"
         case (.network, .russian): return "Сеть"
         case (.network, .english): return "Network"
         case (.time, .russian): return "Время и статус"
@@ -345,6 +345,12 @@ public enum MategramCatalog {
         MategramOption(key: .hideTabTitles, section: .tabs, titleRu: "Без подписей вкладок", titleEn: "No tab titles",
             footerRu: "Внизу остаются только значки вкладок, без названий.",
             footerEn: "Only the tab icons stay at the bottom, without names."),
+        MategramOption(key: .mutePinnedNotifications, section: .calls, titleRu: "Без уведомлений о закреплённых", titleEn: "No pinned notifications",
+            footerRu: "Сообщения «закрепил(а)» не показывают уведомление в приложении.",
+            footerEn: "«Pinned a message» updates do not show an in-app notification."),
+        MategramOption(key: .muteMentionNotifications, section: .calls, titleRu: "Без уведомлений об упоминаниях", titleEn: "No mention notifications",
+            footerRu: "Упоминания в группах не показывают уведомление в приложении.",
+            footerEn: "Mentions in groups do not show an in-app notification."),
         MategramOption(key: .callsTcp, section: .calls, titleRu: "Звонки через TCP", titleEn: "TCP calls",
             footerRu: "Разрешает TCP для звонков, если UDP блокируется.",
             footerEn: "Allows TCP for calls when UDP is blocked."),

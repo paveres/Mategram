@@ -2726,6 +2726,25 @@
         "mategramStartAutoProxy(context: self.context)"
       ],
       "required": true
+    },
+    {
+      "id": "m9.notif.filter",
+      "file": "submodules/TelegramUI/Sources/ApplicationContext.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "}",
+        "before": [
+          "return messageList.filter { item in",
+          "guard let message = item.0.first else {",
+          "return false"
+        ]
+      },
+      "text": [
+        "if mategramSkipsNotification(EngineMessage(message)) {",
+        "    return false",
+        "}"
+      ],
+      "required": true
     }
   ]
 }
