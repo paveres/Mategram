@@ -2254,6 +2254,21 @@
         "mategramStartRamMonitor(hostView: hostView.containerView)"
       ],
       "required": true
+    },
+    {
+      "id": "m9.chat.ghost",
+      "file": "submodules/TelegramUI/Sources/ChatController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "})))",
+        "before": [
+          "self?.navigationButtonAction(.openChatInfo(expandAvatar: true, section: nil))"
+        ]
+      },
+      "text": [
+        "items.append(contentsOf: mategramChatGhostItems(context: context, peer: EnginePeer(peer), presentationData: strongSelf.presentationData))"
+      ],
+      "required": true
     }
   ]
 }
