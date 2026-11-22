@@ -140,6 +140,8 @@ private final class MategramSettingsArguments {
     var openValue: (MategramValueKey) -> Void = { _ in }
     var setValue: (MategramValueKey, Int) -> Void = { _, _ in }
     var setValueSilently: (MategramValueKey, Int) -> Void = { _, _ in }
+    var openFont: () -> Void = {}
+    var setFont: (String) -> Void = { _ in }
 
     init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }, backup: @escaping (Bool) -> Void = { _ in }) {
         self.toggle = toggle
@@ -161,6 +163,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case valueRow(index: Int32, section: Int32, key: MategramValueKey, title: String, value: String)
     case valuePreset(index: Int32, section: Int32, key: MategramValueKey, value: Int, title: String, checked: Bool)
     case valueCustom(index: Int32, section: Int32, key: MategramValueKey, text: String, placeholder: String)
+    case fontRow(index: Int32, section: Int32, title: String, value: String)
+    case fontOption(index: Int32, section: Int32, family: String, title: String, checked: Bool)
 
     var section: ItemListSectionId {
         switch self {
@@ -185,6 +189,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .valuePreset(_, section, _, _, _, _):
             return section
         case let .valueCustom(_, section, _, _, _):
+            return section
+        case let .fontRow(_, section, _, _):
+            return section
+        case let .fontOption(_, section, _, _, _):
             return section
         }
     }
@@ -212,6 +220,10 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .valuePreset(index, _, _, _, _, _):
             return index
         case let .valueCustom(index, _, _, _, _):
+            return index
+        case let .fontRow(index, _, _, _):
+            return index
+        case let .fontOption(index, _, _, _, _):
             return index
         }
     }
@@ -266,6 +278,14 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
                 }
             }, action: {
             })
+        case let .fontRow(_, section, title, value):
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: title, label: value, sectionId: section, style: .blocks, action: {
+                arguments.openFont()
+            })
+        case let .fontOption(_, section, family, title, checked):
+            return ItemListCheckboxItem(presentationData: presentationData, systemStyle: .glass, title: title, style: .left, checked: checked, zeroSeparatorInsets: false, sectionId: section, action: {
+                arguments.setFont(family)
+            })
         }
     }
 }
@@ -297,6 +317,15 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
     var sectionId: Int32 = 0
     if section == .liquidGlass {
         entries.append(.preview(section: 0, glass: MategramSettings.shared.bool(.glassMessages)))
+    }
+    if section == .appearance {
+        let family = settings.text(.customFont)
+        let systemTitle = language == .russian ? "Системный" : "System"
+        sectionId += 1
+        index += 1
+        entries.append(.fontRow(index: index, section: sectionId, title: language == .russian ? "Шрифт" : "Font", value: family.isEmpty ? systemTitle : family))
+        index += 1
+        entries.append(.footer(index: index, section: sectionId, text: language == .russian ? "Шрифт всего приложения. Применяется после перезапуска." : "Font of the whole app. Applies after a restart."))
     }
     for option in MategramCatalog.options(in: section) {
         sectionId += 1
@@ -369,6 +398,38 @@ private func mategramValueController(context: AccountContext, key: MategramValue
     return ItemListController(context: context, state: signal)
 }
 
+private func mategramFontController(context: AccountContext, changed: @escaping () -> Void) -> ViewController {
+    let refresh = ValuePromise<Int>(0, ignoreRepeated: false)
+    var counter = 0
+    let arguments = MategramSettingsArguments(toggle: { _, _ in
+    }, openSection: { _ in
+    })
+    arguments.setFont = { family in
+        MategramSettings.shared.setText(family, for: .customFont)
+        counter += 1
+        refresh.set(counter)
+        changed()
+    }
+    let families = UIFont.familyNames.sorted()
+    let signal = combineLatest(queue: .mainQueue(), context.sharedContext.presentationData, refresh.get())
+    |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
+        let current = MategramSettings.shared.text(.customFont)
+        var entries: [MategramSettingsEntry] = []
+        var index: Int32 = 0
+        index += 1
+        entries.append(.fontOption(index: index, section: 0, family: "", title: language == .russian ? "Системный" : "System", checked: current.isEmpty))
+        for family in families {
+            index += 1
+            entries.append(.fontOption(index: index, section: 1, family: family, title: family, checked: family == current))
+        }
+        let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(language == .russian ? "Шрифт" : "Font"), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
+        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks, animateChanges: false)
+        return (controllerState, (listState, arguments))
+    }
+    return ItemListController(context: context, state: signal)
+}
+
 private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromise<Int>, arguments: MategramSettingsArguments, section: MategramSection?) -> Signal<(ItemListControllerState, (ItemListNodeState, Any)), NoError> {
     return combineLatest(queue: .mainQueue(),
         context.sharedContext.presentationData,
@@ -408,6 +469,12 @@ private func mategramSectionController(context: AccountContext, section: Mategra
         let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
         let title = MategramCatalog.valueOptions.first(where: { $0.key == key })?.title(language) ?? ""
         pushImpl?(mategramValueController(context: context, key: key, title: title, changed: {
+            counter += 1
+            refresh.set(counter)
+        }))
+    }
+    arguments.openFont = {
+        pushImpl?(mategramFontController(context: context, changed: {
             counter += 1
             refresh.set(counter)
         }))

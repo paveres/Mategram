@@ -2,6 +2,7 @@ import Foundation
 
 public enum MategramSection: Int, CaseIterable {
     case ghost
+    case appearance
     case liquidGlass
     case profile
     case tabs
@@ -21,6 +22,8 @@ public enum MategramSection: Int, CaseIterable {
         switch (self, language) {
         case (.ghost, .russian): return "Режим призрака"
         case (.ghost, .english): return "Ghost mode"
+        case (.appearance, .russian): return "Внешний вид"
+        case (.appearance, .english): return "Appearance"
         case (.liquidGlass, .russian): return "Liquid Glass"
         case (.liquidGlass, .english): return "Liquid Glass"
         case (.profile, .russian): return "Профили"
@@ -56,6 +59,8 @@ public enum MategramSection: Int, CaseIterable {
         switch (self, language) {
         case (.ghost, .russian): return "Прочтение, печать, онлайн, истории"
         case (.ghost, .english): return "Read, typing, online, stories"
+        case (.appearance, .russian): return "Шрифт приложения"
+        case (.appearance, .english): return "App font"
         case (.liquidGlass, .russian): return "Стекло на сообщениях и кнопках"
         case (.liquidGlass, .english): return "Glass on messages and buttons"
         case (.profile, .russian): return "ID, датацентр, регистрация"
@@ -90,6 +95,7 @@ public enum MategramSection: Int, CaseIterable {
     public var symbol: String {
         switch self {
         case .ghost: return "moon"
+        case .appearance: return "textformat"
         case .liquidGlass: return "drop"
         case .profile: return "person.crop.circle"
         case .tabs: return "rectangle.bottomthird.inset.filled"
@@ -321,6 +327,9 @@ public enum MategramCatalog {
         MategramOption(key: .hideAllChatsTab, section: .folders, titleRu: "Скрыть «Все чаты»", titleEn: "Hide «All Chats»",
             footerRu: "Убирает папку «Все чаты», если есть другие папки.",
             footerEn: "Removes the «All Chats» folder when other folders exist."),
+        MategramOption(key: .compactFolders, section: .folders, titleRu: "Компактные папки", titleEn: "Compact folders",
+            footerRu: "Меньше отступы между названиями папок, больше папок помещается.",
+            footerEn: "Smaller gaps between folder names so more folders fit."),
         MategramOption(key: .rememberFolder, section: .folders, titleRu: "Запоминать папку", titleEn: "Remember folder",
             footerRu: "При запуске открывается последняя выбранная папка.",
             footerEn: "Opens the last selected folder on launch."),

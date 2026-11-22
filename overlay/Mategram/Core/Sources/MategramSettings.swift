@@ -103,6 +103,7 @@ public enum MategramKey: String, CaseIterable {
     case ghostChatButtons
     case appleSpeech
     case chatTranslateFree
+    case compactFolders
 
     public var defaultValue: Bool {
         switch self {
@@ -150,6 +151,7 @@ public final class MategramSettings {
 
 public enum MategramTextKey: String, CaseIterable {
     case filterWords
+    case customFont
 }
 
 extension MategramSettings {

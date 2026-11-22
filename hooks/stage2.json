@@ -2563,6 +2563,58 @@
         "if info.isPremium || MategramSettings.shared.bool(.chatTranslateFree) {"
       ],
       "required": true
+    },
+    {
+      "id": "m9.ctabs.import",
+      "file": "submodules/TelegramUI/Components/HorizontalTabsComponent/Sources/HorizontalTabsComponent.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctabs.build",
+      "file": "submodules/TelegramUI/Components/HorizontalTabsComponent/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "deps = [",
+        "occurrence": 1
+      },
+      "text": [
+        "    \"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.ctabs.inset",
+      "file": "submodules/TelegramUI/Components/HorizontalTabsComponent/Sources/HorizontalTabsComponent.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let sideInset: CGFloat = 16.0",
+        "occurrence": 1
+      },
+      "text": [
+        "let sideInset: CGFloat = MategramSettings.shared.bool(.compactFolders) ? 9.0 : 16.0"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.font.install",
+      "file": "submodules/TelegramUI/Sources/AppDelegate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "testIsLaunched = true",
+        "occurrence": 1
+      },
+      "text": [
+        "mategramInstallCustomFont()"
+      ],
+      "required": true
     }
   ]
 }
