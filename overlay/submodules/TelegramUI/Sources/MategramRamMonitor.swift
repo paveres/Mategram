@@ -7,7 +7,7 @@ private final class MategramRamMonitor: NSObject {
 
     private weak var hostView: UIView?
     private let label = UILabel()
-    private var timer: Timer?
+    private var timer: Foundation.Timer?
 
     init(hostView: UIView) {
         self.hostView = hostView
@@ -20,7 +20,7 @@ private final class MategramRamMonitor: NSObject {
         self.label.clipsToBounds = true
         self.label.isUserInteractionEnabled = false
         self.label.layer.zPosition = 10000.0
-        let timer = Timer(timeInterval: 2.0, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
+        let timer = Foundation.Timer(timeInterval: 2.0, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
         self.tick()

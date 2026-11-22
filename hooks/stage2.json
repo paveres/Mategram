@@ -1892,7 +1892,7 @@
         ]
       },
       "text": [
-        "self.backgroundColor = .clear"
+        "self.backgroundColor = backgroundColor.withAlphaComponent(0.0)"
       ],
       "required": true
     },

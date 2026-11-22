@@ -50,7 +50,7 @@ final class MategramProfileBackdrop: NSObject {
     private var currentPeerId: EnginePeer.Id?
     private var currentRepresentation: TelegramMediaImageRepresentation?
     private weak var rootView: UIView?
-    private var timer: Timer?
+    private var timer: Foundation.Timer?
     private var clearColors: [UIColor] = []
     private var itemColor: UIColor?
     private var isDark = true
@@ -77,7 +77,7 @@ final class MategramProfileBackdrop: NSObject {
         }
         self.rootView = view
         if self.timer == nil {
-            let timer = Timer(timeInterval: 0.4, target: self, selector: #selector(self.timerFired), userInfo: nil, repeats: true)
+            let timer = Foundation.Timer(timeInterval: 0.4, target: self, selector: #selector(self.timerFired), userInfo: nil, repeats: true)
             RunLoop.main.add(timer, forMode: .common)
             self.timer = timer
         }
