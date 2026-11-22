@@ -111,6 +111,7 @@ public enum MategramKey: String, CaseIterable {
     case muteMentionNotifications
     case swipeUpCamera
     case ghostTypingFollowsOnline
+    case hideNotificationAccount
 
     public var defaultValue: Bool {
         switch self {
@@ -136,9 +137,17 @@ public final class MategramSettings {
         }
         self.defaults.register(defaults: registered)
         MategramVault.restoreIfNeeded(defaults: self.defaults)
+        MategramSettings.mirrorToGroup(self.defaults.bool(forKey: MategramSettings.storageKey(.hideNotificationAccount)))
         DispatchQueue.main.async {
             MategramVault.save()
         }
+    }
+
+    private static func mirrorToGroup(_ value: Bool) {
+        guard let identifier = Bundle.main.bundleIdentifier else {
+            return
+        }
+        UserDefaults(suiteName: "group.\(identifier)")?.set(value, forKey: "mategram.hideNotificationAccount")
     }
 
     private static func storageKey(_ key: MategramKey) -> String {
@@ -152,6 +161,9 @@ public final class MategramSettings {
     public func set(_ value: Bool, for key: MategramKey) {
         self.defaults.set(value, forKey: MategramSettings.storageKey(key))
         MategramVault.save()
+        if key == .hideNotificationAccount {
+            MategramSettings.mirrorToGroup(value)
+        }
         NotificationCenter.default.post(name: MategramSettings.didChangeNotification, object: nil)
     }
 }

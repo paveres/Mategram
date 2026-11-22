@@ -2770,6 +2770,19 @@
         ""
       ],
       "required": true
+    },
+    {
+      "id": "m9.notif.account",
+      "file": "Telegram/NotificationService/Sources/NotificationService.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if notificationsNameRecipientAccount(records: records.records, notificationsFromAllAccounts: inAppNotificationSettings.displayNotificationsFromAllAccounts, isCurrentAccount: isCurrentAccount) {",
+        "occurrence": 1
+      },
+      "text": [
+        "if notificationsNameRecipientAccount(records: records.records, notificationsFromAllAccounts: inAppNotificationSettings.displayNotificationsFromAllAccounts, isCurrentAccount: isCurrentAccount) && !(UserDefaults(suiteName: \"group.\" + (Bundle.main.bundleIdentifier ?? \"\").components(separatedBy: \".\").dropLast().joined(separator: \".\"))?.bool(forKey: \"mategram.hideNotificationAccount\") ?? false) {"
+      ],
+      "required": true
     }
   ]
 }
