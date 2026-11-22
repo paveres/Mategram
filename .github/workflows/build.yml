@@ -187,14 +187,6 @@ jobs:
             echo
             echo "$CHANGES" | grep -v -i "сборк" | awk '!seen[$0]++' | sed 's/^/* /'
             echo
-            echo "### Установка"
-            echo
-            echo "* Скачайте файл \`Mategram_$VERSION.ipa\`."
-            echo "* Откройте его в Sideloadly и войдите под своим Apple ID. Приложение подписывается вашим аккаунтом."
-            echo "* Бесплатный Apple ID подписывает приложение на 7 дней, потом его нужно переустановить поверх."
-            echo
-            echo "Контрольная сумма опубликована в \`SHA256SUMS\`. Проверка: \`shasum -a 256 -c SHA256SUMS\`."
-            echo "Проверена сборка Release. Установка на разные модели iPhone не проверялась."
             if [ -n "$PREV" ]; then
               echo "[Изменения после $PREV](https://github.com/$REPO/compare/$PREV...$TAG)."
             fi
