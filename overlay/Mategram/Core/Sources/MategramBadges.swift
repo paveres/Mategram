@@ -311,36 +311,3 @@ final class MategramBadgeStream: NSObject, URLSessionDataDelegate, @unchecked Se
         MategramBadges.applyEvent(userId: userId, badge: object["badge"] as? [String: Any])
     }
 }
-
-public enum MategramInstalls {
-    private static let key = "mategram.installs.sent"
-
-    public static func hello(userId: Int64) {
-        guard userId > 0, let url = URL(string: "https://api.mates.wtf/v1/hello") else {
-            return
-        }
-        var sent = UserDefaults.standard.dictionary(forKey: key) as? [String: Double] ?? [:]
-        let now = Date().timeIntervalSince1970
-        let build = Int(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "") ?? 0
-        let marker = "\(userId)"
-        if let last = sent[marker], now - last < 6.0 * 3600.0, UserDefaults.standard.integer(forKey: key + ".build") == build {
-            return
-        }
-        sent[marker] = now
-        UserDefaults.standard.set(sent, forKey: key)
-        UserDefaults.standard.set(build, forKey: key + ".build")
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 15.0
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: ["users": [userId], "build": build, "version": version])
-        URLSession.shared.dataTask(with: request) { _, response, _ in
-            if (response as? HTTPURLResponse)?.statusCode != 200 {
-                var current = UserDefaults.standard.dictionary(forKey: key) as? [String: Double] ?? [:]
-                current.removeValue(forKey: marker)
-                UserDefaults.standard.set(current, forKey: key)
-            }
-        }.resume()
-    }
-}

@@ -33,7 +33,6 @@ private let mategramUpdateSkipKey = "mategram.update.skipped"
 func mategramCheckForUpdate(context: AccountContext, present: @escaping (ViewController) -> Void) {
     MategramUpdateState.lastContext = context
     MategramUpdateState.lastPresent = present
-    MategramInstalls.hello(userId: context.account.peerId.id._internalGetInt64Value())
     if MategramUpdateState.timer == nil {
         let timer = Foundation.Timer(timeInterval: 60.0, target: MategramUpdateTicker.shared, selector: #selector(MategramUpdateTicker.tick), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: .common)
