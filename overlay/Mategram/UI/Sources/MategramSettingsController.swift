@@ -165,6 +165,7 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case valueCustom(index: Int32, section: Int32, key: MategramValueKey, text: String, placeholder: String)
     case fontRow(index: Int32, section: Int32, title: String, value: String)
     case fontOption(index: Int32, section: Int32, family: String, title: String, checked: Bool)
+    case infoRow(index: Int32, section: Int32, title: String, value: String)
 
     var section: ItemListSectionId {
         switch self {
@@ -193,6 +194,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .fontRow(_, section, _, _):
             return section
         case let .fontOption(_, section, _, _, _):
+            return section
+        case let .infoRow(_, section, _, _):
             return section
         }
     }
@@ -224,6 +227,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .fontRow(index, _, _, _):
             return index
         case let .fontOption(index, _, _, _, _):
+            return index
+        case let .infoRow(index, _, _, _):
             return index
         }
     }
@@ -286,6 +291,8 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             return ItemListCheckboxItem(presentationData: presentationData, systemStyle: .glass, title: title, style: .left, checked: checked, zeroSeparatorInsets: false, sectionId: section, action: {
                 arguments.setFont(family)
             })
+        case let .infoRow(_, section, title, value):
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: title, label: value, sectionId: section, style: .blocks, disclosureStyle: .none, action: nil)
         }
     }
 }
@@ -317,6 +324,32 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
     var sectionId: Int32 = 0
     if section == .liquidGlass {
         entries.append(.preview(section: 0, glass: MategramSettings.shared.bool(.glassMessages)))
+    }
+    if section == .ghost {
+        let isRussian = language == .russian
+        let ghostOn = settings.bool(.ghostMode)
+        func state(_ hidden: Bool) -> String {
+            if isRussian {
+                return hidden ? "Скрыто" : "Видно"
+            }
+            return hidden ? "Hidden" : "Visible"
+        }
+        sectionId += 1
+        index += 1
+        entries.append(.textHeader(index: index, section: sectionId, text: isRussian ? "КАК ВАС ВИДЯТ" : "HOW OTHERS SEE YOU"))
+        let rows: [(String, String, Bool)] = [
+            ("Прочтение сообщений", "Message reads", ghostOn && settings.bool(.ghostRead)),
+            ("«Печатает»", "Typing", ghostOn && (settings.bool(.ghostTyping) || (settings.bool(.ghostOnline) && settings.bool(.ghostTypingFollowsOnline)))),
+            ("Онлайн", "Online", ghostOn && settings.bool(.ghostOnline)),
+            ("Просмотр историй", "Story views", ghostOn && settings.bool(.ghostStories)),
+            ("Прослушивание голосовых", "Voice listened", ghostOn && settings.bool(.ghostContents))
+        ]
+        for (ru, en, hidden) in rows {
+            index += 1
+            entries.append(.infoRow(index: index, section: sectionId, title: isRussian ? ru : en, value: state(hidden)))
+        }
+        index += 1
+        entries.append(.footer(index: index, section: sectionId, text: isRussian ? "Так собеседник видит ваши действия при текущих настройках." : "This is what the other side sees with the current settings."))
     }
     if section == .appearance {
         let family = settings.text(.customFont)
