@@ -2783,6 +2783,35 @@
         "if notificationsNameRecipientAccount(records: records.records, notificationsFromAllAccounts: inAppNotificationSettings.displayNotificationsFromAllAccounts, isCurrentAccount: isCurrentAccount) && !(UserDefaults(suiteName: \"group.\" + (Bundle.main.bundleIdentifier ?? \"\").components(separatedBy: \".\").dropLast().joined(separator: \".\"))?.bool(forKey: \"mategram.hideNotificationAccount\") ?? false) {"
       ],
       "required": true
+    },
+    {
+      "id": "m9.upload.import",
+      "file": "submodules/TelegramCore/Sources/Network/MultipartUpload.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.upload.parts",
+      "file": "submodules/TelegramCore/Sources/Network/MultipartUpload.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if increaseParallelParts {",
+        "before": [
+          "self.fileId = fileId",
+          ""
+        ]
+      },
+      "text": [
+        "if increaseParallelParts || MategramSettings.shared.bool(.fastUpload) {"
+      ],
+      "required": true
     }
   ]
 }
