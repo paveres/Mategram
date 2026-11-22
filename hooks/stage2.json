@@ -2723,7 +2723,14 @@
         ]
       },
       "text": [
-        "mategramStartAutoProxy(context: self.context)"
+        "mategramStartAutoProxy(context: self.context)",
+        "if MategramSettings.shared.bool(.swipeUpCamera), !(self.view.gestureRecognizers ?? []).contains(where: { $0.name == \"mategramSwipeUp\" }) {",
+        "    let mategramSwipe = UISwipeGestureRecognizer(target: self, action: #selector(self.mategramSwipeUpCamera(_:)))",
+        "    mategramSwipe.direction = .up",
+        "    mategramSwipe.numberOfTouchesRequired = 2",
+        "    mategramSwipe.name = \"mategramSwipeUp\"",
+        "    self.view.addGestureRecognizer(mategramSwipe)",
+        "}"
       ],
       "required": true
     },
@@ -2743,6 +2750,24 @@
         "if mategramSkipsNotification(EngineMessage(message)) {",
         "    return false",
         "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.swipecam.fn",
+      "file": "submodules/ChatListUI/Sources/ChatListController.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "fileprivate func openStoryCamera(fromList: Bool, gesturePullOffset: CGFloat? = nil, sourceView: UIView? = nil) {",
+        "occurrence": 1
+      },
+      "text": [
+        "@objc private func mategramSwipeUpCamera(_ recognizer: UISwipeGestureRecognizer) {",
+        "    if MategramSettings.shared.bool(.swipeUpCamera) {",
+        "        self.openStoryCamera(fromList: false)",
+        "    }",
+        "}",
+        ""
       ],
       "required": true
     }

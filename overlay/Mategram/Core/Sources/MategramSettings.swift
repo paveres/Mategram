@@ -109,6 +109,7 @@ public enum MategramKey: String, CaseIterable {
     case autoProxy
     case mutePinnedNotifications
     case muteMentionNotifications
+    case swipeUpCamera
 
     public var defaultValue: Bool {
         switch self {
