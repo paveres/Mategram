@@ -3507,6 +3507,19 @@
       "required": true
     },
     {
+      "id": "m13.av.fadeback",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.avatarListNode.listContainerNode.updateEntryIsHidden(entry: entry)"
+      },
+      "text": [
+        "mategramApplyBottomFade(to: self.avatarListNode.listContainerNode.view, enabled: self.isAvatarExpanded)",
+        "MategramProfileBackdrop.sweepAll()"
+      ],
+      "required": true
+    },
+    {
       "id": "m11.screen.import",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
       "action": "insert_after",

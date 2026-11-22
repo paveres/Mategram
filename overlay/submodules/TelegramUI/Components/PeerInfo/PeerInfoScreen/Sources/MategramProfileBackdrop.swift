@@ -165,6 +165,9 @@ final class MategramProfileBackdrop: NSObject {
         guard self.isActive, !self.clearColors.isEmpty else {
             return
         }
+        if self.displayLink == nil {
+            self.startBurst()
+        }
         var budget = 8000
         self.visit(rootView, budget: &budget)
     }
