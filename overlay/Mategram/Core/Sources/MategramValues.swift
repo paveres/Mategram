@@ -210,3 +210,46 @@ public enum MategramVault {
         }
     }
 }
+
+public enum MategramSecureStore {
+    private static let service = "app.mategram.sessions"
+
+    private static func query(_ account: String) -> [String: Any] {
+        return [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+    }
+
+    public static func set(_ data: Data, account: String) {
+        let base = query(account)
+        let attributes: [String: Any] = [
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        ]
+        let status = SecItemUpdate(base as CFDictionary, attributes as CFDictionary)
+        if status == errSecItemNotFound {
+            var item = base
+            for (key, value) in attributes {
+                item[key] = value
+            }
+            SecItemAdd(item as CFDictionary, nil)
+        }
+    }
+
+    public static func get(account: String) -> Data? {
+        var request = query(account)
+        request[kSecReturnData as String] = true
+        request[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: AnyObject?
+        guard SecItemCopyMatching(request as CFDictionary, &result) == errSecSuccess else {
+            return nil
+        }
+        return result as? Data
+    }
+
+    public static func remove(account: String) {
+        SecItemDelete(query(account) as CFDictionary)
+    }
+}

@@ -2812,6 +2812,35 @@
         "if increaseParallelParts || MategramSettings.shared.bool(.fastUpload) {"
       ],
       "required": true
+    },
+    {
+      "id": "m9.sess.restore",
+      "file": "submodules/TelegramUI/Sources/AppDelegate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.accountManager = accountManager",
+        "occurrence": 1
+      },
+      "text": [
+        "mategramRestoreSessions(accountManager: accountManager)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.sess.store",
+      "file": "submodules/TelegramUI/Sources/SharedAccountContext.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "})",
+        "before": [
+          "attributes.append(.backupData(AccountBackupDataAttribute(data: backupData)))",
+          "return AccountRecord(id: record.id, attributes: attributes, temporarySessionId: record.temporarySessionId)"
+        ]
+      },
+      "text": [
+        "mategramStoreSessions(transaction.getRecords())"
+      ],
+      "required": true
     }
   ]
 }
