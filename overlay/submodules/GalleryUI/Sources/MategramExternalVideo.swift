@@ -1,11 +1,10 @@
 import Foundation
 import UIKit
-import Postbox
 import TelegramCore
 import AccountContext
 
-func mategramOpenVideoExternally(context: AccountContext, message: Message, from controller: UIViewController?) {
-    guard let controller, let file = message.media.first(where: { $0 is TelegramMediaFile }) as? TelegramMediaFile, let path = context.account.postbox.mediaBox.completedResourcePath(file.resource) else {
+func mategramOpenVideoExternally(context: AccountContext, message: EngineMessage, from controller: UIViewController?) {
+    guard let controller, let file = message.media.first(where: { $0 is TelegramMediaFile }) as? TelegramMediaFile, let path = context.engine.resources.completedResourcePath(id: EngineMediaResource.Id(file.resource.id)) else {
         return
     }
     var ext = "mp4"

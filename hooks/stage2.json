@@ -1731,7 +1731,7 @@
         "        guard let self else {",
         "            return",
         "        }",
-        "        mategramOpenVideoExternally(context: self.context, message: message, from: self.view.window?.rootViewController)",
+        "        mategramOpenVideoExternally(context: self.context, message: EngineMessage(message), from: self.view.window?.rootViewController)",
         "    })))",
         "}"
       ],
