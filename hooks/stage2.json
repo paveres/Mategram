@@ -2841,6 +2841,48 @@
         "mategramStoreSessions(transaction.getRecords())"
       ],
       "required": true
+    },
+    {
+      "id": "m9.fmt.extra1",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "let formatMenu = UIMenu(title: self.strings?.TextFormat_Format ?? \"Format\", image: nil, children: children)",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.formatExtras) {",
+        "    let mategramRu = self.strings?.baseLanguageCode.hasPrefix(\"ru\") ?? false",
+        "    children.append(UIAction(title: mategramRu ? \"Выделить всё\" : \"Select All\", image: nil) { _ in",
+        "        UIApplication.shared.sendAction(#selector(UIResponder.selectAll(_:)), to: nil, from: nil, for: nil)",
+        "    })",
+        "    children.append(UIAction(title: mategramRu ? \"Отменить\" : \"Undo\", image: nil) { [weak self] _ in",
+        "        self?.richTextInputNode?.view.undoManager?.undo()",
+        "    })",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m9.fmt.extra2",
+      "file": "submodules/TelegramUI/Components/Chat/ChatTextInputPanelNode/Sources/ChatTextInputPanelNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "let formatMenu = UIMenu(title: self.strings?.TextFormat_Format ?? \"Format\", image: nil, children: children)",
+        "occurrence": 2
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.formatExtras) {",
+        "    let mategramRu = self.strings?.baseLanguageCode.hasPrefix(\"ru\") ?? false",
+        "    children.append(UIAction(title: mategramRu ? \"Выделить всё\" : \"Select All\", image: nil) { _ in",
+        "        UIApplication.shared.sendAction(#selector(UIResponder.selectAll(_:)), to: nil, from: nil, for: nil)",
+        "    })",
+        "    children.append(UIAction(title: mategramRu ? \"Отменить\" : \"Undo\", image: nil) { [weak self] _ in",
+        "        self?.richTextInputNode?.view.undoManager?.undo()",
+        "    })",
+        "}"
+      ],
+      "required": true
     }
   ]
 }
