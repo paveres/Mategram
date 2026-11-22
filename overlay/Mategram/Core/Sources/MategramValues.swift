@@ -6,6 +6,7 @@ public enum MategramValueKey: String, CaseIterable {
     case onlineInterval
     case stickerSize
     case maxPinnedPreview
+    case peekDuration
 
     public var defaultValue: Int {
         switch self {
@@ -17,6 +18,8 @@ public enum MategramValueKey: String, CaseIterable {
             return 70
         case .maxPinnedPreview:
             return 2
+        case .peekDuration:
+            return 10
         }
     }
 
@@ -30,6 +33,8 @@ public enum MategramValueKey: String, CaseIterable {
             return [40, 50, 60, 70, 80, 90, 120, 150]
         case .maxPinnedPreview:
             return [1, 2, 3]
+        case .peekDuration:
+            return [5, 10, 15, 30, 60]
         }
     }
 
@@ -43,13 +48,15 @@ public enum MategramValueKey: String, CaseIterable {
             return 20 ... 200
         case .maxPinnedPreview:
             return 1 ... 3
+        case .peekDuration:
+            return 3 ... 600
         }
     }
 
     public func format(_ value: Int, _ language: MategramLanguage) -> String {
         let isRussian = language == .russian
         switch self {
-        case .sendDelay, .onlineInterval:
+        case .sendDelay, .onlineInterval, .peekDuration:
             if value >= 3600 && value % 3600 == 0 {
                 return isRussian ? "\(value / 3600) ч" : "\(value / 3600) h"
             } else if value >= 60 && value % 60 == 0 {
@@ -86,6 +93,7 @@ public extension MategramCatalog {
     static let valueOptions: [MategramValueOption] = [
         MategramValueOption(key: .sendDelay, section: .ghost, titleRu: "Время задержки", titleEn: "Delay time", footerRu: "Насколько откладывать отправку при включённой задержке.", footerEn: "How long sending is delayed when the delay is on."),
         MategramValueOption(key: .onlineInterval, section: .ghost, titleRu: "Интервал «в сети»", titleEn: "Online interval", footerRu: "Как часто обновлять статус «в сети» для «Всегда в сети».", footerEn: "How often the online status is refreshed for «Always online»."),
+        MategramValueOption(key: .peekDuration, section: .ghost, titleRu: "Время подглядывания", titleEn: "Peek duration", footerRu: "Сколько держать «был(а)» открытым при «Подглядеть онлайн».", footerEn: "How long last seen stays open for «Peek last seen»."),
         MategramValueOption(key: .stickerSize, section: .chat, titleRu: "Размер стикеров", titleEn: "Sticker size", footerRu: "Размер стикеров при включённых маленьких стикерах.", footerEn: "Sticker size when small stickers are on.")
     ]
 

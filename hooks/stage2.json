@@ -2241,6 +2241,19 @@
         "let timer = SignalKitTimer(timeout: MategramGhost.keepsOnline() ? MategramGhost.onlineInterval : 30.0, repeat: false, completion: { [weak self] in"
       ],
       "required": true
+    },
+    {
+      "id": "m9.ram.start",
+      "file": "submodules/TelegramUI/Sources/AppDelegate.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.nativeWindow = window",
+        "occurrence": 1
+      },
+      "text": [
+        "mategramStartRamMonitor(hostView: hostView.containerView)"
+      ],
+      "required": true
     }
   ]
 }

@@ -98,10 +98,12 @@ public enum MategramKey: String, CaseIterable {
     case noDoubleTapReaction
     case hideSponsored
     case hideChatListStatus
+    case peekOnline
+    case ramMonitor
 
     public var defaultValue: Bool {
         switch self {
-        case .showProfileId, .showDataCenter, .showRegistrationDate, .preciseLastSeen, .roundProfileButtons, .ghostRead, .ghostTyping, .ghostOnline, .ghostStories, .ghostContents:
+        case .peekOnline, .showProfileId, .showDataCenter, .showRegistrationDate, .preciseLastSeen, .roundProfileButtons, .ghostRead, .ghostTyping, .ghostOnline, .ghostStories, .ghostContents:
             return true
         default:
             return false

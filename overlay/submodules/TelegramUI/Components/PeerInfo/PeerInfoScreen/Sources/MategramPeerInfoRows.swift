@@ -137,12 +137,26 @@ func mategramPeerInfoItems(
 
 func mategramGhostMenuItems(context: AccountContext, peer: EnginePeer, presentationData: PresentationData) -> [ContextMenuItem] {
     let settings = MategramSettings.shared
-    if peer.id == context.account.peerId || !settings.bool(.ghostMode) {
+    if peer.id == context.account.peerId {
         return []
     }
     let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
     let isRussian = language == .russian
     var items: [ContextMenuItem] = []
+    if case .user = peer, settings.bool(.peekOnline) {
+        items.append(.action(ContextMenuActionItem(text: isRussian ? "Подглядеть онлайн" : "Peek last seen", icon: { theme in
+            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Eye"), color: theme.contextMenu.primaryColor)
+        }, action: { _, f in
+            f(.default)
+            mategramPeekOnline(context: context, presentationData: presentationData, isRussian: isRussian)
+        })))
+    }
+    if !settings.bool(.ghostMode) {
+        if !items.isEmpty {
+            items.append(.separator)
+        }
+        return items
+    }
     let peerKey = peer.id.toInt64()
     let isOn = !MategramGhost.isException(peer: peerKey)
     items.append(.action(ContextMenuActionItem(text: isRussian ? "Призрак в этом чате" : "Ghost in this chat", icon: { theme in
@@ -178,4 +192,24 @@ func mategramGhostMenuItems(context: AccountContext, peer: EnginePeer, presentat
     }
     items.append(.separator)
     return items
+}
+
+private func mategramPeekOnline(context: AccountContext, presentationData: PresentationData, isRussian: Bool) {
+    let engine = context.engine
+    let seconds = MategramSettings.shared.value(.peekDuration)
+    let _ = (engine.privacy.requestAccountPrivacySettings()
+    |> take(1)
+    |> deliverOnMainQueue).startStandalone(next: { privacy in
+        let original = privacy.presence
+        let _ = (engine.privacy.updateSelectiveAccountPrivacySettings(type: .presence, settings: .enableEveryone(disableFor: [:]))
+        |> deliverOnMainQueue).startStandalone(completed: {
+            let text = isRussian ? "«Был(а)» открыт на \(seconds) сек" : "Last seen is open for \(seconds) sec"
+            context.sharedContext.mainWindow?.present(UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: text, timeout: nil, customUndoText: nil), elevatedLayout: false, animateInAsReplacement: false, action: { _ in
+                return false
+            }), on: .root)
+            Queue.mainQueue().after(Double(seconds), {
+                let _ = engine.privacy.updateSelectiveAccountPrivacySettings(type: .presence, settings: original).startStandalone()
+            })
+        })
+    })
 }
