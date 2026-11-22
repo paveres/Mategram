@@ -59,7 +59,7 @@ func mategramPeerInfoItems(
     if settings.bool(.showDataCenter) {
         var dataCenterText: String?
         if let number = mategramDataCenter(peer: peer) {
-            dataCenterText = "DC\(number)"
+            dataCenterText = "\(number)"
         }
         var countryText: String?
         if let cachedData = data.cachedData as? CachedUserData, let phoneCountry = cachedData.peerStatusSettings?.phoneCountry, !phoneCountry.isEmpty {

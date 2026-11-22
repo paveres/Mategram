@@ -50,7 +50,10 @@ final class MategramProfileBackdrop: NSObject {
 
     static func sweepAll() {
         for instance in instances.allObjects {
-            instance.sweep()
+            instance.sweepThrottled()
+            if instance.isActive && instance.displayLink == nil && CACurrentMediaTime() - instance.lastBurstStart > 4.0 {
+                instance.startBurst()
+            }
         }
     }
 
@@ -67,6 +70,9 @@ final class MategramProfileBackdrop: NSObject {
     private var isDark = true
     private var isActive = false
     private var lastSweep: Double = 0.0
+    private var displayLink: CADisplayLink?
+    private var burstUntil: Double = 0.0
+    private var lastBurstStart: Double = 0.0
 
     override init() {
         super.init()
@@ -82,6 +88,26 @@ final class MategramProfileBackdrop: NSObject {
     deinit {
         self.disposable.dispose()
         self.timer?.invalidate()
+        self.displayLink?.invalidate()
+    }
+
+    func startBurst() {
+        self.lastBurstStart = CACurrentMediaTime()
+        self.burstUntil = self.lastBurstStart + 2.0
+        if self.displayLink == nil {
+            let link = CADisplayLink(target: self, selector: #selector(self.displayLinkFired))
+            link.add(to: RunLoop.main, forMode: .common)
+            self.displayLink = link
+        }
+    }
+
+    @objc private func displayLinkFired() {
+        if CACurrentMediaTime() > self.burstUntil || self.rootView == nil {
+            self.displayLink?.invalidate()
+            self.displayLink = nil
+            return
+        }
+        self.sweep()
     }
 
     func attach(to view: UIView) {
@@ -252,6 +278,7 @@ final class MategramProfileBackdrop: NSObject {
         }
         self.isActive = true
         self.sweep()
+        self.startBurst()
         if self.currentPeerId == peer.id, let currentRepresentation = self.currentRepresentation, currentRepresentation == representation {
             return
         }

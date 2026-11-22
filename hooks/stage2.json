@@ -1612,7 +1612,7 @@
         "occurrence": 1
       },
       "text": [
-        "} else if let profileColor = peer?.effectiveProfileColor, !MategramSettings.shared.bool(.hideProfileColor) {"
+        "} else if let profileColor = peer?.effectiveProfileColor, !(MategramSettings.shared.bool(.hideProfileColor) || MategramDesign.keepAvatarExpanded) {"
       ],
       "required": true
     },
@@ -1625,7 +1625,7 @@
         "occurrence": 2
       },
       "text": [
-        "} else if let profileColor = peer?.effectiveProfileColor, !MategramSettings.shared.bool(.hideProfileColor) {"
+        "} else if let profileColor = peer?.effectiveProfileColor, !(MategramSettings.shared.bool(.hideProfileColor) || MategramDesign.keepAvatarExpanded) {"
       ],
       "required": true
     },
@@ -3566,6 +3566,94 @@
       },
       "text": [
         "let (panelHeight, panelOffset) = self.panel.update(layout: containerLayout, buttons: self.controller?.buttons ?? [], isSelecting: self.selectionCount > 0, selectionCount: self.selectionCount, elevateProgress: !hasPanel && !hasButton, hideButtons: (!self.isPanelVisible && self.panel.hasMediaAccessoryPanel) || (self.controller?.buttons.count ?? 0) <= 1, transition: transition)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.av.prop",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "func updateIsAvatarExpanded(_ isAvatarExpanded: Bool, transition: ContainedViewLayoutTransition) {",
+        "occurrence": 1
+      },
+      "text": [
+        "var mategramAllowCollapse = false",
+        ""
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.av.guard",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "func updateIsAvatarExpanded(_ isAvatarExpanded: Bool, transition: ContainedViewLayoutTransition) {",
+        "occurrence": 1
+      },
+      "text": [
+        "if !isAvatarExpanded && self.isAvatarExpanded && MategramDesign.keepAvatarExpanded && !self.mategramAllowCollapse {",
+        "    return",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.av.edit",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "self.state = self.state.withIsEditing(true)",
+        "occurrence": 1
+      },
+      "text": [
+        "self.headerNode.mategramAllowCollapse = true"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.av.editexit",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "strongSelf.state = strongSelf.state.withIsEditing(false).withUpdatingBio(nil).withUpdatingBirthDate(nil).withIsEditingBirthDate(false).withUpdatingNote(nil)",
+        "occurrence": 1
+      },
+      "text": [
+        "strongSelf.headerNode.mategramAllowCollapse = false",
+        "if let mategramPeer = strongSelf.data?.peer, mategramPeer.smallProfileImage != nil, strongSelf.chatLocation.threadId == nil {",
+        "    strongSelf.headerNode.updateIsAvatarExpanded(true, transition: .immediate)",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.av.delete",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "self.headerNode.updateIsAvatarExpanded(false, transition: .immediate)",
+        "before": [
+          "if dismiss {",
+          "if self.headerNode.isAvatarExpanded {"
+        ]
+      },
+      "text": [
+        "self.headerNode.mategramAllowCollapse = true"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.title.center",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let rawTitleFrame = titleFrame.offsetBy(dx: self.isAvatarExpanded ? titleExpandedHorizontalOffset : titleHorizontalOffset * titleScale, dy: 0.0)",
+        "occurrence": 1
+      },
+      "text": [
+        "let _ = titleExpandedHorizontalOffset",
+        "let rawTitleFrame = titleFrame.offsetBy(dx: titleHorizontalOffset * titleScale, dy: 0.0)"
       ],
       "required": true
     }

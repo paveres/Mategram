@@ -61,6 +61,7 @@ private final class MategramMusicCardItemNode: PeerInfoScreenItemNode {
         let height: CGFloat = 72.0
         let cardWidth = max(1.0, width - safeInsets.left - safeInsets.right)
         let frame = CGRect(origin: CGPoint(x: safeInsets.left, y: 0.0), size: CGSize(width: cardWidth, height: height))
+        self.clipsToBounds = true
         transition.updateFrame(node: self.cardNode, frame: frame)
         if let view = self.cardNode.view as? MategramMusicCardComponent.View {
             let _ = view.update(component: MategramMusicCardComponent(context: item.context, file: item.file, title: item.title, artist: item.artist, width: cardWidth), availableSize: frame.size)

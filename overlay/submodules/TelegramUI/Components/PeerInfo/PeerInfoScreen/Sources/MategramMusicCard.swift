@@ -48,7 +48,7 @@ final class MategramMusicCardComponent: Component {
 
     final class View: UIView {
         private let backgroundNode = TransformImageNode()
-        private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterialDark))
+        private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         private let dimView = UIView()
         private let coverNode = TransformImageNode()
         private let titleLabel = UILabel()
@@ -61,11 +61,11 @@ final class MategramMusicCardComponent: Component {
             self.clipsToBounds = true
             self.layer.cornerRadius = 26.0
             self.layer.cornerCurve = .continuous
-            self.backgroundColor = UIColor(white: 0.0, alpha: 0.3)
+            self.backgroundColor = UIColor(white: 0.1, alpha: 1.0)
             self.backgroundNode.contentAnimations = [.firstUpdate]
             self.addSubview(self.backgroundNode.view)
             self.addSubview(self.blurView)
-            self.dimView.backgroundColor = UIColor(white: 0.0, alpha: 0.25)
+            self.dimView.backgroundColor = UIColor(white: 0.0, alpha: 0.15)
             self.addSubview(self.dimView)
             self.coverNode.contentAnimations = [.firstUpdate]
             self.addSubview(self.coverNode.view)
@@ -82,18 +82,19 @@ final class MategramMusicCardComponent: Component {
         }
 
         func update(component: MategramMusicCardComponent, availableSize: CGSize) -> CGSize {
-            let size = CGSize(width: component.width, height: 68.0)
+            let size = CGSize(width: component.width, height: 72.0)
             if self.currentFileId != component.file.fileId.id {
                 self.currentFileId = component.file.fileId.id
                 let reference: FileMediaReference = .standalone(media: component.file)
                 let albumArt = SharedMediaPlaybackAlbumArt(thumbnailResource: ExternalMusicAlbumArtResource(file: reference, title: component.title, performer: component.artist, isThumbnail: true), fullSizeResource: ExternalMusicAlbumArtResource(file: reference, title: component.title, performer: component.artist, isThumbnail: false))
                 self.coverNode.setSignal(playerAlbumArt(engine: component.context.engine, fileReference: reference, albumArt: albumArt, thumbnail: false))
-                self.backgroundNode.setSignal(playerAlbumArt(engine: component.context.engine, fileReference: reference, albumArt: albumArt, thumbnail: true, drawPlaceholderWhenEmpty: false))
+                self.backgroundNode.setSignal(playerAlbumArt(engine: component.context.engine, fileReference: reference, albumArt: albumArt, thumbnail: false, drawPlaceholderWhenEmpty: false))
             }
-            let backgroundFrame = CGRect(x: -20.0, y: -size.width * 0.5 + size.height * 0.5, width: size.width + 40.0, height: size.width + 40.0)
+            let backgroundFrame = CGRect(x: 0.0, y: floor((size.height - size.width) / 2.0), width: size.width, height: size.width)
             self.backgroundNode.frame = backgroundFrame
             self.backgroundNode.asyncLayout()(TransformImageArguments(corners: ImageCorners(radius: 0.0), imageSize: backgroundFrame.size, boundingSize: backgroundFrame.size, intrinsicInsets: .zero))()
             self.blurView.frame = CGRect(origin: CGPoint(), size: size)
+            self.blurView.alpha = 0.55
             self.dimView.frame = CGRect(origin: CGPoint(), size: size)
 
             let coverSize = CGSize(width: 52.0, height: 52.0)
