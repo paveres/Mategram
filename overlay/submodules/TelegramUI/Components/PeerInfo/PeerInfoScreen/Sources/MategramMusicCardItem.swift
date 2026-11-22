@@ -38,6 +38,22 @@ private final class MategramMusicCardItemNode: PeerInfoScreenItemNode {
         self.addSubnode(self.cardNode)
     }
 
+    override func didLoad() {
+        super.didLoad()
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.cardTapped)))
+    }
+
+    @objc private func cardTapped() {
+        var current: ASDisplayNode? = self.supernode
+        while let node = current {
+            if let screenNode = node as? PeerInfoScreenNode {
+                screenNode.mategramOpenSavedMusic()
+                return
+            }
+            current = node.supernode
+        }
+    }
+
     override func update(context: AccountContext, width: CGFloat, safeInsets: UIEdgeInsets, presentationData: PresentationData, item: PeerInfoScreenItem, topItem: PeerInfoScreenItem?, bottomItem: PeerInfoScreenItem?, hasCorners: Bool, transition: ContainedViewLayoutTransition) -> CGFloat {
         guard let item = item as? MategramMusicCardItem else {
             return 10.0

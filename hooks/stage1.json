@@ -51,7 +51,7 @@
     {
       "id": "mate.info.section",
       "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift",
-      "action": "insert_after",
+      "action": "insert_before",
       "anchor": {
         "line": "case peerInfo",
         "before": [
@@ -193,7 +193,8 @@
         "return MategramBadges.emojiFileId(userId: user.id.id._internalGetInt64Value()).map { PeerEmojiStatus(content: .emoji(fileId: $0), expirationDate: nil) } ?? user.emojiStatus"
       ],
       "required": true,
-      "note": "client-only Mategram badge shown as emoji status"
+      "note": "client-only Mategram badge shown as emoji status",
+      "enabled": false
     },
     {
       "id": "mate.views.import",

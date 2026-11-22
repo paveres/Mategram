@@ -132,7 +132,7 @@ func mategramPeerInfoItems(
         }
     }
 
-    return result
+    return mategramCompactInfo(result)
 }
 
 func mategramGhostMenuItems(context: AccountContext, peer: EnginePeer, presentationData: PresentationData) -> [ContextMenuItem] {

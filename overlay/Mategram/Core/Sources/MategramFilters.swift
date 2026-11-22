@@ -136,3 +136,9 @@ public enum MategramDNS {
         return resolved
     }
 }
+
+public enum MategramDesign {
+    public static var keepAvatarExpanded: Bool {
+        return true
+    }
+}

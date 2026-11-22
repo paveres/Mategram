@@ -46,6 +46,7 @@ private func mategramSameColor(_ lhs: CGColor?, _ rhs: UIColor) -> Bool {
 
 final class MategramProfileBackdrop: NSObject {
     private static let instances = NSHashTable<MategramProfileBackdrop>.weakObjects()
+    private static let blurCache = NSCache<NSString, UIImage>()
 
     static func sweepAll() {
         for instance in instances.allObjects {
@@ -152,26 +153,57 @@ final class MategramProfileBackdrop: NSObject {
         if view.isHidden {
             return
         }
+        if let imageView = view as? UIImageView, imageView.image != nil, imageView.image?.renderingMode == .alwaysTemplate, let tint = imageView.tintColor, self.clearColors.contains(where: { mategramSameColor(tint.cgColor, $0) }) {
+            imageView.isHidden = true
+            return
+        }
         let color = view.backgroundColor?.cgColor
+        let size = view.bounds.size
         if self.clearColors.contains(where: { mategramSameColor(color, $0) }) {
             view.backgroundColor = .clear
-        } else if let itemColor = self.itemColor, mategramSameColor(color, itemColor), view.bounds.width > 40.0, view.bounds.height > 40.0, view.bounds.width < 600.0 {
+        } else if let itemColor = self.itemColor, mategramSameColor(color, itemColor) {
             view.backgroundColor = .clear
-            self.addGlass(to: view)
+            if size.width > 40.0, size.height > 40.0, size.width < 250.0 {
+                self.addGlass(to: view)
+            }
         } else if let glass = view.viewWithTag(mategramGlassTag), glass.superview === view {
             self.addGlass(to: view)
         }
         if let sublayers = view.layer.sublayers {
-            for layer in sublayers where layer.delegate == nil {
-                if self.clearColors.contains(where: { mategramSameColor(layer.backgroundColor, $0) }) {
-                    layer.backgroundColor = UIColor.clear.cgColor
-                } else if let itemColor = self.itemColor, mategramSameColor(layer.backgroundColor, itemColor) {
-                    layer.backgroundColor = UIColor(white: self.isDark ? 1.0 : 0.0, alpha: self.isDark ? 0.1 : 0.06).cgColor
-                }
+            for layer in sublayers where !(layer.delegate is UIView) {
+                self.visitLayer(layer, budget: &budget)
             }
         }
         for subview in view.subviews {
             self.visit(subview, budget: &budget)
+        }
+    }
+
+    private func visitLayer(_ layer: CALayer, budget: inout Int) {
+        if budget <= 0 || layer.isHidden {
+            return
+        }
+        budget -= 1
+        if !self.cornerImages.isEmpty, let contents = layer.contents {
+            let object = contents as AnyObject
+            if self.cornerImages.contains(where: { object === $0 }) {
+                layer.isHidden = true
+                return
+            }
+        }
+        if self.clearColors.contains(where: { mategramSameColor(layer.backgroundColor, $0) }) {
+            layer.backgroundColor = UIColor.clear.cgColor
+        } else if let itemColor = self.itemColor, mategramSameColor(layer.backgroundColor, itemColor) {
+            if layer.bounds.width >= 250.0 {
+                layer.backgroundColor = UIColor.clear.cgColor
+            } else {
+                layer.backgroundColor = UIColor(white: self.isDark ? 1.0 : 0.0, alpha: self.isDark ? 0.1 : 0.06).cgColor
+            }
+        }
+        if let sublayers = layer.sublayers {
+            for sublayer in sublayers where !(sublayer.delegate is UIView) {
+                self.visitLayer(sublayer, budget: &budget)
+            }
         }
     }
 
@@ -225,6 +257,14 @@ final class MategramProfileBackdrop: NSObject {
         }
         self.currentPeerId = peer.id
         self.currentRepresentation = representation
+        let cacheKey = "\(peer.id.toInt64())-\(representation.resource.id.stringRepresentation)" as NSString
+        if let cached = MategramProfileBackdrop.blurCache.object(forKey: cacheKey) {
+            self.imageView.image = cached
+            self.dimView.alpha = 1.0
+            self.disposable.set(nil)
+            self.sweep()
+            return
+        }
         self.disposable.set((peerAvatarCompleteImage(account: context.account, peer: peer, size: CGSize(width: 240.0, height: 240.0), round: false, drawLetters: false, blurred: false)
         |> mapToQueue { image -> Signal<UIImage?, NoError> in
             guard let image else {
@@ -240,8 +280,9 @@ final class MategramProfileBackdrop: NSObject {
             guard let self else {
                 return
             }
-            if image != nil {
+            if let image {
                 self.imageView.image = image
+                MategramProfileBackdrop.blurCache.setObject(image, forKey: cacheKey)
             }
             self.dimView.alpha = image == nil ? 0.0 : 1.0
             self.sweep()

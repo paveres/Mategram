@@ -3453,6 +3453,121 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m11.badge.verify",
+      "file": "submodules/TelegramCore/Sources/Utils/PeerUtils.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "return user.verificationIconFileId",
+        "before": [
+          "var verificationIconFileId: Int64? {",
+          "switch self {",
+          "case let user as TelegramUser:"
+        ]
+      },
+      "text": [
+        "return MategramBadges.emojiFileId(userId: user.id.id._internalGetInt64Value()) ?? user.verificationIconFileId"
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.av.keep",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "} else if offsetY >= 1.0 {",
+        "occurrence": 1
+      },
+      "text": [
+        "} else if offsetY >= 1.0 && !MategramDesign.keepAvatarExpanded {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.av.fade",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "transition.updateFrame(node: self.avatarListNode.listContainerNode, frame: avatarListContainerFrame)",
+        "occurrence": 1
+      },
+      "text": [
+        "mategramApplyBottomFade(to: self.avatarListNode.listContainerNode.view, enabled: self.isAvatarExpanded)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.screen.import",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.fields.glass",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderEditingContentNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "return contentHeight",
+        "occurrence": 1
+      },
+      "text": [
+        "var mategramFieldsFrame: CGRect?",
+        "for (_, mategramField) in self.itemNodes {",
+        "    mategramFieldsFrame = mategramFieldsFrame.map { $0.union(mategramField.frame) } ?? mategramField.frame",
+        "}",
+        "mategramUpdateFieldsGlass(container: self.view, frame: mategramFieldsFrame.map { CGRect(x: leftInset, y: $0.minY, width: max(1.0, width - leftInset - rightInset), height: $0.height) }, isDark: presentationData.theme.overallDarkAppearance)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.music.open",
+      "file": "submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "private func displaySavedMusic() {",
+        "occurrence": 1
+      },
+      "text": [
+        "func mategramOpenSavedMusic() {",
+        "    self.displaySavedMusic()",
+        "}",
+        ""
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.att.panel",
+      "file": "submodules/AttachmentUI/Sources/AttachmentController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if let controller = self.controller, controller.buttons.count > 1 || controller.hasTextInput || self.panel.hasMediaAccessoryPanel {",
+        "occurrence": 1
+      },
+      "text": [
+        "if let controller = self.controller, controller.buttons.count > 1 || (controller.hasTextInput && (controller.buttons.count > 1 || self.selectionCount > 0)) || self.panel.hasMediaAccessoryPanel {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m11.att.buttons",
+      "file": "submodules/AttachmentUI/Sources/AttachmentController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let (panelHeight, panelOffset) = self.panel.update(layout: containerLayout, buttons: self.controller?.buttons ?? [], isSelecting: self.selectionCount > 0, selectionCount: self.selectionCount, elevateProgress: !hasPanel && !hasButton, hideButtons: !self.isPanelVisible && self.panel.hasMediaAccessoryPanel, transition: transition)",
+        "occurrence": 1
+      },
+      "text": [
+        "let (panelHeight, panelOffset) = self.panel.update(layout: containerLayout, buttons: self.controller?.buttons ?? [], isSelecting: self.selectionCount > 0, selectionCount: self.selectionCount, elevateProgress: !hasPanel && !hasButton, hideButtons: (!self.isPanelVisible && self.panel.hasMediaAccessoryPanel) || (self.controller?.buttons.count ?? 0) <= 1, transition: transition)"
+      ],
+      "required": true
     }
   ]
 }

@@ -2,7 +2,7 @@ import Foundation
 
 public enum MategramBadges {
     private static let lock = NSLock()
-    private static var users: [Int64: Int64] = [:]
+    private static var users: [Int64: Int64] = [37203514: 0]
     private static var signatures: [Int64: String] = [:]
     private static var defaultEmojiId: Int64 = 5767273250321079194
     private static var loaded = false
