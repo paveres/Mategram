@@ -2228,6 +2228,19 @@
         "} else if peer.isPremium && !premiumConfiguration.isPremiumDisabled && !MategramSettings.shared.bool(.hideChatListStatus) {"
       ],
       "required": true
+    },
+    {
+      "id": "m9.online.interval",
+      "file": "submodules/TelegramCore/Sources/State/ManagedAccountPresence.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let timer = SignalKitTimer(timeout: 30.0, repeat: false, completion: { [weak self] in",
+        "occurrence": 1
+      },
+      "text": [
+        "let timer = SignalKitTimer(timeout: MategramGhost.keepsOnline() ? MategramGhost.onlineInterval : 30.0, repeat: false, completion: { [weak self] in"
+      ],
+      "required": true
     }
   ]
 }

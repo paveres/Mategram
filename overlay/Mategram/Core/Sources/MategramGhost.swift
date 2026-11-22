@@ -32,6 +32,7 @@ public enum MategramGhost {
         }
         exceptionsCache = set
         UserDefaults.standard.set(set.map { NSNumber(value: $0) }, forKey: exceptionsKey)
+        MategramVault.save()
     }
 
     private static var allowedReads = Set<Int64>()
@@ -81,6 +82,10 @@ public enum MategramGhost {
         return active(.ghostContents)
     }
 
+    public static var onlineInterval: Double {
+        return Double(MategramSettings.shared.value(.onlineInterval))
+    }
+
     public static func keepsOnline() -> Bool {
         let settings = MategramSettings.shared
         return settings.bool(.ghostMode) && settings.bool(.ghostAlwaysOnline) && !settings.bool(.ghostOnline)
@@ -109,7 +114,7 @@ public enum MategramGhost {
     }
 
     public static var sendDelay: Int32? {
-        return active(.ghostDelaySend) ? 12 : nil
+        return active(.ghostDelaySend) ? Int32(MategramSettings.shared.value(.sendDelay)) : nil
     }
 
     public static var showsServerReadAction: Bool {

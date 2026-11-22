@@ -137,6 +137,9 @@ private final class MategramSettingsArguments {
     let updateText: (MategramTextKey, String) -> Void
     let backup: (Bool) -> Void
     var context: AccountContext?
+    var openValue: (MategramValueKey) -> Void = { _ in }
+    var setValue: (MategramValueKey, Int) -> Void = { _, _ in }
+    var setValueSilently: (MategramValueKey, Int) -> Void = { _, _ in }
 
     init(toggle: @escaping (MategramKey, Bool) -> Void, openSection: @escaping (MategramSection) -> Void, updateText: @escaping (MategramTextKey, String) -> Void = { _, _ in }, backup: @escaping (Bool) -> Void = { _ in }) {
         self.toggle = toggle
@@ -155,6 +158,9 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
     case textInput(index: Int32, section: Int32, key: MategramTextKey, placeholder: String, value: String)
     case backupAction(index: Int32, section: Int32, isExport: Bool, title: String)
     case preview(section: Int32, glass: Bool)
+    case valueRow(index: Int32, section: Int32, key: MategramValueKey, title: String, value: String)
+    case valuePreset(index: Int32, section: Int32, key: MategramValueKey, value: Int, title: String, checked: Bool)
+    case valueCustom(index: Int32, section: Int32, key: MategramValueKey, text: String, placeholder: String)
 
     var section: ItemListSectionId {
         switch self {
@@ -173,6 +179,12 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
         case let .backupAction(_, section, _, _):
             return section
         case let .preview(section, _):
+            return section
+        case let .valueRow(_, section, _, _, _):
+            return section
+        case let .valuePreset(_, section, _, _, _, _):
+            return section
+        case let .valueCustom(_, section, _, _, _):
             return section
         }
     }
@@ -195,6 +207,12 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
             return index
         case .preview:
             return -1
+        case let .valueRow(index, _, _, _, _):
+            return index
+        case let .valuePreset(index, _, _, _, _, _):
+            return index
+        case let .valueCustom(index, _, _, _, _):
+            return index
         }
     }
 
@@ -233,6 +251,21 @@ private enum MategramSettingsEntry: ItemListNodeEntry {
                 return mategramChatPreviewItem(context: context, presentationData: context.sharedContext.currentPresentationData.with { $0 }, sectionId: section)
             }
             return ItemListTextItem(presentationData: presentationData, text: .plain(""), sectionId: section)
+        case let .valueRow(_, section, key, title, value):
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: title, label: value, sectionId: section, style: .blocks, action: {
+                arguments.openValue(key)
+            })
+        case let .valuePreset(_, section, key, value, title, checked):
+            return ItemListCheckboxItem(presentationData: presentationData, systemStyle: .glass, title: title, style: .left, checked: checked, zeroSeparatorInsets: false, sectionId: section, action: {
+                arguments.setValue(key, value)
+            })
+        case let .valueCustom(_, section, key, text, placeholder):
+            return ItemListSingleLineInputItem(presentationData: presentationData, systemStyle: .glass, title: NSAttributedString(), text: text, placeholder: placeholder, type: .number, sectionId: section, textUpdated: { value in
+                if let number = Int(value.trimmingCharacters(in: .whitespaces)) {
+                    arguments.setValueSilently(key, number)
+                }
+            }, action: {
+            })
         }
     }
 }
@@ -272,6 +305,13 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
         index += 1
         entries.append(.footer(index: index, section: sectionId, text: option.footer(language)))
     }
+    for option in MategramCatalog.valueOptions(in: section) {
+        sectionId += 1
+        index += 1
+        entries.append(.valueRow(index: index, section: sectionId, key: option.key, title: option.title(language), value: option.key.format(settings.value(option.key), language)))
+        index += 1
+        entries.append(.footer(index: index, section: sectionId, text: option.footer(language)))
+    }
     for option in MategramCatalog.textOptions(in: section) {
         sectionId += 1
         index += 1
@@ -280,6 +320,53 @@ private func mategramSectionEntries(section: MategramSection, language: Mategram
         entries.append(.textInput(index: index, section: sectionId, key: option.key, placeholder: option.placeholder(language), value: settings.text(option.key)))
     }
     return entries
+}
+
+private func mategramValueEntries(key: MategramValueKey, language: MategramLanguage) -> [MategramSettingsEntry] {
+    let current = MategramSettings.shared.value(key)
+    var entries: [MategramSettingsEntry] = []
+    var index: Int32 = 0
+    for preset in key.presets {
+        index += 1
+        entries.append(.valuePreset(index: index, section: 0, key: key, value: preset, title: key.format(preset, language), checked: preset == current))
+    }
+    index += 1
+    entries.append(.textHeader(index: index, section: 1, text: language == .russian ? "СВОЁ ЗНАЧЕНИЕ" : "CUSTOM VALUE"))
+    index += 1
+    let isSeconds = key == .sendDelay || key == .onlineInterval
+    let placeholder = isSeconds ? (language == .russian ? "Секунды" : "Seconds") : (language == .russian ? "Число" : "Number")
+    entries.append(.valueCustom(index: index, section: 1, key: key, text: key.presets.contains(current) ? "" : "\(current)", placeholder: placeholder))
+    index += 1
+    let lower = key.range.lowerBound
+    let upper = key.range.upperBound
+    entries.append(.footer(index: index, section: 1, text: language == .russian ? "От \(lower) до \(upper)." : "From \(lower) to \(upper)."))
+    return entries
+}
+
+private func mategramValueController(context: AccountContext, key: MategramValueKey, title: String, changed: @escaping () -> Void) -> ViewController {
+    let refresh = ValuePromise<Int>(0, ignoreRepeated: false)
+    var counter = 0
+    let arguments = MategramSettingsArguments(toggle: { _, _ in
+    }, openSection: { _ in
+    })
+    arguments.setValue = { key, value in
+        MategramSettings.shared.setValue(value, for: key)
+        counter += 1
+        refresh.set(counter)
+        changed()
+    }
+    arguments.setValueSilently = { key, value in
+        MategramSettings.shared.setValue(value, for: key)
+        changed()
+    }
+    let signal = combineLatest(queue: .mainQueue(), context.sharedContext.presentationData, refresh.get())
+    |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, Any)) in
+        let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
+        let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
+        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: mategramValueEntries(key: key, language: language), style: .blocks, animateChanges: false)
+        return (controllerState, (listState, arguments))
+    }
+    return ItemListController(context: context, state: signal)
 }
 
 private func mategramSettingsSignal(context: AccountContext, refresh: ValuePromise<Int>, arguments: MategramSettingsArguments, section: MategramSection?) -> Signal<(ItemListControllerState, (ItemListNodeState, Any)), NoError> {
@@ -315,7 +402,21 @@ private func mategramSectionController(context: AccountContext, section: Mategra
         MategramSettings.shared.setText(text, for: key)
     })
     arguments.context = context
-    return ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: section))
+    var pushImpl: ((ViewController) -> Void)?
+    arguments.openValue = { key in
+        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+        let language = MategramLanguage(code: presentationData.strings.baseLanguageCode)
+        let title = MategramCatalog.valueOptions.first(where: { $0.key == key })?.title(language) ?? ""
+        pushImpl?(mategramValueController(context: context, key: key, title: title, changed: {
+            counter += 1
+            refresh.set(counter)
+        }))
+    }
+    let controller = ItemListController(context: context, state: mategramSettingsSignal(context: context, refresh: refresh, arguments: arguments, section: section))
+    pushImpl = { [weak controller] next in
+        controller?.push(next)
+    }
+    return controller
 }
 
 public func mategramSettingsController(context: AccountContext) -> ViewController {

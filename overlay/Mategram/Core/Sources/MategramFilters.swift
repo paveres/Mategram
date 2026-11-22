@@ -52,7 +52,7 @@ public enum MategramPhone {
 
 public enum MategramLook {
     public static var stickerScale: CGFloat {
-        return MategramSettings.shared.bool(.smallStickers) ? 0.7 : 1.0
+        return MategramSettings.shared.bool(.smallStickers) ? CGFloat(MategramSettings.shared.value(.stickerSize)) / 100.0 : 1.0
     }
 
     public static func muted(_ color: UIColor) -> UIColor {

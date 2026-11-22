@@ -122,6 +122,10 @@ public final class MategramSettings {
             registered[MategramSettings.storageKey(key)] = key.defaultValue
         }
         self.defaults.register(defaults: registered)
+        MategramVault.restoreIfNeeded(defaults: self.defaults)
+        DispatchQueue.main.async {
+            MategramVault.save()
+        }
     }
 
     private static func storageKey(_ key: MategramKey) -> String {
@@ -134,6 +138,7 @@ public final class MategramSettings {
 
     public func set(_ value: Bool, for key: MategramKey) {
         self.defaults.set(value, forKey: MategramSettings.storageKey(key))
+        MategramVault.save()
         NotificationCenter.default.post(name: MategramSettings.didChangeNotification, object: nil)
     }
 }
@@ -156,6 +161,7 @@ extension MategramSettings {
         if key == .filterWords {
             MategramWordFilter.reset()
         }
+        MategramVault.save()
         NotificationCenter.default.post(name: MategramSettings.didChangeNotification, object: nil)
     }
 }

@@ -11,7 +11,12 @@ public enum MategramBackup {
         for key in MategramTextKey.allCases {
             texts[key.rawValue] = settings.text(key)
         }
-        let object: [String: Any] = ["app": "Mategram", "version": 1, "flags": flags, "texts": texts]
+        var values: [String: Int] = [:]
+        for key in MategramValueKey.allCases {
+            values[key.rawValue] = settings.value(key)
+        }
+        let exceptions = (UserDefaults.standard.array(forKey: "mategram.ghost.exceptions") as? [NSNumber]) ?? []
+        let object: [String: Any] = ["app": "Mategram", "version": 2, "flags": flags, "texts": texts, "values": values, "ghostExceptions": exceptions]
         guard let data = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), let string = String(data: data, encoding: .utf8) else {
             return ""
         }
@@ -34,6 +39,13 @@ public enum MategramBackup {
             for (name, value) in texts {
                 if let key = MategramTextKey(rawValue: name) {
                     settings.setText(value, for: key)
+                }
+            }
+        }
+        if let values = object["values"] as? [String: Int] {
+            for (name, value) in values {
+                if let key = MategramValueKey(rawValue: name) {
+                    settings.setValue(value, for: key)
                 }
             }
         }
