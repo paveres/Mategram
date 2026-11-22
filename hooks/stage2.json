@@ -2730,7 +2730,10 @@
         "    mategramSwipe.numberOfTouchesRequired = 2",
         "    mategramSwipe.name = \"mategramSwipeUp\"",
         "    self.view.addGestureRecognizer(mategramSwipe)",
-        "}"
+        "}",
+        "mategramCheckForUpdate(context: self.context, present: { [weak self] controller in",
+        "    self?.present(controller, in: .window(.root))",
+        "})"
       ],
       "required": true
     },

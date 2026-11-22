@@ -178,6 +178,7 @@ jobs:
           fi
           cp "$IPA_PATH" "Mategram_$VERSION.ipa"
           shasum -a 256 "Mategram_$VERSION.ipa" > SHA256SUMS
+          echo "{\"build\": ${{ github.run_number }}, \"version\": \"$VERSION\"}" > latest.json
           {
             echo "Mategram $TAG"
             echo
@@ -193,4 +194,4 @@ jobs:
           } > notes.md
           TITLE=$(head -n 1 notes.md)
           tail -n +2 notes.md > notes_body.md
-          gh release create "$TAG" "Mategram_$VERSION.ipa" SHA256SUMS -R "$REPO" --title "$TITLE" --notes-file notes_body.md
+          gh release create "$TAG" "Mategram_$VERSION.ipa" SHA256SUMS latest.json -R "$REPO" --title "$TITLE" --notes-file notes_body.md
