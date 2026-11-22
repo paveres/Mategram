@@ -129,6 +129,7 @@ public enum MategramKey: String, CaseIterable {
     case glassDarker
     case transparentMessages
     case semiTransparentMessages
+    case noHaptics
 
     public var defaultValue: Bool {
         switch self {

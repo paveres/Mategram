@@ -3720,6 +3720,21 @@
         "let canShareStory = controllerInteraction.shareStory != nil && !MategramSettings.shared.bool(.hideShareToStory)"
       ],
       "required": true
+    },
+    {
+      "id": "m12.haptics.off",
+      "file": "submodules/Display/Source/HapticFeedback.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private func withImpl(_ f: (HapticFeedbackImpl) -> Void) {",
+        "occurrence": 1
+      },
+      "text": [
+        "if UserDefaults.standard.bool(forKey: \"mategram.noHaptics\") {",
+        "    return",
+        "}"
+      ],
+      "required": true
     }
   ]
 }
