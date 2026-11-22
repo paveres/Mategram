@@ -50,8 +50,8 @@ final class MategramProfileBackdrop: NSObject {
 
     static func sweepAll() {
         for instance in instances.allObjects {
-            instance.sweepThrottled()
-            if instance.isActive && instance.displayLink == nil && CACurrentMediaTime() - instance.lastBurstStart > 4.0 {
+            instance.sweep()
+            if instance.isActive && instance.displayLink == nil {
                 instance.startBurst()
             }
         }
@@ -102,7 +102,12 @@ final class MategramProfileBackdrop: NSObject {
     }
 
     @objc private func displayLinkFired() {
-        if CACurrentMediaTime() > self.burstUntil || self.rootView == nil {
+        guard let rootView = self.rootView, self.isActive else {
+            self.displayLink?.invalidate()
+            self.displayLink = nil
+            return
+        }
+        if rootView.window == nil && CACurrentMediaTime() > self.burstUntil {
             self.displayLink?.invalidate()
             self.displayLink = nil
             return
@@ -111,7 +116,7 @@ final class MategramProfileBackdrop: NSObject {
     }
 
     func attach(to view: UIView) {
-        if self.imageView.superview !== view {
+        if self.imageView.superview !== view || view.subviews.first !== self.imageView {
             view.insertSubview(self.imageView, at: 0)
             view.insertSubview(self.dimView, aboveSubview: self.imageView)
         }
@@ -135,11 +140,10 @@ final class MategramProfileBackdrop: NSObject {
     }
 
     func sweepThrottled() {
-        let now = CACurrentMediaTime()
-        if now - self.lastSweep < 0.12 {
-            return
-        }
         self.sweep()
+        if self.isActive && self.displayLink == nil {
+            self.startBurst()
+        }
     }
 
     func sweep() {
@@ -148,6 +152,15 @@ final class MategramProfileBackdrop: NSObject {
             self.timer?.invalidate()
             self.timer = nil
             return
+        }
+        if self.imageView.superview === rootView, rootView.subviews.first !== self.imageView {
+            rootView.sendSubviewToBack(self.dimView)
+            rootView.sendSubviewToBack(self.imageView)
+        }
+        if self.isActive, self.imageView.image != nil {
+            self.imageView.isHidden = false
+            self.imageView.alpha = 1.0
+            self.dimView.alpha = 1.0
         }
         guard self.isActive, !self.clearColors.isEmpty else {
             return
@@ -267,7 +280,10 @@ final class MategramProfileBackdrop: NSObject {
             }
         }
         self.cornerImages = corners
-        guard let peer, let representation = peer.smallProfileImage else {
+        guard let peer else {
+            return
+        }
+        guard let representation = peer.smallProfileImage else {
             self.isActive = false
             self.currentPeerId = nil
             self.currentRepresentation = nil
