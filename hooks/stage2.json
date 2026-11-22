@@ -3412,6 +3412,47 @@
         "} else if isRegularChat, strongSelf.nextChannelToReadDisposable == nil, !MategramSettings.shared.bool(.noNextChannel) {"
       ],
       "required": true
+    },
+    {
+      "id": "m10.menu.fromuser",
+      "file": "submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if !selectAll || messages.count == 1 {",
+        "before": [
+          "if !isPinnedMessages, !isReplyThreadHead, data.canSelect {",
+          "var didAddSeparator = false"
+        ]
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.menuSelectFromUser), let mategramAuthorId = message.author?.id {",
+        "    let mategramIsRu = chatPresentationInterfaceState.strings.baseLanguageCode.hasPrefix(\"ru\")",
+        "    if !actions.isEmpty && !didAddSeparator {",
+        "        didAddSeparator = true",
+        "        actions.append(.separator)",
+        "    }",
+        "    actions.append(.action(ContextMenuActionItem(text: mategramIsRu ? \"Выбрать все от пользователя\" : \"Select all from user\", icon: { theme in",
+        "        return generateTintedImage(image: UIImage(bundleImageName: \"Chat/Context Menu/SelectAll\"), color: theme.actionSheet.primaryTextColor)",
+        "    }, action: { _, f in",
+        "        var mategramThreadId: Int64?",
+        "        if case let .replyThread(replyThreadMessage) = chatPresentationInterfaceState.chatLocation {",
+        "            mategramThreadId = replyThreadMessage.threadId",
+        "        }",
+        "        let _ = (context.engine.messages.searchMessages(location: .peer(peerId: message.id.peerId, fromId: mategramAuthorId, tags: nil, reactions: nil, threadId: mategramThreadId, minDate: nil, maxDate: nil), query: \"\", state: nil, limit: 500)",
+        "        |> take(1)",
+        "        |> deliverOnMainQueue).startStandalone(next: { value in",
+        "            var ids = value.0.messages.filter { !$0.media.contains(where: { $0 is TelegramMediaAction }) }.map { $0.id }",
+        "            if !ids.contains(message.id) {",
+        "                ids.append(message.id)",
+        "            }",
+        "            interfaceInteraction.beginMessageSelection(ids, { transition in",
+        "                f(.custom(transition))",
+        "            })",
+        "        })",
+        "    })))",
+        "}"
+      ],
+      "required": true
     }
   ]
 }

@@ -123,6 +123,7 @@ public enum MategramKey: String, CaseIterable {
     case noDeleteSwipe
     case forceEmojiTab
     case noNextChannel
+    case menuSelectFromUser
 
     public var defaultValue: Bool {
         switch self {
