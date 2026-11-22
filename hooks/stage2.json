@@ -1736,6 +1736,49 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m7.share.import",
+      "file": "submodules/ShareController/Sources/ShareController.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.share.build",
+      "file": "submodules/ShareController/BUILD",
+      "action": "insert_after",
+      "anchor": {
+        "line": "\"//submodules/Postbox:Postbox\",",
+        "occurrence": 1
+      },
+      "text": [
+        "\"//Mategram/Core:MategramCore\","
+      ],
+      "required": true
+    },
+    {
+      "id": "m7.share.system",
+      "file": "submodules/ShareController/Sources/ShareController.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "self.immediateExternalShare = immediateExternalShare",
+        "occurrence": 1
+      },
+      "text": [
+        "var mategramImmediate = immediateExternalShare",
+        "if MategramSettings.shared.bool(.systemShare), case .url = subject {",
+        "    mategramImmediate = true",
+        "}",
+        "self.immediateExternalShare = mategramImmediate"
+      ],
+      "required": true
     }
   ]
 }
