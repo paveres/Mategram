@@ -3236,6 +3236,89 @@
         ""
       ],
       "required": true
+    },
+    {
+      "id": "m10.wide.posts",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageBubbleItemNode/Sources/ChatMessageBubbleItemNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "tmpWidth -= deliveryFailedInset",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.wideChannelPosts), let mategramChannel = item.message.peers[item.message.id.peerId] as? TelegramChannel, case .broadcast = mategramChannel.info {",
+        "    tmpWidth = baseWidth",
+        "    needsShareButton = false",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.dust.off",
+      "file": "submodules/TelegramUI/Sources/ChatHistoryListNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "self.mode = mode",
+        "occurrence": 1
+      },
+      "text": [
+        "if MategramSettings.shared.bool(.noDeleteEffect) {",
+        "    self.allowDustEffect = false",
+        "}"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.sticker.time1",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageStickerItemNode/Sources/ChatMessageStickerItemNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "strongSelf.dateAndStatusNode.isHidden = false",
+        "occurrence": 1
+      },
+      "text": [
+        "strongSelf.dateAndStatusNode.isHidden = MategramSettings.shared.bool(.hideStickerTime)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.sticker.time2",
+      "file": "submodules/TelegramUI/Components/Chat/ChatMessageAnimatedStickerItemNode/Sources/ChatMessageAnimatedStickerItemNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "strongSelf.dateAndStatusNode.isHidden = false",
+        "occurrence": 1
+      },
+      "text": [
+        "strongSelf.dateAndStatusNode.isHidden = MategramSettings.shared.bool(.hideStickerTime)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.swipe.del1",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListItem.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if canDelete {",
+        "occurrence": 1
+      },
+      "text": [
+        "if canDelete && !MategramSettings.shared.bool(.noDeleteSwipe) {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m10.swipe.del2",
+      "file": "submodules/ChatListUI/Sources/Node/ChatListItem.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "if canDelete {",
+        "occurrence": 2
+      },
+      "text": [
+        "if canDelete && !MategramSettings.shared.bool(.noDeleteSwipe) {"
+      ],
+      "required": true
     }
   ]
 }
