@@ -3656,6 +3656,61 @@
         "let rawTitleFrame = titleFrame.offsetBy(dx: titleHorizontalOffset * titleScale, dy: 0.0)"
       ],
       "required": true
+    },
+    {
+      "id": "m12.storyswipe.1",
+      "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "guard let self, self.availableFilters.count > 1 || (self.controller?.isStoryPostingAvailable == true && !(self.context.sharedContext.callManager?.hasActiveCall ?? false)) else {",
+        "occurrence": 1
+      },
+      "text": [
+        "guard let self, self.availableFilters.count > 1 || (self.controller?.isStoryPostingAvailable == true && !(self.context.sharedContext.callManager?.hasActiveCall ?? false) && !MategramSettings.shared.bool(.noStorySwipe)) else {"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.storyswipe.2",
+      "file": "submodules/ChatListUI/Sources/ChatListControllerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "&& !(self.context.sharedContext.callManager?.hasActiveCall ?? false)",
+        "before": [
+          "&& self.controller?.isStoryPostingAvailable == true"
+        ]
+      },
+      "text": [
+        "&& !(self.context.sharedContext.callManager?.hasActiveCall ?? false)",
+        "&& !MategramSettings.shared.bool(.noStorySwipe)"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.sharestory.import",
+      "file": "submodules/ShareController/Sources/SharePeersContainerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "import Foundation",
+        "occurrence": 1
+      },
+      "text": [
+        "import MategramCore"
+      ],
+      "required": true
+    },
+    {
+      "id": "m12.sharestory.hide",
+      "file": "submodules/ShareController/Sources/SharePeersContainerNode.swift",
+      "action": "replace",
+      "anchor": {
+        "line": "let canShareStory = controllerInteraction.shareStory != nil",
+        "occurrence": 1
+      },
+      "text": [
+        "let canShareStory = controllerInteraction.shareStory != nil && !MategramSettings.shared.bool(.hideShareToStory)"
+      ],
+      "required": true
     }
   ]
 }

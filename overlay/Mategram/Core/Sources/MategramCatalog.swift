@@ -17,6 +17,7 @@ public enum MategramSection: Int, CaseIterable {
     case time
     case security
     case settings
+    case backup
 
     public func title(_ language: MategramLanguage) -> String {
         switch (self, language) {
@@ -52,6 +53,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.security, .english): return "Privacy"
         case (.settings, .russian): return "Разделы настроек"
         case (.settings, .english): return "Settings sections"
+        case (.backup, .russian): return "Резервная копия"
+        case (.backup, .english): return "Backup"
         }
     }
 
@@ -89,6 +92,8 @@ public enum MategramSection: Int, CaseIterable {
         case (.security, .english): return "Phone number, sessions"
         case (.settings, .russian): return "Скрытие стандартных разделов"
         case (.settings, .english): return "Hide standard rows"
+        case (.backup, .russian): return "Вход и настройки в Keychain"
+        case (.backup, .english): return "Login and settings in Keychain"
         }
     }
 
@@ -110,6 +115,7 @@ public enum MategramSection: Int, CaseIterable {
         case .time: return "clock"
         case .security: return "lock"
         case .settings: return "eye.slash"
+        case .backup: return "externaldrive"
         }
     }
 }
@@ -285,7 +291,7 @@ public enum MategramCatalog {
         MategramOption(key: .hideBusinessBotPanel, section: .chat, titleRu: "Скрыть панель бизнес-бота", titleEn: "Hide business bot panel",
             footerRu: "Убирает плашку бота, который управляет чатом.",
             footerEn: "Removes the bar of the bot that manages the chat."),
-        MategramOption(key: .sessionBackup, section: .security, titleRu: "Вход после переустановки", titleEn: "Stay logged in after reinstall",
+        MategramOption(key: .sessionBackup, section: .backup, titleRu: "Вход после переустановки", titleEn: "Stay logged in after reinstall",
             footerRu: "Ключи входа хранятся в Keychain этого iPhone. После переустановки Mategram аккаунты войдут сами, без кода.",
             footerEn: "Login keys are kept in this iPhone's Keychain. After reinstalling Mategram your accounts log in by themselves."),
         MategramOption(key: .hidePhone, section: .security, titleRu: "Скрыть номер телефона", titleEn: "Hide phone number",
@@ -351,6 +357,9 @@ public enum MategramCatalog {
         MategramOption(key: .noDeleteSwipe, section: .chatList, titleRu: "Без «Удалить» в свайпе", titleEn: "No «Delete» on swipe",
             footerRu: "Свайп по чату не показывает кнопку удаления, чтобы не удалить случайно.",
             footerEn: "Swiping a chat does not show the delete button, so nothing is deleted by accident."),
+        MategramOption(key: .noStorySwipe, section: .chatList, titleRu: "Без свайпа в камеру историй", titleEn: "No swipe to story camera",
+            footerRu: "Свайп вправо по списку чатов не открывает камеру историй.",
+            footerEn: "Swiping right on the chat list does not open the story camera."),
         MategramOption(key: .hideChatsTitle, section: .chatList, titleRu: "Скрыть заголовок «Чаты»", titleEn: "Hide «Chats» title",
             footerRu: "Больше места в шапке списка чатов.",
             footerEn: "More room in the chat list header."),
@@ -396,6 +405,9 @@ public enum MategramCatalog {
         MategramOption(key: .confirmCalls, section: .calls, titleRu: "Подтверждать звонок", titleEn: "Confirm calls",
             footerRu: "Спрашивает «Позвонить?» перед звонком.",
             footerEn: "Asks «Call?» before dialing."),
+        MategramOption(key: .hideShareToStory, section: .chat, titleRu: "Скрыть «В историю» в «Поделиться»", titleEn: "Hide «To story» in share",
+            footerRu: "В окне «Поделиться» нет кнопки репоста в историю.",
+            footerEn: "The share sheet has no repost-to-story button."),
         MategramOption(key: .systemShare, section: .chat, titleRu: "Системное «Поделиться»", titleEn: "System share sheet",
             footerRu: "Ссылки отправляются через окно «Поделиться» iOS.",
             footerEn: "Links are shared with the iOS share sheet."),
