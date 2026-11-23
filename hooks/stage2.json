@@ -3842,6 +3842,64 @@
         "}"
       ],
       "required": true
+    },
+    {
+      "id": "m13.player.prop",
+      "file": "submodules/TelegramUI/Sources/OverlayAudioPlayerControllerNode.swift",
+      "action": "insert_after",
+      "anchor": {
+        "line": "private var peer: EnginePeer?"
+      },
+      "text": [
+        "private var mategramPlayer: MategramPlayerPage?"
+      ],
+      "required": true,
+      "note": "full player page of Mategram, always on"
+    },
+    {
+      "id": "m13.player.sync",
+      "file": "submodules/TelegramUI/Sources/OverlayAudioPlayerControllerNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "var layout = layout"
+      },
+      "text": [
+        "if self.mategramPlayer == nil {",
+        "let mategramPage = MategramPlayerPage(context: self.context, presentationData: self.presentationData, status: self.context.sharedContext.mediaManager.musicMediaPlayerState)",
+        "mategramPage.requestDismiss = { [weak self] in self?.requestDismiss() }",
+        "mategramPage.requestShare = { [weak self] in self?.controlsNode.sharePressed() }",
+        "mategramPage.requestArtist = { [weak self] artist in self?.requestSearchByArtist(artist) }",
+        "mategramPage.requestSetSaved = { [weak self] file, saved in",
+        "guard let self else { return }",
+        "if saved { self.addToSavedMusic(file: file) } else { self.removeFromSavedMusic(file: file) }",
+        "}",
+        "mategramPage.control = { [weak self] action in",
+        "guard let self else { return }",
+        "self.context.sharedContext.mediaManager.playlistControl(action, type: self.type)",
+        "}",
+        "self.contentNode.view.addSubview(mategramPage)",
+        "self.mategramPlayer = mategramPage",
+        "}",
+        "self.mategramPlayer?.frame = CGRect(origin: CGPoint(), size: layout.size)",
+        "self.mategramPlayer?.update(size: layout.size, topInset: max(layout.statusBarHeight ?? 0.0, layout.safeInsets.top), bottomInset: layout.intrinsicInsets.bottom, isSaved: self.isSaved, playlistToolbarHeight: controlsHeight)"
+      ],
+      "required": true,
+      "note": "creates and lays out the Mategram full player page over the standard playlist"
+    },
+    {
+      "id": "m13.player.pan",
+      "file": "submodules/TelegramUI/Sources/OverlayAudioPlayerControllerNode.swift",
+      "action": "insert_before",
+      "anchor": {
+        "line": "if self.historyFrameTopOverlayNode.bounds.contains(self.view.convert(point, to: self.historyFrameTopOverlayNode.view)) {"
+      },
+      "text": [
+        "if self.mategramPlayer?.isCovering == true {",
+        "return false",
+        "}"
+      ],
+      "required": true,
+      "note": "the sheet pan must not start while the page is shown"
     }
   ]
 }
